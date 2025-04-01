@@ -6,7 +6,7 @@ FCL-1.0
 
 ## Notice
 
-Copyright 2025-present LuoShuiTianYi
+Copyright © 2025-present LuoShuiTianYi. All Rights Reserved.
 
 ## Terms and Conditions
 
