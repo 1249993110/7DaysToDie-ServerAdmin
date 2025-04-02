@@ -1,9 +1,28 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net9.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>11.0</LangVersion>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
 
+	<ItemGroup>
+		<!--<PackageReference Include="IceCoffee.Common" Version="1.2.4" />
+		<PackageReference Include="IceCoffee.Cron" Version="1.0.6" />
+		<PackageReference Include="IceCoffee.Cron.DependencyInjection" Version="1.0.6" />
+		<PackageReference Include="RestSharp" Version="112.1.0" />-->
+		<PackageReference Include="NSwag.AspNetCore" Version="14.3.0" />
+		<PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+		<PackageReference Include="Serilog.Sinks.File.Archive" Version="1.0.6" />
+		<PackageReference Include="Mapster" Version="7.4.0" />
+		<PackageReference Include="FastExpressionCompiler" Version="5.1.0" />
+		<PackageReference Include="SkiaSharp" Version="3.116.1" />
+		<PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.116.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="wwwroot\" />
+	</ItemGroup>
 </Project>
