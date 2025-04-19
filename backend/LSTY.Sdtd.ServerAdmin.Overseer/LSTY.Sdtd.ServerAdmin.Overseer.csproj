@@ -1,36 +1,50 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-	  <TargetFramework>net48</TargetFramework>
-	  <ImplicitUsings>enable</ImplicitUsings>
-	  <Nullable>enable</Nullable>
-	  <LangVersion>11.0</LangVersion>
-	  <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
-	  <Platform>x64</Platform>
-	  <OutputType>Library</OutputType>
-	  <Authors>IceCoffee</Authors>
-	  <Company>LuoShuiTianYi</Company>
-	  <Copyright>Copyright © 2025-present LuoShuiTianYi. All Rights Reserved.</Copyright>
-	  <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-	  <PackageReadmeFile>README.md</PackageReadmeFile>
-	  <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-	  <PackageProjectUrl>https://github.com/1249993110/7DaysToDie-ServerAdmin</PackageProjectUrl>
-	  <RepositoryUrl>https://github.com/1249993110/7DaysToDie-ServerAdmin</RepositoryUrl>
-	  <Description></Description>
-	  <Version>1.0</Version>
-  </PropertyGroup>
-	
+	<PropertyGroup>
+		<TargetFramework>net48</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<LangVersion>11.0</LangVersion>
+		<RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
+		<Platform>x64</Platform>
+		<OutputType>Library</OutputType>
+		<Authors>IceCoffee</Authors>
+		<Company>LuoShuiTianYi</Company>
+		<Copyright>Copyright © 2025-present LuoShuiTianYi. All Rights Reserved.</Copyright>
+		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<PackageProjectUrl>https://github.com/1249993110/7DaysToDie-ServerAdmin</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/1249993110/7DaysToDie-ServerAdmin</RepositoryUrl>
+		<Description></Description>
+		<Version>1.0</Version>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<None Include="..\..\LICENSE.md" Pack="true" PackagePath="" Visible="false" />
 		<None Include="..\..\README.md" Pack="true" PackagePath="" Visible="false" />
 	</ItemGroup>
-	
+
 	<ItemGroup>
-	  <ProjectReference Include="..\LSTY.Sdtd.ServerAdmin.Shared\LSTY.Sdtd.ServerAdmin.Shared.csproj" />
+		<PackageReference Include="Microsoft.Bcl.Cryptography" Version="9.0.4" />
+		<PackageReference Include="BouncyCastle.Cryptography" Version="2.5.1" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.4" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.4" />
+		<PackageReference Include="PolySharp" Version="1.15.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\LSTY.Sdtd.ServerAdmin.Shared\LSTY.Sdtd.ServerAdmin.Shared.csproj" />
 	</ItemGroup>
 
 
 	<ItemGroup>
+		<None Update="Config\appsettings.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 		<None Update="ModInfo.xml">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
@@ -74,6 +88,13 @@
 		<Reference Include="WebServer">
 			<Private>false</Private>
 			<HintPath>7dtd-binaries\WebServer.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="System.Reflection.Emit">
+			<Private>true</Private>
+			<HintPath>$(SystemRoot)\Microsoft.NET\Framework64\v$(MSBuildRuntimeVersion)\System.Reflection.Emit.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 </Project>

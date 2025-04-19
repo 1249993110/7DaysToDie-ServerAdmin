@@ -1,9 +1,17 @@
 using FastExpressionCompiler;
+using LSTY.Sdtd.ServerAdmin.RpcClient.Extensions;
 using LSTY.Sdtd.ServerAdmin.WebApi.Middlewares;
+using LSTY.Sdtd.ServerAdmin.WebApi.Providers;
+using LSTY.Sdtd.ServerAdmin.Data.Extensions;
 using Microsoft.AspNetCore.HttpOverrides;
 using NSwag;
 using Serilog;
 using Serilog.Events;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Hosting;
+using LSTY.Sdtd.ServerAdmin.Services.Core;
+using LSTY.Sdtd.ServerAdmin.WebApi.NotificationPublishers;
+using LSTY.Sdtd.ServerAdmin.Services.Abstractions;
 
 namespace LSTY.Sdtd.ServerAdmin.WebApi
 {
@@ -38,7 +46,28 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
                 #region Services
 
                 // Add services to the container.
-                services.AddControllers();
+                services.AddControllers()
+                    .AddJsonOptions(options =>
+                    {
+                        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                        //options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
+                        //options.JsonSerializerOptions.Converters.Add(new DateTimeNullableConverter());
+                    });
+
+                services.AddRpcClientManager<RpcClientConfigProvider>();
+
+                services.AddRavenDb("RavenOptions");
+
+                services.AddSingleton<FunctionManager>();
+                services.AddSingleton<IFunctionSettingsProvider, FunctionSettingsProvider>();
+                
+                services.AddMediatR(cfg => 
+                { 
+                    cfg.RegisterServicesFromAssemblies(typeof(FunctionManager).Assembly);
+                    cfg.NotificationPublisherType = typeof(ParallelForeachPublisher);
+                });
+
+                services.AddMemoryCache();
 
                 #region Serilog
 
