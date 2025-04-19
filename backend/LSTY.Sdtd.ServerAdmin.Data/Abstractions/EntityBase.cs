@@ -1,7 +1,8 @@
 ﻿namespace LSTY.Sdtd.ServerAdmin.Data.Abstractions
 {
-    public abstract class EntityBase
+    public class EntityBase : Entity, ICreatedOn, IModifiedOn
     {
-        public required string Id { get; set; }
+        public required DateTime CreatedOn { get; set; }
+        public DateTime ModifiedOn { get; set; }
     }
 }

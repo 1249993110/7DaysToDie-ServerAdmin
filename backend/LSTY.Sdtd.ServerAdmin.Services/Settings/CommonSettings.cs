@@ -9,21 +9,21 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Settings
         /// <summary>
         /// Gets or sets the global server name.
         /// </summary>
-        public required string GlobalServerName { get; set; }
+        public string? GlobalServerName { get; set; }
 
         /// <summary>
         /// Gets or sets the whisper server name.
         /// </summary>
-        public required string WhisperServerName { get; set; }
+        public string? WhisperServerName { get; set; }
 
         /// <summary>
         /// Gets or sets the chat command prefix.
         /// </summary>
-        public required string ChatCommandPrefix { get; set; }
+        public string? ChatCommandPrefix { get; set; }
 
         /// <summary>
         /// Gets or sets the chat command separator.
         /// </summary>
-        public required string ChatCommandSeparator { get; set; }
+        public string? ChatCommandSeparator { get; set; }
     }
 }

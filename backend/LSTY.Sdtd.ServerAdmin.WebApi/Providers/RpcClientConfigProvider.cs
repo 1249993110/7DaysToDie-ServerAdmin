@@ -1,9 +1,7 @@
 ﻿using LSTY.Sdtd.ServerAdmin.Data.Entities;
 using LSTY.Sdtd.ServerAdmin.RpcClient.Abstractions;
 using LSTY.Sdtd.ServerAdmin.RpcClient.Models;
-using Raven.Client.Documents;
-using Raven.Client.Documents.Linq;
-using Raven.Client.Documents.Session;
+using MongoDB.Entities;
 using System.Security.Cryptography.X509Certificates;
 
 namespace LSTY.Sdtd.ServerAdmin.WebApi.Providers
@@ -13,67 +11,51 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Providers
     /// </summary>
     public class RpcClientConfigProvider : IRpcClientConfigProvider
     {
-        private readonly IConfiguration _configuration;
-        private readonly IServiceProvider _serviceProvider;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RpcClientConfigProvider"/> class.
-        /// </summary>
-        /// <param name="configuration"></param>
-        /// <param name="serviceProvider"></param>
-        public RpcClientConfigProvider(IConfiguration configuration, IServiceProvider serviceProvider)
-        {
-            _configuration = configuration;
-            _serviceProvider = serviceProvider;
-        }
-
         async Task<IEnumerable<RpcClientConfig>> IRpcClientConfigProvider.GetAllAsync(CancellationToken cancellationToken)
         {
             var configs = new List<RpcClientConfig>();
-            using (var scope = _serviceProvider.CreateAsyncScope())
+
+            var count = await DB.CountAsync<GameServerConfig>(cancellation: cancellationToken);
+            if (count == 0)
             {
-                var asyncDocumentSession = scope.ServiceProvider.GetRequiredService<IAsyncDocumentSession>();
-
-                int count = await asyncDocumentSession.Query<GameServerConfig>().CountAsync(cancellationToken);
-                if(count == 0)
+                var config = new GameServerConfig()
                 {
-                    var config = new GameServerConfig()
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        Ip = "127.0.0.1",
-                        Port = 8081,
-                        IsEnabled = true,
-                        Name = "Test",
-                    };
-                    
-                    await asyncDocumentSession.StoreAsync(config, cancellationToken);
+                    ID = Guid.NewGuid().ToString(),
+                    CreatedOn = DateTime.UtcNow,
+                    Ip = "172.16.168.25",
+                    Port = 8088,
+                    IsEnabled = true,
+                    Name = "Test",
+                };
 
-                    using var fileStream = File.OpenRead(Path.Combine(AppContext.BaseDirectory, GameServerConfig.PfxFileName));
-                    asyncDocumentSession.Advanced.Attachments.Store(config.Id, GameServerConfig.PfxFileName, fileStream);
+                await DB.SaveAsync(config, cancellation: cancellationToken);
 
-                    await asyncDocumentSession.SaveChangesAsync(cancellationToken);
-                }
+                using var fileStream = File.OpenRead(Path.Combine(AppContext.BaseDirectory, GameServerConfig.PfxFileName));
 
-                var gameServerConfigs = asyncDocumentSession.Query<GameServerConfig>().Where(p => p.IsEnabled).AsAsyncEnumerable();
-                await foreach (var item in gameServerConfigs)
-                {
-                    var attachment = await asyncDocumentSession.Advanced.Attachments.GetAsync(item.Id, GameServerConfig.PfxFileName, cancellationToken);
-                    using var ms = new MemoryStream();
-                    attachment.Stream.CopyTo(ms);
-                    byte[] data = ms.ToArray();
+                await config.Data.UploadAsync(fileStream, cancellation: cancellationToken);
 
-                    var rpcClientConfig = new RpcClientConfig()
-                    {
-                        Id = item.Id,
-                        Url = $"tcp://{item.Ip}:{item.Port}",
-                        Certificate = X509CertificateLoader.LoadPkcs12(data, item.PfxPassword)
-                    };
-
-                    configs.Add(rpcClientConfig);
-                }
-
-                return configs;
+                //asyncDocumentSession.Advanced.Attachments.Store(config.Id, GameServerConfig.PfxFileName, fileStream);
             }
+
+            var gameServerConfigs = await DB.Find<GameServerConfig>().ManyAsync(p => p.IsEnabled, cancellationToken);
+            foreach (var config in gameServerConfigs)
+            {
+                using var ms = new MemoryStream((int)config.FileSize);
+                await config.Data.DownloadAsync(ms, cancellation: cancellationToken);
+                byte[] data = ms.ToArray();
+
+                var rpcClientConfig = new RpcClientConfig()
+                {
+                    Id = config.ID,
+                    Url = $"tcp://{config.Ip}:{config.Port}",
+                    Certificate = X509CertificateLoader.LoadPkcs12(data, config.PfxPassword)
+                };
+
+                configs.Add(rpcClientConfig);
+            }
+
+            return configs;
+
         }
     }
 }

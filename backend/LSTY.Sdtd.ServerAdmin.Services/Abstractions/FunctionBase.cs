@@ -117,7 +117,7 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Abstractions
             return GameManageProxy.SendGlobalMessageAsync(new GlobalMessage()
             {
                 Message = message,
-                SenderName = CommonSettings.WhisperServerName
+                SenderName = CommonSettings.GlobalServerName
             });
         }
 

@@ -49,7 +49,7 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
                 if (playerId != null && chatMessageEventArgs.ChatType == ChatType.Global)
                 {
                     string command = chatMessageEventArgs.Message;
-                    string chatPrefix = _sharedState.CommonSettings.ChatCommandPrefix;
+                    string? chatPrefix = _sharedState.CommonSettings.ChatCommandPrefix;
 
                     if (string.IsNullOrEmpty(chatPrefix) == false)
                     {

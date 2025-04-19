@@ -1,17 +1,22 @@
 using FastExpressionCompiler;
+using LSTY.Sdtd.ServerAdmin.Data.Options;
 using LSTY.Sdtd.ServerAdmin.RpcClient.Extensions;
+using LSTY.Sdtd.ServerAdmin.Services.Abstractions;
+using LSTY.Sdtd.ServerAdmin.Services.Core;
 using LSTY.Sdtd.ServerAdmin.WebApi.Middlewares;
+using LSTY.Sdtd.ServerAdmin.WebApi.NotificationPublishers;
 using LSTY.Sdtd.ServerAdmin.WebApi.Providers;
-using LSTY.Sdtd.ServerAdmin.Data.Extensions;
+using Microsoft;
 using Microsoft.AspNetCore.HttpOverrides;
+using MongoDB.Driver;
+using MongoDB.Driver.Core.Configuration;
+using MongoDB.Entities;
 using NSwag;
 using Serilog;
 using Serilog.Events;
+using System.Security;
+using System.Security.Policy;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Hosting;
-using LSTY.Sdtd.ServerAdmin.Services.Core;
-using LSTY.Sdtd.ServerAdmin.WebApi.NotificationPublishers;
-using LSTY.Sdtd.ServerAdmin.Services.Abstractions;
 
 namespace LSTY.Sdtd.ServerAdmin.WebApi
 {
@@ -24,7 +29,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
         /// The main entry point for the application.
         /// </summary>
         /// <param name="args"></param>
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Information)
@@ -45,6 +50,10 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
 
                 #region Services
 
+                var databaseOptions = config.GetSection(nameof(DatabaseOptions)).Get<DatabaseOptions>();
+                Requires.NotNull(databaseOptions!);
+                await InitDatabase(databaseOptions);
+
                 // Add services to the container.
                 services.AddControllers()
                     .AddJsonOptions(options =>
@@ -55,8 +64,6 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
                     });
 
                 services.AddRpcClientManager<RpcClientConfigProvider>();
-
-                services.AddRavenDb("RavenOptions");
 
                 services.AddSingleton<FunctionManager>();
                 services.AddSingleton<IFunctionSettingsProvider, FunctionSettingsProvider>();
@@ -238,6 +245,11 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
             {
                 Log.CloseAndFlush();
             }
+        }
+
+        private static Task InitDatabase(DatabaseOptions options)
+        {
+            return DB.InitAsync(options.DatabaseName, MongoClientSettings.FromConnectionString(options.ConnectionString));
         }
     }
 }

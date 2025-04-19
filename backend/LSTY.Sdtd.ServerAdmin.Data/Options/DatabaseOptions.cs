@@ -3,13 +3,12 @@
     /// <summary>
     /// Contains settings for RavenDB, such as the URL to the database.
     /// </summary>
-    public class RavenOptions
+    public class DatabaseOptions
     {
         /// <summary>
-        /// The URLs where the database resides.
+        /// The connection string to the database.
         /// </summary>
-        public required string[] Urls { get; set; }
-
+        public required string ConnectionString { get; set; }
         /// <summary>
         /// The name of the database.
         /// </summary>
