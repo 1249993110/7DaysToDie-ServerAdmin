@@ -7,23 +7,28 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Settings
         bool ISettings.IsEnabled { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets the global server name.
+        ///
         /// </summary>
         public string? GlobalServerName { get; set; }
 
         /// <summary>
-        /// Gets or sets the whisper server name.
+        ///
         /// </summary>
         public string? WhisperServerName { get; set; }
 
         /// <summary>
-        /// Gets or sets the chat command prefix.
+        ///
         /// </summary>
-        public string? ChatCommandPrefix { get; set; }
+        public char[]? ChatCommandPrefixes { get; set; }
 
         /// <summary>
-        /// Gets or sets the chat command separator.
+        /// 
         /// </summary>
-        public string? ChatCommandSeparator { get; set; }
+        public bool AllowNoPrefix { get; set; }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public char[]? ChatCommandSeparator { get; set; }
     }
 }

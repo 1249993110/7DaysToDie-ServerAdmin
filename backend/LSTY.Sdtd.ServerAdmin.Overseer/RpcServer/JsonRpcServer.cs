@@ -1,6 +1,6 @@
 ﻿using LSTY.Sdtd.ServerAdmin.Shared.Abstractions;
 using LSTY.Sdtd.ServerAdmin.Shared.Constants;
-using LSTY.Sdtd.ServerAdmin.Shared.Utilities;
+using LSTY.Sdtd.ServerAdmin.Shared.Helpers;
 using Microsoft;
 using StreamJsonRpc;
 using System.Collections.Concurrent;
@@ -95,8 +95,6 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer
 
         public void UpdateSslCertificate(X509Certificate2 certificate)
         {
-            Requires.NotNull(certificate);
-
             _sslCertificate.Dispose();
             _sslCertificate = certificate;
         }

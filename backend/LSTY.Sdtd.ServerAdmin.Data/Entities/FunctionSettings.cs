@@ -7,5 +7,13 @@ namespace LSTY.Sdtd.ServerAdmin.Data.Entities
         public required string GameServerId { get; set; }
         public required string? FunctionName { get; set; }
         public required Dictionary<string, object> SettingsDict { get; set; }
+
+        static FunctionSettings()
+        {
+            DB.Index<FunctionSettings>()
+                .Key(e => e.GameServerId, KeyType.Ascending)
+                .Key(e => e.FunctionName, KeyType.Ascending)
+                .CreateAsync();
+        }
     }
 }

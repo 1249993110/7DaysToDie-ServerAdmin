@@ -1,7 +1,7 @@
 ﻿using MessagePack;
 using StreamJsonRpc;
 
-namespace LSTY.Sdtd.ServerAdmin.Shared.Utilities
+namespace LSTY.Sdtd.ServerAdmin.Shared.Helpers
 {
     public static class MessagePackFormatterHelper
     {

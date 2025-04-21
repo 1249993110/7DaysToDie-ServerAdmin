@@ -1,6 +1,6 @@
 ﻿namespace LSTY.Sdtd.ServerAdmin.Services.Core
 {
-    public class ChatCommand
+    public class CommandSender
     {
         /// <summary>
         /// Gets or sets the entity ID.
@@ -16,10 +16,5 @@
         /// Gets or sets the sender's name.
         /// </summary>
         public required string PlayerName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the command.
-        /// </summary>
-        public required string Command { get; set; }
     }
 }

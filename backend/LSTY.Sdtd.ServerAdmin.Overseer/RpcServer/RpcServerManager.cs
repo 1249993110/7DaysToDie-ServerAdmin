@@ -1,9 +1,7 @@
-﻿using LSTY.Sdtd.ServerAdmin.Overseer.Utilities;
+﻿using LSTY.Sdtd.ServerAdmin.Overseer.Helpers;
 using LSTY.Sdtd.ServerAdmin.Shared.Abstractions;
 using LSTY.Sdtd.ServerAdmin.Shared.Constants;
 using LSTY.Sdtd.ServerAdmin.Shared.Proxies;
-using Microsoft;
-using System.Net;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
 
@@ -11,13 +9,12 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer
 {
     public static class RpcServerManager
     {
-        private static JsonRpcServer? _jsonRpcServer;
-
-        public static JsonRpcServer JsonRpcServer  => _jsonRpcServer!;
-        public static ModEventProxy ModEventProxy => (ModEventProxy)JsonRpcServer.GetProxy<IModEventProxy>();
-
-        private static string? _certPath;
+        private static JsonRpcServer _jsonRpcServer = null!;
+        private static string _certPath = null!;
         private static string? _certPassword;
+
+        public static JsonRpcServer JsonRpcServer  => _jsonRpcServer;
+        public static ModEventProxy ModEventProxy => (ModEventProxy)JsonRpcServer.GetProxy<IModEventProxy>();
 
         public static void Init(int port, string certPath, string? certPassword)
         {
@@ -49,8 +46,6 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer
         {
             try
             {
-                Requires.NotNull(_certPath!);
-
                 if (File.Exists(_certPath) == false)
                 {
                     CustomLogger.Info($"Certificate not found at {_certPath}. Generating a new one.");
@@ -73,7 +68,7 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer
             }
                 
             var certificate = LoadCertificate();
-            _jsonRpcServer!.UpdateSslCertificate(certificate);
+            _jsonRpcServer.UpdateSslCertificate(certificate);
         }
     }
 }

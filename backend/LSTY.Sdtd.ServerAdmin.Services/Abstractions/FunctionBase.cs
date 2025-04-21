@@ -1,111 +1,98 @@
-﻿using LSTY.Sdtd.ServerAdmin.Services.Core;
+﻿using LSTY.Sdtd.ServerAdmin.Data.Abstractions;
+using LSTY.Sdtd.ServerAdmin.Data.Enums;
+using LSTY.Sdtd.ServerAdmin.Services.Core;
 using LSTY.Sdtd.ServerAdmin.Services.Settings;
-using LSTY.Sdtd.ServerAdmin.Shared.Abstractions;
-using LSTY.Sdtd.ServerAdmin.Shared.EventArgs;
 using LSTY.Sdtd.ServerAdmin.Shared.Models;
 using LSTY.Sdtd.ServerAdmin.Shared.Proxies;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace LSTY.Sdtd.ServerAdmin.Services.Abstractions
 {
-    public abstract class FunctionBase<TSettings> : IFunction where TSettings : class, ISettings
+    public abstract class FunctionBase : IFunction
     {
         private readonly string _name;
-        private bool _isEnabled;
-        private TSettings _settings = null!;
         private SharedState _sharedState = null!;
-        private ChatCommandHandler _chatCommandHandler = null!;
+        private CommandRegistry _commandRegistry = null!;
+        private List<ISubFunction>? _subFunctions;
+        private ICustomLogger _logger = null!;
 
         protected SharedState SharedState => _sharedState;
         protected CommonSettings CommonSettings => _sharedState.CommonSettings;
         protected IModEventProxy ModEventProxy => _sharedState.ModEventProxy;
         protected IGameManageProxy GameManageProxy => _sharedState.GameManageProxy;
-        protected TSettings Settings => _settings;
+        protected CommandRegistry CommandRegistry => _commandRegistry;
+        protected ICustomLogger Logger => _logger;
 
         public string Name => _name;
-        ISettings IFunction.Settings => _settings;
+        public abstract ISettings Settings { get; }
+
+        void IFunction.OnSettingsChanged(ISettings settings)
+        {
+            throw new NotImplementedException();
+        }
+
+        Type IFunction.GetSettingsType()
+        {
+            throw new NotImplementedException();
+        }
+
+        List<ISubFunction>? IFunction.GetSubFunctions()
+        {
+            return _subFunctions;
+        }
 
         public FunctionBase()
         {
             _name = GetType().Name;
         }
 
-        void IFunction.Init(SharedState sharedState, ChatCommandHandler chatCommandHandler)
+        protected void AddSubFunction<TSubFunction>() where TSubFunction : class, ISubFunction
         {
-            _sharedState = sharedState;
-            _chatCommandHandler = chatCommandHandler;
-        }
-
-        /// <summary>
-        /// If the settings are changed, update the settings and call the protected OnSettingsChanged method
-        /// </summary>
-        /// <param name="settings">Settings</param>
-        void IFunction.OnSettingsChanged(ISettings? settings)
-        {
-            if (settings is TSettings changedSettings)
+            if (_subFunctions == null)
             {
-                lock (this)
-                {
-                    _settings = changedSettings;
-                    if (_settings.IsEnabled)
-                    {
-                        // If the function is not running.
-                        if (_isEnabled == false)
-                        {
-                            _isEnabled = true;
-                            OnEnableFunction();
-                        }
-                    }
-                    else
-                    {
-                        // If the function is not disabled
-                        if (_isEnabled)
-                        {
-                            _isEnabled = false;
-                            OnDisableFunction();
-                        }
-                    }
-                    OnSettingsChanged();
-                }
+                _subFunctions = new List<ISubFunction>();
+            }
+
+            var function = ActivatorUtilities.CreateInstance<TSubFunction>(SharedState.ServiceProvider);
+            if (function is FunctionBase functionBase)
+            {
+                functionBase._logger = _logger;
+                function.Init(_sharedState, _commandRegistry);
+                _subFunctions.Add(function);
             }
         }
 
-        Type IFunction.GetSettingsType()
+        void IFunction.Init(SharedState sharedState, CommandRegistry commandRegistry)
         {
-            return typeof(TSettings);
+            _sharedState = sharedState;
+            _commandRegistry = commandRegistry;
+
+            if (this is not ISubFunction)
+            {
+                var serviceModule = Enum.Parse<ServiceModule>(_name);
+                _logger = sharedState.ServiceProvider.GetRequiredService<ICustomLoggerFactory>().CreateLogger(serviceModule, sharedState.GameServerId);
+            }
+
+            OnInit();
         }
 
-        /// <summary>
-        /// Called when the configuration changes, will be automatically called once during function initialization if the settings exist
-        /// </summary>
-        protected virtual void OnSettingsChanged()
+        protected virtual void OnInit()
         {
-        }
-
-        /// <summary>
-        /// Called when capturing player chat messages, returns true if the message is handled by the current function
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="chatMessageEventArgs"></param>
-        /// <returns>True if the message is handled by the current function</returns>
-        protected virtual Task<bool> OnChatCommand(ChatCommand chatCommand)
-        {
-            return Task.FromResult(false);
-        }
-
-        /// <summary>
-        /// Disabled function
-        /// </summary>
-        protected virtual void OnDisableFunction()
-        {
-            _chatCommandHandler.RemoveHook(OnChatCommand);
+            // This method can be overridden in derived classes to perform additional initialization tasks, such as add sub functions.
         }
 
         /// <summary>
         /// Enabled function
         /// </summary>
-        protected virtual void OnEnableFunction()
+        protected virtual void OnEnabled()
         {
-            _chatCommandHandler.AddHook(OnChatCommand);
+        }
+
+        /// <summary>
+        /// Disabled function
+        /// </summary>
+        protected virtual void OnDisabled()
+        {
         }
 
         /// <summary>

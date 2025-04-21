@@ -1,21 +1,21 @@
 using FastExpressionCompiler;
+using LSTY.Sdtd.ServerAdmin.Data.Abstractions;
+using LSTY.Sdtd.ServerAdmin.Data.Logging;
 using LSTY.Sdtd.ServerAdmin.Data.Options;
 using LSTY.Sdtd.ServerAdmin.RpcClient.Extensions;
 using LSTY.Sdtd.ServerAdmin.Services.Abstractions;
 using LSTY.Sdtd.ServerAdmin.Services.Core;
+using LSTY.Sdtd.ServerAdmin.WebApi.Authentication;
 using LSTY.Sdtd.ServerAdmin.WebApi.Middlewares;
 using LSTY.Sdtd.ServerAdmin.WebApi.NotificationPublishers;
 using LSTY.Sdtd.ServerAdmin.WebApi.Providers;
-using Microsoft;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using MongoDB.Driver;
-using MongoDB.Driver.Core.Configuration;
 using MongoDB.Entities;
 using NSwag;
 using Serilog;
 using Serilog.Events;
-using System.Security;
-using System.Security.Policy;
 using System.Text.Json.Serialization;
 
 namespace LSTY.Sdtd.ServerAdmin.WebApi
@@ -50,8 +50,8 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
 
                 #region Services
 
-                var databaseOptions = config.GetSection(nameof(DatabaseOptions)).Get<DatabaseOptions>();
-                Requires.NotNull(databaseOptions!);
+                var databaseOptions = config.GetRequiredSection(nameof(DatabaseOptions)).Get<DatabaseOptions>();
+                ArgumentNullException.ThrowIfNull(databaseOptions);
                 await InitDatabase(databaseOptions);
 
                 // Add services to the container.
@@ -67,14 +67,31 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
 
                 services.AddSingleton<FunctionManager>();
                 services.AddSingleton<IFunctionSettingsProvider, FunctionSettingsProvider>();
-                
-                services.AddMediatR(cfg => 
-                { 
+                services.AddSingleton<ICustomLoggerFactory, CustomLoggerFactory>();
+
+                services.AddMediatR(cfg =>
+                {
                     cfg.RegisterServicesFromAssemblies(typeof(FunctionManager).Assembly);
                     cfg.NotificationPublisherType = typeof(ParallelForeachPublisher);
                 });
 
                 services.AddMemoryCache();
+
+                var basicAuthenticationSchemeOptions = config.GetRequiredSection(nameof(BasicAuthenticationSchemeOptions)).Get<BasicAuthenticationSchemeOptions>();
+                ArgumentNullException.ThrowIfNull(basicAuthenticationSchemeOptions);
+                
+                services.AddAuthentication(AuthenticationSchemes.BasicAuthenticationScheme)
+                   .AddScheme<BasicAuthenticationSchemeOptions, BasicAuthenticationHandler>(AuthenticationSchemes.BasicAuthenticationScheme, null, options =>
+                   {
+                       options.Realm = basicAuthenticationSchemeOptions.Realm ?? Shared.Constants.Common.CompanyName;
+                       options.UserName = basicAuthenticationSchemeOptions.UserName;
+                       options.Password = basicAuthenticationSchemeOptions.Password;
+                   });
+
+                services.AddAuthorizationBuilder()
+                    .SetFallbackPolicy(new AuthorizationPolicyBuilder()
+                        .RequireAuthenticatedUser()
+                        .Build());
 
                 #region Serilog
 
@@ -200,7 +217,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
                     app.UseSwaggerUi();
                 }
 
-                if(Directory.Exists(env.WebRootPath))
+                if (Directory.Exists(env.WebRootPath))
                 {
                     var options = new DefaultFilesOptions();
                     options.DefaultFileNames.Clear();

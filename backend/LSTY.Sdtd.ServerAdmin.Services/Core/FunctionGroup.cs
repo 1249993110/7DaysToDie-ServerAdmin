@@ -7,7 +7,7 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
     {
         public required Dictionary<string, IFunction> Functions { get; set; }
         public required SharedState SharedState { get; set; }
-        public required ChatCommandHandler ChatCommandHandler { get; set; }
+        public required ChatCommandProcessor ChatCommandProcessor { get; set; }
 
         public void Dispose()
         {
@@ -16,7 +16,8 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
                 function.TryDispose();
             }
 
-            ChatCommandHandler.Dispose();
+            SharedState.TryDispose();
+            ChatCommandProcessor.TryDispose();
         }
     }
 }

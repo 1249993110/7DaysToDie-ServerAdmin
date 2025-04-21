@@ -20,12 +20,12 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Providers
             {
                 var config = new GameServerConfig()
                 {
-                    ID = Guid.NewGuid().ToString(),
-                    CreatedOn = DateTime.UtcNow,
                     Ip = "172.16.168.25",
                     Port = 8088,
                     IsEnabled = true,
                     Name = "Test",
+                    PfxPassword = null,
+                    UserId = "admin",
                 };
 
                 await DB.SaveAsync(config, cancellation: cancellationToken);
@@ -33,8 +33,6 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Providers
                 using var fileStream = File.OpenRead(Path.Combine(AppContext.BaseDirectory, GameServerConfig.PfxFileName));
 
                 await config.Data.UploadAsync(fileStream, cancellation: cancellationToken);
-
-                //asyncDocumentSession.Advanced.Attachments.Store(config.Id, GameServerConfig.PfxFileName, fileStream);
             }
 
             var gameServerConfigs = await DB.Find<GameServerConfig>().ManyAsync(p => p.IsEnabled, cancellationToken);

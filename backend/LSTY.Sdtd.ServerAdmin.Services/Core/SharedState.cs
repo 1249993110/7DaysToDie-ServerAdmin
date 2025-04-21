@@ -11,5 +11,6 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
         public required IReadOnlyDictionary<Type, IProxy> RpcProxies { get; set; }
         public required IModEventProxy ModEventProxy { get; set; }
         public required IGameManageProxy GameManageProxy { get; set; }
+        public required IServiceProvider ServiceProvider { get; set; }
     }
 }

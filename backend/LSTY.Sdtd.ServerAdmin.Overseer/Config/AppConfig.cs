@@ -1,5 +1,6 @@
 ﻿using Microsoft;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
 
 namespace LSTY.Sdtd.ServerAdmin.Overseer.Config
 {
@@ -24,7 +25,10 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.Config
                 var configuration = builder.Build();
                 var appSettings = configuration.Get<AppSettings>();
 
-                Requires.NotNull(appSettings!);
+                if (appSettings == null)
+                {
+                    throw new ArgumentNullException(nameof(appSettings));
+                }
 
                 Settings = appSettings;
 

@@ -2,10 +2,8 @@
 
 namespace LSTY.Sdtd.ServerAdmin.Services.Settings
 {
-    public class GeneralSettings : ISettings
+    public sealed class BasicSettings : ISettings
     {
         public bool IsEnabled { get; set; }
-
-        public BasicSettings? SubASettings { get; set; }
     }
 }

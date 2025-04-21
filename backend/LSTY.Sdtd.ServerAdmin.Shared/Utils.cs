@@ -1,4 +1,4 @@
-﻿namespace LSTY.Sdtd.ServerAdmin.Shared.Utilities
+﻿namespace LSTY.Sdtd.ServerAdmin.Shared
 {
     public static class Utils
     {
@@ -9,7 +9,7 @@
                 return string.Empty;
             }
 
-            if (args[0] == '\"' && args[args.Length - 1] == '\"')
+            if (args[0] == '\"' && args[^1] == '\"')
             {
                 return args;
             }
@@ -21,7 +21,7 @@
 
             if (args.Contains(' '))
             {
-                return string.Concat("\"", args, "\"");
+                return $"\"{args}\"";
             }
 
             return args;

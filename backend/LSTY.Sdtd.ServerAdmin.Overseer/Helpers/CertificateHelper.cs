@@ -7,7 +7,7 @@ using Org.BouncyCastle.X509;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Crypto.Operators;
 
-namespace LSTY.Sdtd.ServerAdmin.Overseer.Utilities
+namespace LSTY.Sdtd.ServerAdmin.Overseer.Helpers
 {
     /// <summary>
     /// Helper class for managing certificates.

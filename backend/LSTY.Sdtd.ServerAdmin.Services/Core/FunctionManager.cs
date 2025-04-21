@@ -1,4 +1,5 @@
 ﻿using IceCoffee.Common.Extensions;
+using LSTY.Sdtd.ServerAdmin.Data.Abstractions;
 using LSTY.Sdtd.ServerAdmin.Services.Abstractions;
 using LSTY.Sdtd.ServerAdmin.Services.Settings;
 using LSTY.Sdtd.ServerAdmin.Shared.Abstractions;
@@ -16,23 +17,25 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
         private readonly ConcurrentDictionary<string, FunctionGroup> _runningFunctions;
         private readonly IServiceProvider _serviceProvider;
         private readonly IFunctionSettingsProvider _functionSettingsProvider;
+        private readonly ICustomLoggerFactory _customLoggerFactory;
 
-        public FunctionManager(IServiceProvider serviceProvider, IFunctionSettingsProvider functionSettingsProvider, ILogger<FunctionManager> logger)
+        public FunctionManager(IServiceProvider serviceProvider, IFunctionSettingsProvider functionSettingsProvider, ILogger<FunctionManager> logger, ICustomLoggerFactory customLoggerFactory)
         {
             _runningFunctions = new ConcurrentDictionary<string, FunctionGroup>();
             _serviceProvider = serviceProvider;
             _functionSettingsProvider = functionSettingsProvider;
             _logger = logger;
+            _customLoggerFactory = customLoggerFactory;
         }
 
         private static IEnumerable<Type> GetFunctionTypes()
         {
             return typeof(IFunction).Assembly
                 .GetExportedTypes()
-                .Where(t => t.IsClass && t.IsAbstract == false && typeof(IFunction).IsAssignableFrom(t));
+                .Where(t => t.IsClass && t.IsAbstract == false && typeof(IFunction).IsAssignableFrom(t) && typeof(ISubFunction).IsAssignableFrom(t) == false);
         }
 
-        private async Task<Dictionary<string, IFunction>> CreateFunctionsAsync(SharedState sharedState, ChatCommandHandler chatCommandHandler)
+        private async Task<Dictionary<string, IFunction>> CreateFunctionsAsync(SharedState sharedState, CommandRegistry commandRegistry)
         {
             var result = new Dictionary<string, IFunction>();
             var types = GetFunctionTypes();
@@ -46,7 +49,7 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
                     var settingsDict = await _functionSettingsProvider.GetAsync(serverId, functionName);
                     var functionSettings = AdaptSettings(function.GetSettingsType(), settingsDict);
 
-                    function.Init(sharedState, chatCommandHandler);
+                    function.Init(sharedState, commandRegistry);
                     function.OnSettingsChanged(functionSettings);
 
                     result.Add(functionName, function);
@@ -80,7 +83,7 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
         public void UpdateFunctionSettings(string serverId, string? functionName, IReadOnlyDictionary<string, object> settingsDict)
         {
             // Check if the function name is null, which means CommonSettings are changed
-            if (functionName == null)
+            if (string.IsNullOrEmpty(functionName))
             {
                 var commonSettings = AdaptSettings(typeof(CommonSettings), settingsDict);
                 // Update all functions with the new CommonSettings
@@ -113,19 +116,20 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
                 RpcProxies = rpcProxies,
                 ModEventProxy = (IModEventProxy)rpcProxies[typeof(IModEventProxy)],
                 GameManageProxy = (IGameManageProxy)rpcProxies[typeof(IGameManageProxy)],
+                ServiceProvider = _serviceProvider,
             };
 
-            var chatCommandHandlerLogger = _serviceProvider.GetRequiredService<ILogger<ChatCommandHandler>>();
-            var chatCommandHandler = new ChatCommandHandler(chatCommandHandlerLogger, sharedState);
-            sharedState.ModEventProxy.ChatMessage += chatCommandHandler.Handle;
+            var commandRegistry = new CommandRegistry();
+            var chatCommandProcessorLogger = _customLoggerFactory.CreateLogger(Data.Enums.ServiceModule.ChatCommandProcessor, serverId);
+            var chatCommandProcessor = new ChatCommandProcessor(chatCommandProcessorLogger, commandRegistry, sharedState);
+            sharedState.ModEventProxy.ChatMessage += chatCommandProcessor.Process;
 
-            var functions = await CreateFunctionsAsync(sharedState, chatCommandHandler);
-
+            var functions = await CreateFunctionsAsync(sharedState, commandRegistry);
             var functionGroup = new FunctionGroup()
             {
                 Functions = functions,
                 SharedState = sharedState,
-                ChatCommandHandler = chatCommandHandler,
+                ChatCommandProcessor = chatCommandProcessor,
             };
 
             _runningFunctions.AddOrUpdate(serverId, (gameServerId, newValue) =>

@@ -13,5 +13,4 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\LSTY.Sdtd.ServerAdmin.Data\LSTY.Sdtd.ServerAdmin.Data.csproj" />
 	</ItemGroup>
-
 </Project>
