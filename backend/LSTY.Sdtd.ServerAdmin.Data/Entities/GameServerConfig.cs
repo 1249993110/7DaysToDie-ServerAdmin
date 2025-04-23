@@ -14,13 +14,16 @@ namespace LSTY.Sdtd.ServerAdmin.Data.Entities
         public required int Port { get; set; }
         public required string? PfxPassword { get; set; }
         public required bool IsEnabled { get; set; }
-
         public required string UserId { get; set; }
 
         static GameServerConfig()
         {
             DB.Index<GameServerConfig>()
                 .Key(e => e.IsEnabled, KeyType.Ascending)
+                .CreateAsync();
+
+            DB.Index<GameServerConfig>()
+                .Key(e => e.UserId, KeyType.Ascending)
                 .CreateAsync();
         }
     }

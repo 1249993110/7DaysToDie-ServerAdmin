@@ -34,6 +34,11 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Authentication
         /// <returns></returns>
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
+            //if (Context.WebSockets.IsWebSocketRequest)
+            //{
+
+            //}
+
             if (Request.Headers.ContainsKey(HeaderNames.Authorization) == false)
             {
                 Logger.LogDebug("No 'Authorization' header found in the request.");

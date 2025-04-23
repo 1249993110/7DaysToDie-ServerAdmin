@@ -85,6 +85,7 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer
             }
 
             _acceptTask = AcceptClientsAsync(_cts.Token);
+
             lock (_lock)
             {
                 _state = ServerState.Started;

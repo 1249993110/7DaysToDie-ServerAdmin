@@ -1,5 +1,6 @@
 ﻿using LSTY.Sdtd.ServerAdmin.Data.Entities;
 using LSTY.Sdtd.ServerAdmin.Services.Abstractions;
+using MongoDB.Bson;
 using MongoDB.Entities;
 
 namespace LSTY.Sdtd.ServerAdmin.WebApi.Providers
@@ -16,12 +17,12 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Providers
         /// <param name="functionName"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<IReadOnlyDictionary<string, object>?> GetAsync(string gameServerId, string? functionName)
+        public async Task<IReadOnlyDictionary<string, object?>?> GetAsync(string gameServerId, string? functionName)
         {
             var functionSettings = await DB.Find<FunctionSettings>()
-                .ManyAsync(p => p.GameServerId == gameServerId && p.FunctionName == functionName);
+                .Match(p => p.GameServerId == gameServerId && p.FunctionName == functionName).ExecuteSingleAsync();
 
-            return functionSettings.FirstOrDefault()?.SettingsDict;
+            return functionSettings?.Settings;
         }
     }
 }

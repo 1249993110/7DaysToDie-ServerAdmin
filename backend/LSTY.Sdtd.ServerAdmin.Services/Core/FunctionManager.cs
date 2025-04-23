@@ -1,12 +1,14 @@
 ﻿using LSTY.Sdtd.ServerAdmin.Data.Abstractions;
+using LSTY.Sdtd.ServerAdmin.Data.Entities;
 using LSTY.Sdtd.ServerAdmin.Services.Abstractions;
 using LSTY.Sdtd.ServerAdmin.Services.Settings;
 using LSTY.Sdtd.ServerAdmin.Shared.Abstractions;
 using LSTY.Sdtd.ServerAdmin.Shared.Proxies;
-using Mapster;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
+using System.Text.Json;
 
 namespace LSTY.Sdtd.ServerAdmin.Services.Core
 {
@@ -16,13 +18,15 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
         private readonly IServiceProvider _serviceProvider;
         private readonly IFunctionSettingsProvider _functionSettingsProvider;
         private readonly ICustomLoggerFactory _customLoggerFactory;
+        private readonly IOptions<Microsoft.AspNetCore.Mvc.JsonOptions> _jsonOptions;
 
-        public FunctionManager(IServiceProvider serviceProvider, IFunctionSettingsProvider functionSettingsProvider, ILogger<FunctionManager> logger, ICustomLoggerFactory customLoggerFactory)
+        public FunctionManager(IServiceProvider serviceProvider, IFunctionSettingsProvider functionSettingsProvider, ILogger<FunctionManager> logger, ICustomLoggerFactory customLoggerFactory, IOptions<Microsoft.AspNetCore.Mvc.JsonOptions> jsonOptions)
         {
             _runningFunctions = new ConcurrentDictionary<string, FunctionGroup>();
             _serviceProvider = serviceProvider;
             _functionSettingsProvider = functionSettingsProvider;
             _customLoggerFactory = customLoggerFactory;
+            _jsonOptions = jsonOptions;
         }
 
         private static IEnumerable<Type> GetFunctionTypes()
@@ -61,44 +65,53 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
             return result;
         }
 
-        private static ISettings AdaptSettings(Type settingsType, IReadOnlyDictionary<string, object>? settingsDict)
+        private ISettings AdaptSettings(Type settingsType, IReadOnlyDictionary<string, object?>? settingsDict)
         {
-            var settings = Activator.CreateInstance(settingsType) as ISettings;
+            ISettings? settings;
+            
+            if (settingsDict == null)
+            {
+                settings = Activator.CreateInstance(settingsType) as ISettings;
+            }
+            else
+            {
+                string json = JsonSerializer.Serialize(settingsDict, _jsonOptions.Value.JsonSerializerOptions);
+                settings = JsonSerializer.Deserialize(json, settingsType, _jsonOptions.Value.JsonSerializerOptions) as ISettings;
+            }
             if (settings == null)
             {
                 throw new InvalidOperationException($"Cannot create instance of {settingsType}");
             }
 
-            if(settingsDict == null)
-            {
-                return settings;
-            }
-
-            settingsDict.Adapt(settings);
+            //settingsDict.Adapt(settings);
             return settings;
         }
 
-        public void UpdateFunctionSettings(string serverId, string? functionName, IReadOnlyDictionary<string, object> settingsDict)
+        public bool UpdateFunctionSettings(FunctionSettings entity)
         {
             // Check if the function name is null, which means CommonSettings are changed
-            if (string.IsNullOrEmpty(functionName))
+            if (string.IsNullOrEmpty(entity.FunctionName))
             {
-                var commonSettings = AdaptSettings(typeof(CommonSettings), settingsDict);
+                var commonSettings = AdaptSettings(typeof(CommonSettings), entity.Settings);
                 // Update all functions with the new CommonSettings
-                if (_runningFunctions.TryGetValue(serverId, out var functionGroup))
+                if (_runningFunctions.TryGetValue(entity.GameServerId, out var functionGroup))
                 {
                     functionGroup.SharedState.CommonSettings = (CommonSettings)commonSettings;
+                    return true;
                 }
             }
-            else if (_runningFunctions.TryGetValue(serverId, out var functionGroup))
+            else if (_runningFunctions.TryGetValue(entity.GameServerId, out var functionGroup))
             {
-                if (functionGroup.Functions.TryGetValue(functionName, out var function))
+                if (functionGroup.Functions.TryGetValue(entity.FunctionName, out var function))
                 {
                     var settingsType = function.GetSettingsType();
-                    var _settings = AdaptSettings(settingsType, settingsDict);
+                    var _settings = AdaptSettings(settingsType, entity.Settings);
                     function.OnSettingsChanged(_settings);
+                    return true;
                 }
             }
+
+            return false;
         }
 
         public async Task RegisterFunctionsAsync(string serverId, IReadOnlyDictionary<Type, IProxy> rpcProxies)

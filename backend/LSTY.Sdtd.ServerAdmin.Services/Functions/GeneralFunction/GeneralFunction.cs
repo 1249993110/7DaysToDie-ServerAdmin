@@ -28,6 +28,11 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Functions.GeneralFunction
 
         protected override void OnInit()
         {
+            
+        }
+
+        protected override void OnEnabled()
+        {
             CommandRegistry.RegisterCommand(new Core.CommandInfo()
             {
                 Name = "AA",

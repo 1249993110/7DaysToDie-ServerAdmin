@@ -5,7 +5,7 @@ using LSTY.Sdtd.ServerAdmin.Shared.Models;
 using LSTY.Sdtd.ServerAdmin.Shared.Proxies;
 using System.Text;
 
-namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer
+namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer.Proxies
 {
     public class ModEventProxy : IModEventProxy
     {

@@ -5,8 +5,8 @@ namespace LSTY.Sdtd.ServerAdmin.Data.Entities
     public class FunctionSettings : EntityBase
     {
         public required string GameServerId { get; set; }
-        public required string? FunctionName { get; set; }
-        public required Dictionary<string, object> SettingsDict { get; set; }
+        public required string? FunctionName { get; set; } // nameof(CommonSettings)
+        public required Dictionary<string, object?> Settings { get; set; }
 
         static FunctionSettings()
         {

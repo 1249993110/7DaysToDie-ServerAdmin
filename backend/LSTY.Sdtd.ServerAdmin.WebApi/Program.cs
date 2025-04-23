@@ -6,8 +6,11 @@ using LSTY.Sdtd.ServerAdmin.RpcClient.Extensions;
 using LSTY.Sdtd.ServerAdmin.Services.Abstractions;
 using LSTY.Sdtd.ServerAdmin.Services.Core;
 using LSTY.Sdtd.ServerAdmin.WebApi.Authentication;
+using LSTY.Sdtd.ServerAdmin.WebApi.Authorization;
+using LSTY.Sdtd.ServerAdmin.WebApi.JsonConverters;
 using LSTY.Sdtd.ServerAdmin.WebApi.Middlewares;
 using LSTY.Sdtd.ServerAdmin.WebApi.NotificationPublishers;
+using LSTY.Sdtd.ServerAdmin.WebApi.OperationProcessors;
 using LSTY.Sdtd.ServerAdmin.WebApi.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -18,6 +21,7 @@ using Serilog;
 using Serilog.Events;
 using System.Text.Json.Serialization;
 
+[assembly: ApiController]
 namespace LSTY.Sdtd.ServerAdmin.WebApi
 {
     /// <summary>
@@ -42,6 +46,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
             try
             {
                 TypeAdapterConfig.GlobalSettings.Compiler = exp => exp.CompileFast();
+                //TypeAdapterConfig.GlobalSettings.Default.NameMatchingStrategy(NameMatchingStrategy.IgnoreCase);
 
                 var builder = WebApplication.CreateBuilder(args);
                 var env = builder.Environment;
@@ -59,8 +64,9 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
                     .AddJsonOptions(options =>
                     {
                         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                        //options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
-                        //options.JsonSerializerOptions.Converters.Add(new DateTimeNullableConverter());
+                        options.JsonSerializerOptions.Converters.Add(new ObjectToInferredTypesConverter());
+                        options.JsonSerializerOptions.Converters.Add(new DateTimeConverter());
+                        options.JsonSerializerOptions.Converters.Add(new DateTimeNullableConverter());
                     });
 
                 services.AddRpcClientManager<RpcClientConfigProvider>();
@@ -88,7 +94,12 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
                        options.Password = basicAuthenticationSchemeOptions.Password;
                    });
 
+                services.AddSingleton<IAuthorizationHandler, GameServerOwnerHandler>();
                 services.AddAuthorizationBuilder()
+                    .AddPolicy(AuthorizationPolicys.GameServerOwner, policy =>
+                    {
+                        policy.Requirements.Add(new GameServerOwnerRequirement());
+                    })
                     .SetFallbackPolicy(new AuthorizationPolicyBuilder()
                         .RequireAuthenticatedUser()
                         .Build());
@@ -139,6 +150,8 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
                         //    BearerFormat = "JWT",
                         //    Description = "Type into the textbox: {your JWT token}."
                         //});
+
+                        config.OperationProcessors.Add(new AddGameServerIdHeaderParameter());
                     });
                 }
 
@@ -266,6 +279,8 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
 
         private static Task InitDatabase(DatabaseOptions options)
         {
+            //var objectSerializer = new ObjectSerializer(ObjectSerializer.AllAllowedTypes);
+            //BsonSerializer.RegisterSerializer(objectSerializer);
             return DB.InitAsync(options.DatabaseName, MongoClientSettings.FromConnectionString(options.ConnectionString));
         }
     }
