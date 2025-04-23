@@ -19,7 +19,9 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Hosting
         {
             _logger.LogInformation("{Name} starting...", nameof(RpcClientHostedService));
 
-            await _manager.LoadClientsFromConfigAsync(cancellationToken);
+            int count = await _manager.LoadClientsFromConfigAsync(cancellationToken);
+            _logger.LogInformation("Loaded {ClientCount} RPC clients from config.", count);
+
             await _manager.StartAllAsync(cancellationToken);
         }
 

@@ -46,7 +46,8 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Providers
                 {
                     Id = config.ID,
                     Url = $"tcp://{config.Ip}:{config.Port}",
-                    Certificate = X509CertificateLoader.LoadPkcs12(data, config.PfxPassword)
+                    Certificate = X509CertificateLoader.LoadPkcs12(data, config.PfxPassword),
+                    Name = config.Name,
                 };
 
                 configs.Add(rpcClientConfig);

@@ -1,4 +1,5 @@
-﻿using LSTY.Sdtd.ServerAdmin.RpcClient.Abstractions;
+﻿using LSTY.Sdtd.ServerAdmin.Data.Abstractions;
+using LSTY.Sdtd.ServerAdmin.RpcClient.Abstractions;
 using LSTY.Sdtd.ServerAdmin.RpcClient.Clients;
 using LSTY.Sdtd.ServerAdmin.RpcClient.Models;
 using MediatR;
@@ -6,42 +7,42 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 
 namespace LSTY.Sdtd.ServerAdmin.RpcClient.Core
 {
     public class RpcClientManager
     {
         private readonly ConcurrentDictionary<string, IRpcClient> _clients = new();
-        private readonly ILogger<RpcClientManager> _logger;
+        private readonly ICustomLoggerFactory _customLoggerFactory;
         private readonly IServiceProvider _serviceProvider;
         private readonly IRpcClientConfigProvider _configProvider;
 
         public RpcClientManager(
-            ILogger<RpcClientManager> logger,
+            ICustomLoggerFactory customLoggerFactory,
             IServiceProvider serviceProvider,
             IRpcClientConfigProvider configProvider)
         {
-            _logger = logger;
+            _customLoggerFactory = customLoggerFactory;
             _serviceProvider = serviceProvider;
             _configProvider = configProvider;
         }
 
         public ICollection<IRpcClient> GetAllClients() => _clients.Values;
 
-        public async Task LoadClientsFromConfigAsync(CancellationToken cancellationToken)
+        public async Task<int> LoadClientsFromConfigAsync(CancellationToken cancellationToken)
         {
+            int count = 0;
             var configs = await _configProvider.GetAllAsync(cancellationToken);
             foreach (var config in configs)
             {
                 var client = CreateJsonRpcClient(config);
-                if (_clients.TryAdd(config.Id, client) == false)
+                if(_clients.TryAdd(config.Id, client))
                 {
-                    _logger.LogWarning("Client with name {Name} already exists. Skipping...", config.Id);
+                    count++;
                 }
             }
 
-            _logger.LogInformation("Loaded {ClientCount} RPC clients from config.", _clients.Count);
+            return count;
         }
 
         public async Task StartAllAsync(CancellationToken cancellationToken)
@@ -68,24 +69,23 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Core
 
         public async Task RemoveClientAsync(string id)
         {
+            var logger = _customLoggerFactory.CreateLogger(Data.Enums.ServiceModule.RpcClientManager, id);
+
             if (_clients.TryRemove(id, out var client))
             {
                 await client.DisconnectAsync();
                 client.Dispose();
-                _logger.LogInformation("Client {Id} disposed.", id);
+                await logger.LogInformationAsync($"Rpc Client {client.Name} disposed.");
             }
             else
             {
-                _logger.LogWarning("Client {Id} not found.", id);
+                await logger.LogWarningAsync($"Rpc Client {id} not found.");
             }
         }
 
         private JsonRpcClient CreateJsonRpcClient(RpcClientConfig config)
         {
-            var logger = _serviceProvider.GetRequiredService<ILogger<JsonRpcClient>>();
-            var appLifetime = _serviceProvider.GetRequiredService<IHostApplicationLifetime>();
-            var mediator = _serviceProvider.GetRequiredService<IMediator>();
-            return new JsonRpcClient(config, logger, appLifetime, mediator);
+            return ActivatorUtilities.CreateInstance<JsonRpcClient>(_serviceProvider, config);
         }
 
         public async Task AddOrUpdateClientAsync(RpcClientConfig config)
@@ -101,7 +101,9 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Core
             }, client);
 
             await client.ConnectAsync();
-            _logger.LogInformation("Client {Id} added or updated.", config.Id);
+
+            var logger = _customLoggerFactory.CreateLogger(Data.Enums.ServiceModule.RpcClientManager, config.Id);
+            await logger.LogInformationAsync($"Rpc Client {config.Name} added or updated.");
         }
 
         public bool TryGetClient(string id, out IRpcClient? rpcClient)

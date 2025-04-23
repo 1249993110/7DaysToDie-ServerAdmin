@@ -13,6 +13,11 @@ namespace LSTY.Sdtd.ServerAdmin.Data.Entities
             DB.Index<FunctionSettings>()
                 .Key(e => e.GameServerId, KeyType.Ascending)
                 .Key(e => e.FunctionName, KeyType.Ascending)
+                .Option(o =>
+                {
+                    o.Background = true;
+                    o.Unique = true;
+                })
                 .CreateAsync();
         }
     }

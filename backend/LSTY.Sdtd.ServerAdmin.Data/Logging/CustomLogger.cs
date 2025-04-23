@@ -16,41 +16,40 @@ namespace LSTY.Sdtd.ServerAdmin.Data.Logging
             _gameServerId = gameServerId;
         }
 
-        public Task<string> LogInformationAsync(Exception exception, string message, params object?[] args)
+        public Task<string> LogInformationAsync(Exception exception, string message)
         {
-            return SaveLog(LogLevel.Info, string.Format(message, args), exception);
+            return SaveLog(LogLevel.Info, message, exception);
         }
 
-        public Task<string> LogInformationAsync(string message, params object?[] args)
+        public Task<string> LogInformationAsync(string message)
         {
-            return SaveLog(LogLevel.Info, string.Format(message, args));
+            return SaveLog(LogLevel.Info, message);
         }
 
-        public Task<string> LogWarningAsync(Exception exception, string message, params object?[] args)
+        public Task<string> LogWarningAsync(Exception exception, string message)
         {
-            return SaveLog(LogLevel.Warning, string.Format(message, args), exception);
+            return SaveLog(LogLevel.Warning, message, exception);
         }
 
-        public Task<string> LogWarningAsync(string message, params object?[] args)
+        public Task<string> LogWarningAsync(string message)
         {
-            return SaveLog(LogLevel.Warning, string.Format(message, args));
+            return SaveLog(LogLevel.Warning, message);
         }
 
-        public Task<string> LogErrorAsync(Exception exception, string message, params object?[] args)
+        public Task<string> LogErrorAsync(Exception exception, string message)
         {
-            return SaveLog(LogLevel.Error, string.Format(message, args), exception);
+            return SaveLog(LogLevel.Error, message, exception);
         }
 
-        public Task<string> LogErrorAsync(string message, params object?[] args)
+        public Task<string> LogErrorAsync(string message)
         {
-            return SaveLog(LogLevel.Error, string.Format(message, args));
+            return SaveLog(LogLevel.Error, message);
         }
 
         private async Task<string> SaveLog(LogLevel level, string message, Exception? exception = null)
         {
             var logEntry = new LogEntry()
             {
-                CreatedOn = DateTime.UtcNow,
                 Level = level,
                 Content = message,
                 AdditionalData = exception?.ToString(),

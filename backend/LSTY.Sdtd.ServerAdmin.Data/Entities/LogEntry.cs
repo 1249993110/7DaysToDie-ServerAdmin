@@ -20,11 +20,20 @@ namespace LSTY.Sdtd.ServerAdmin.Data.Entities
         static LogEntry()
         {
             DB.Index<LogEntry>()
+                .Key(e => e.GameServerId, KeyType.Ascending)
+                .Key(e => e.CreatedOn, KeyType.Descending)
+                .Key(e => e.ServiceModule, KeyType.Ascending)
+                .CreateAsync();
+
+            DB.Index<LogEntry>()
+                .Key(e => e.GameServerId, KeyType.Ascending)
                 .Key(e => e.CreatedOn, KeyType.Descending)
                 .Key(e => e.Level, KeyType.Ascending)
+                .CreateAsync();
+
+            DB.Index<LogEntry>()
                 .Key(e => e.Content, KeyType.Text)
-                .Key(e => e.ServiceModule, KeyType.Ascending)
-                .Key(e => e.GameServerId, KeyType.Ascending)
+                .Key(e => e.AdditionalData, KeyType.Text)
                 .CreateAsync();
         }
     }

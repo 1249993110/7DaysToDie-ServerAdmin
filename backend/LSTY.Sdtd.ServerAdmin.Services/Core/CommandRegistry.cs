@@ -41,7 +41,7 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
         /// <returns>True if the command was successfully unregistered; otherwise, false.</returns>
         public bool UnregisterCommand(string? name)
         {
-            if (string.IsNullOrWhiteSpace(name))
+            if (string.IsNullOrEmpty(name))
                 return false;
 
             if (_commands.TryGetValue(name, out var command) == false)

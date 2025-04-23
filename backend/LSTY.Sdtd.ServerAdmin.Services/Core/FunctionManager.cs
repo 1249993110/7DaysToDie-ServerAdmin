@@ -1,5 +1,4 @@
-﻿using IceCoffee.Common.Extensions;
-using LSTY.Sdtd.ServerAdmin.Data.Abstractions;
+﻿using LSTY.Sdtd.ServerAdmin.Data.Abstractions;
 using LSTY.Sdtd.ServerAdmin.Services.Abstractions;
 using LSTY.Sdtd.ServerAdmin.Services.Settings;
 using LSTY.Sdtd.ServerAdmin.Shared.Abstractions;
@@ -13,7 +12,6 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
 {
     public class FunctionManager
     {
-        private readonly ILogger<FunctionManager> _logger;
         private readonly ConcurrentDictionary<string, FunctionGroup> _runningFunctions;
         private readonly IServiceProvider _serviceProvider;
         private readonly IFunctionSettingsProvider _functionSettingsProvider;
@@ -24,7 +22,6 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
             _runningFunctions = new ConcurrentDictionary<string, FunctionGroup>();
             _serviceProvider = serviceProvider;
             _functionSettingsProvider = functionSettingsProvider;
-            _logger = logger;
             _customLoggerFactory = customLoggerFactory;
         }
 
@@ -40,6 +37,7 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
             var result = new Dictionary<string, IFunction>();
             var types = GetFunctionTypes();
             string serverId = sharedState.GameServerId;
+            var logger = _customLoggerFactory.CreateLogger(Data.Enums.ServiceModule.FunctionManager, serverId);
             foreach (var type in types)
             {
                 try
@@ -56,7 +54,7 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to create function {FunctionType} for server {ServerId}", type, serverId);
+                    await logger.LogErrorAsync(ex, $"Failed to create function {type} for server {serverId}");
                 }
             }
 
@@ -149,31 +147,5 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
                 functionGroup.Dispose();
             }
         }
-
-        //public bool TryGetFunction(string serverId, string functionName, out IFunction? function)
-        //{
-        //    if (_runningFunctions.TryGetValue(serverId, out var functions))
-        //    {
-        //        if (functions.TryGetValue(functionName, out function))
-        //        {
-        //            return true;
-        //        }
-        //    }
-
-        //    function = null;
-        //    return false;
-        //}
-
-        //public bool TryGetFunctions(string serverId, out IReadOnlyDictionary<string, IFunction>? functions)
-        //{
-        //    if(_runningFunctions.TryGetValue(serverId, out var _functions))
-        //    {
-        //        functions = _functions;
-        //        return true;
-        //    }
-
-        //    functions = null;
-        //    return false;
-        //}
     }
 }

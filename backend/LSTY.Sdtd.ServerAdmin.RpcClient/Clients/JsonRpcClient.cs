@@ -1,4 +1,5 @@
-﻿using LSTY.Sdtd.ServerAdmin.Data.Notifications;
+﻿using LSTY.Sdtd.ServerAdmin.Data.Abstractions;
+using LSTY.Sdtd.ServerAdmin.Data.Notifications;
 using LSTY.Sdtd.ServerAdmin.RpcClient.Abstractions;
 using LSTY.Sdtd.ServerAdmin.RpcClient.Models;
 using LSTY.Sdtd.ServerAdmin.Shared.Abstractions;
@@ -12,6 +13,7 @@ using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
 
 namespace LSTY.Sdtd.ServerAdmin.RpcClient.Clients
 {
@@ -20,14 +22,15 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Clients
         private readonly object _lock = new object();
         private ConnectionState _state = ConnectionState.Disconnected;
 
-        private readonly ILogger<JsonRpcClient> _logger;
         private readonly IHostApplicationLifetime _appLifetime;
         private TcpClient? _client;
         private JsonRpc? _jsonRpc;
         private Dictionary<Type, IProxy>? _proxies;
         private readonly IMediator _mediator;
+        private readonly ICustomLogger _logger;
 
         private readonly string _id;
+        private readonly string _name;
         private readonly string _url;
         private readonly X509Certificate2 _certificate;
         private int _retryCount = 0;
@@ -35,6 +38,7 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Clients
         private bool _isReconnecting = false;
 
         public string Id => _id;
+        public string Name => _name;
         public string Url => _url;
         public ConnectionState State
         {
@@ -47,12 +51,18 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Clients
             }
         }
 
-        public JsonRpcClient(RpcClientConfig rpcClientConfig, ILogger<JsonRpcClient> logger, IHostApplicationLifetime appLifetime, IMediator mediator)
+        public JsonRpcClient(
+            RpcClientConfig rpcClientConfig, 
+            ILogger<JsonRpcClient> logger, 
+            IHostApplicationLifetime appLifetime, 
+            IMediator mediator,
+            ICustomLoggerFactory customLoggerFactory)
         {
             _id = rpcClientConfig.Id;
+            _name = rpcClientConfig.Name;
             _url = rpcClientConfig.Url;
             _certificate = rpcClientConfig.Certificate;
-            _logger = logger;
+            _logger = customLoggerFactory.CreateLogger(Data.Enums.ServiceModule.JsonRpcClient, _id);
             _appLifetime = appLifetime;
             _mediator = mediator;
         }
@@ -79,20 +89,20 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Clients
 
                     if(State == ConnectionState.Connecting || State == ConnectionState.Connected)
                     {
-                        _logger.LogInformation("Already connected or connecting. No need to reconnect.");
+                        await _logger.LogInformationAsync("Already connected or connecting. No need to reconnect.");
                         return;
                     }
 
-                    _logger.LogInformation("Reconnect attempt {RetryCount}...", _retryCount);
+                    await _logger.LogInformationAsync($"Reconnect attempt {_retryCount}...");
                     if (await ConnectAsync())
                     {
                         _retryCount = 0;
-                        _logger.LogInformation("Reconnected successfully.");
+                        await _logger.LogInformationAsync("Reconnected successfully.");
                         return;
                     }
                 }
 
-                _logger.LogInformation("Max reconnect attempts reached. Giving up.");
+                await _logger.LogInformationAsync("Max reconnect attempts reached. Giving up.");
             }
             finally
             {
@@ -100,7 +110,7 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Clients
             }
         }
 
-        private void OnDisconnected(object? sender, JsonRpcDisconnectedEventArgs args)
+        private async void OnDisconnected(object? sender, JsonRpcDisconnectedEventArgs args)
         {
             _jsonRpc?.Dispose();
             _jsonRpc = null;
@@ -112,7 +122,7 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Clients
                 _state = ConnectionState.Disconnected;
             }
 
-            _logger.LogInformation("[{Id}] Disconnected from server.", _id);
+            await _logger.LogInformationAsync("Disconnected from server.");
 
             if (args.Exception != null)
             {
@@ -128,11 +138,11 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Clients
                         goto Reconnect;
                 }
 
-                _logger.LogError(args.Exception, "[{Id}] Disconnection error.", _id);
+                await _logger.LogInformationAsync(args.Exception, "Disconnection error.");
             }
 
         Reconnect:
-            _ = TryReconnectAsync();
+            await TryReconnectAsync();
         }
 
         public async Task<bool> ConnectAsync(CancellationToken cancellationToken = default)
@@ -149,7 +159,7 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Clients
                     _state = ConnectionState.Connecting;
                 }
 
-                _logger.LogInformation("[{Id}] Connecting to {Url}...", _id, _url);
+                await _logger.LogInformationAsync($"Connecting to {_url}...");
 
                 var uri = new Uri(_url);
                 _client = new TcpClient();
@@ -166,7 +176,7 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Clients
                     return false;
                 });
 
-                _logger.LogInformation("[{Id}] Authenticating SSL stream...", _id);
+                await _logger.LogInformationAsync("Authenticating SSL stream...");
                 var options = new SslClientAuthenticationOptions()
                 {
                     TargetHost = Common.CompanyName,
@@ -186,7 +196,7 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Clients
                     throw new TimeoutException("SSL handshake timed out.");
                 }
 
-                _logger.LogInformation("[{Id}] SSL handshake completed with {RemoteEndPoint}", _id, _client.Client.RemoteEndPoint);
+                await _logger.LogInformationAsync($"SSL handshake completed with {_client.Client.RemoteEndPoint}");
 
                 var headerDelimitedMessageHandler  = new LengthHeaderMessageHandler(sslStream, sslStream, MessagePackFormatterHelper.Create());
                 _jsonRpc = new JsonRpc(headerDelimitedMessageHandler);
@@ -195,8 +205,8 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Clients
                 _proxies = CreateProxies(_jsonRpc);
 
                 _jsonRpc.StartListening();
-                
-                _logger.LogInformation("[{Id}] Listening for RPC with {RemoteEndPoint}", _id, _client.Client.RemoteEndPoint);
+
+                await _logger.LogInformationAsync($"Listening for RPC with {_client.Client.RemoteEndPoint}");
 
                 lock (_lock)
                 {
@@ -229,7 +239,7 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Clients
                     _state = ConnectionState.Disconnected;
                 }
 
-                _logger.LogError(ex, "Error in JsonRpcClient.ConnectAsync");
+                await _logger.LogErrorAsync(ex, "Error in JsonRpcClient.ConnectAsync");
 
                 return false;
             }
@@ -255,7 +265,7 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Clients
                 _state = ConnectionState.Disconnecting;
             }
 
-            _logger.LogInformation("[{Id}] Disconnecting...", Id);
+            await _logger.LogInformationAsync("Disconnecting...");
 
             try
             {

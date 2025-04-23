@@ -1,6 +1,9 @@
 ﻿using LSTY.Sdtd.ServerAdmin.Data.Abstractions;
+using LSTY.Sdtd.ServerAdmin.Data.Entities;
 using LSTY.Sdtd.ServerAdmin.Shared.EventArgs;
 using LSTY.Sdtd.ServerAdmin.Shared.Models;
+using MongoDB.Bson;
+using MongoDB.Entities;
 
 namespace LSTY.Sdtd.ServerAdmin.Services.Core
 {
@@ -22,41 +25,59 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
 
         internal async void Process(object? sender, ChatMessageEventArgs chatMessageEventArgs)
         {
-            string? playerId = chatMessageEventArgs.PlayerId;
-            if (playerId != null && chatMessageEventArgs.ChatType == ChatType.Global)
+            try
             {
-                try
+                string? playerId = chatMessageEventArgs.PlayerId;
+                if (playerId != null && chatMessageEventArgs.ChatType == ChatType.Global)
                 {
-                    var commonSettings = _sharedState.CommonSettings;
-                    var commandParser = new CommandParser(commonSettings.ChatCommandPrefixes, commonSettings.AllowNoPrefix, commonSettings.ChatCommandSeparator);
-                    var commandParseResult = commandParser.Parse(chatMessageEventArgs.Message);
-
-                    if (commandParseResult.IsCommand)
+                    try
                     {
-                        if (_commandRegistry.TryGetCommand(commandParseResult.CommandName, out var commandInfo))
-                        {
-                            var commandSender = new CommandSender()
-                            {
-                                EntityId = chatMessageEventArgs.EntityId,
-                                PlayerId = playerId,
-                                PlayerName = chatMessageEventArgs.SenderName,
-                            };
+                        var commonSettings = _sharedState.CommonSettings;
+                        var commandParser = new CommandParser(commonSettings.ChatCommandPrefixes, commonSettings.AllowNoPrefix, commonSettings.ChatCommandSeparator);
+                        var commandParseResult = commandParser.Parse(chatMessageEventArgs.Message);
 
-                            await commandInfo!.Execute(commandParseResult.Arguments, commandSender);
+                        if (commandParseResult.IsCommand)
+                        {
+                            if (_commandRegistry.TryGetCommand(commandParseResult.CommandName, out var commandInfo))
+                            {
+                                var commandSender = new CommandSender()
+                                {
+                                    EntityId = chatMessageEventArgs.EntityId,
+                                    PlayerId = playerId,
+                                    PlayerName = chatMessageEventArgs.SenderName,
+                                };
+
+                                await commandInfo!.Execute(commandParseResult.Arguments, commandSender);
+                            }
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    string logId = await _logger.LogErrorAsync(ex, "Error in ChatCommandProcessor.Process");
-
-                    await _sharedState.GameManageProxy.SendPrivateMessageAsync(new PrivateMessage()
+                    catch (Exception ex)
                     {
-                        Message = $"An error occurred while processing your command. Please contact the server administrator. Error ID: {logId}",
-                        SenderName = _sharedState.CommonSettings.WhisperServerName,
-                        TargetPlayerIdOrName = playerId,
-                    });
+                        string logId = await _logger.LogErrorAsync(ex, "An error occurred while processing a chat command.");
+
+                        await _sharedState.GameManageProxy.SendPrivateMessageAsync(new PrivateMessage()
+                        {
+                            Message = $"An error occurred while processing your command. Please contact the server administrator. Error ID: {logId}",
+                            SenderName = _sharedState.CommonSettings.WhisperServerName,
+                            TargetPlayerIdOrName = playerId,
+                        });
+                    }
                 }
+            }
+            finally
+            {
+                var chatMessage = new ChatMessage()
+                {
+                    ID = ObjectId.GenerateNewId().ToString(),
+                    CreatedOn = chatMessageEventArgs.Timestamp,
+                    EntityId = chatMessageEventArgs.EntityId,
+                    PlayerId = chatMessageEventArgs.PlayerId,
+                    SenderName = chatMessageEventArgs.SenderName,
+                    ChatType = chatMessageEventArgs.ChatType,
+                    Message = chatMessageEventArgs.Message,
+                    GameServerId = _sharedState.GameServerId,
+                };
+                await DB.SaveAsync(chatMessage);
             }
         }
     }

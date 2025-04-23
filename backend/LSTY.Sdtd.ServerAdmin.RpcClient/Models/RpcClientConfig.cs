@@ -5,6 +5,7 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Models
     public class RpcClientConfig
     {
         public required string Id { get; set; }
+        public required string Name { get; set; }
         public required string Url { get; set; }
         public required X509Certificate2 Certificate { get; set; }
     }
