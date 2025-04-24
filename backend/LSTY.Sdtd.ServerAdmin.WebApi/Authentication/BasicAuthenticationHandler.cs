@@ -34,18 +34,17 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Authentication
         /// <returns></returns>
         protected override Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            //if (Context.WebSockets.IsWebSocketRequest)
-            //{
+            bool isWebSocketRequest = Context.WebSockets.IsWebSocketRequest;
 
-            //}
-
-            if (Request.Headers.ContainsKey(HeaderNames.Authorization) == false)
+            string authHeaderName = isWebSocketRequest ? HeaderNames.WebSocketSubProtocols : HeaderNames.Authorization;
+            if (Request.Headers.ContainsKey(authHeaderName) == false)
             {
                 Logger.LogDebug("No 'Authorization' header found in the request.");
                 return Task.FromResult(AuthenticateResult.NoResult());
             }
 
-            if (AuthenticationHeaderValue.TryParse(Request.Headers[HeaderNames.Authorization], out var headerValue) == false)
+            string? authHeaderValue = isWebSocketRequest ? Context.WebSockets.WebSocketRequestedProtocols.FirstOrDefault() : Request.Headers[authHeaderName].ToString();
+            if (AuthenticationHeaderValue.TryParse(authHeaderValue, out var headerValue) == false)
             {
                 Logger.LogDebug("No valid 'Authorization' header found in the request.");
                 return Task.FromResult(AuthenticateResult.NoResult());

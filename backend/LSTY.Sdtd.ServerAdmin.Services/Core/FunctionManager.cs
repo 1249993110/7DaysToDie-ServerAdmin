@@ -120,14 +120,16 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
             var commonSettingsDict = await _functionSettingsProvider.GetAsync(serverId, null);
             var commonSettings = (CommonSettings)AdaptSettings(typeof(CommonSettings), commonSettingsDict);
 
+            var modEventProxy = (IModEventProxy)rpcProxies[typeof(IModEventProxy)];
             var sharedState = new SharedState()
             {
                 GameServerId = serverId,
                 CommonSettings = commonSettings,
                 RpcProxies = rpcProxies,
-                ModEventProxy = (IModEventProxy)rpcProxies[typeof(IModEventProxy)],
+                ModEventProxy = modEventProxy,
                 GameManageProxy = (IGameManageProxy)rpcProxies[typeof(IGameManageProxy)],
                 ServiceProvider = _serviceProvider,
+                EventForwarder = new EventForwarder(modEventProxy),
             };
 
             var commandRegistry = new CommandRegistry();
@@ -159,6 +161,11 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
             {
                 functionGroup.Dispose();
             }
+        }
+
+        public bool TryGetFunctionGroup(string serverId, out FunctionGroup? functionGroup)
+        {
+            return _runningFunctions.TryGetValue(serverId, out functionGroup);
         }
     }
 }

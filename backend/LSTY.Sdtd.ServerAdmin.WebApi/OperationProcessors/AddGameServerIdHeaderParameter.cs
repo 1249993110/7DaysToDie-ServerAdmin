@@ -11,7 +11,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.OperationProcessors
     /// </summary>
     public class AddGameServerIdHeaderParameter : IOperationProcessor
     {
-        private const string paramName = "gameServerId";
+        internal const string Name = "gameServerId";
 
         /// <summary>
         /// <inheritdoc/>
@@ -23,11 +23,11 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.OperationProcessors
             if (context.ControllerType.CustomAttributes.Any(p => p.AttributeType == typeof(AuthorizeAttribute)
                     && p.ConstructorArguments.FirstOrDefault().Value?.ToString() == AuthorizationPolicys.GameServerOwner))
             {
-                if(context.Parameters.Any(p => p.Key.Name == paramName) == false)
+                if (context.Parameters.Any(p => Name.Equals(p.Key.Name, StringComparison.OrdinalIgnoreCase)) == false)
                 {
                     context.OperationDescription.Operation.Parameters.Add(new OpenApiParameter
                     {
-                        Name = paramName,
+                        Name = Name,
                         Kind = OpenApiParameterKind.Header,
                         Type = NJsonSchema.JsonObjectType.String,
                         IsRequired = true,

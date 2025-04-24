@@ -1,5 +1,6 @@
 ﻿using LSTY.Sdtd.ServerAdmin.Shared.Models;
 using LSTY.Sdtd.ServerAdmin.Shared.Proxies;
+using System.Text;
 
 namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer.Proxies
 {
@@ -28,6 +29,27 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer.Proxies
                 IEnumerable<string> executeResult = SdtdConsole.Instance.ExecuteSync(command, ModMain.CmdExecuteDelegate);
                 return Task.FromResult(executeResult);
             }
+        }
+
+        public Task<string> GetWelcome()
+        {
+            var stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine("*** Connected with 7DTD server.");
+            stringBuilder.AppendLine("*** Server version: " + global::Constants.cVersionInformation.LongString + " Compatibility Version: " + global::Constants.cVersionInformation.LongStringNoBuild);
+            stringBuilder.AppendLine("*** Dedicated server only build");
+            stringBuilder.AppendLine(string.Empty);
+            stringBuilder.AppendLine("Server IP:   " + (string.IsNullOrEmpty(GamePrefs.GetString(EnumGamePrefs.ServerIP)) ? "Any" : GamePrefs.GetString(EnumGamePrefs.ServerIP)));
+            stringBuilder.AppendLine("Server port: " + GamePrefs.GetInt(EnumGamePrefs.ServerPort).ToString());
+            stringBuilder.AppendLine("Max players: " + GamePrefs.GetInt(EnumGamePrefs.ServerMaxPlayerCount).ToString());
+            stringBuilder.AppendLine("Game mode:   " + GamePrefs.GetString(EnumGamePrefs.GameMode));
+            stringBuilder.AppendLine("World:       " + GamePrefs.GetString(EnumGamePrefs.GameWorld));
+            stringBuilder.AppendLine("Game name:   " + GamePrefs.GetString(EnumGamePrefs.GameName));
+            stringBuilder.AppendLine("Difficulty:  " + GamePrefs.GetInt(EnumGamePrefs.GameDifficulty).ToString());
+            stringBuilder.AppendLine(string.Empty);
+            stringBuilder.AppendLine("Press 'help' to get a list of all commands.");
+            stringBuilder.AppendLine(string.Empty);
+
+            return Task.FromResult(stringBuilder.ToString());
         }
 
         /// <summary>

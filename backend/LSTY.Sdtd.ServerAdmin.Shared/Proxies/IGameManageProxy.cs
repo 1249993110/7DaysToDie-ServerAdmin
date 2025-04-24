@@ -8,5 +8,7 @@ namespace LSTY.Sdtd.ServerAdmin.Shared.Proxies
         Task<IEnumerable<string>> ExecuteConsoleCommandAsync(string command, bool inMainThread = true);
         Task<IEnumerable<string>> SendGlobalMessageAsync(GlobalMessage globalMessage);
         Task<IEnumerable<string>> SendPrivateMessageAsync(PrivateMessage privateMessage);
+
+        Task<string> GetWelcome();
     }
 }

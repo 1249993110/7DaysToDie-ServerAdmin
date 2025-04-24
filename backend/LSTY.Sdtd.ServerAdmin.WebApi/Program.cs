@@ -251,6 +251,11 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
 
                 app.UseRouting();
 
+                app.UseWebSockets(new WebSocketOptions()
+                {
+                    KeepAliveInterval = TimeSpan.FromMinutes(2)
+                });
+
                 if (enableCors)
                 {
                     app.UseCors("Cors");

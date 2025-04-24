@@ -12,5 +12,6 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
         public required IModEventProxy ModEventProxy { get; set; }
         public required IGameManageProxy GameManageProxy { get; set; }
         public required IServiceProvider ServiceProvider { get; set; }
+        public required EventForwarder EventForwarder { get; set; }
     }
 }

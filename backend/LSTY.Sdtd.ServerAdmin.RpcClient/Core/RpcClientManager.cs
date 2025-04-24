@@ -2,10 +2,7 @@
 using LSTY.Sdtd.ServerAdmin.RpcClient.Abstractions;
 using LSTY.Sdtd.ServerAdmin.RpcClient.Clients;
 using LSTY.Sdtd.ServerAdmin.RpcClient.Models;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
 
 namespace LSTY.Sdtd.ServerAdmin.RpcClient.Core
