@@ -26,26 +26,11 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         }
 
         /// <summary>
-        /// Gets the function settings by the specified ID.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet("{id}")]
-        public async Task<ActionResult<FunctionSettings>> Get(string id)
-        {
-            var entity = await DB.Find<FunctionSettings>().OneAsync(id);
-            if (entity == null)
-                return NotFound();
-
-            return Ok(entity);
-        }
-
-        /// <summary>
         /// Gets the function settings by the specified game server ID and function name.
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<FunctionSettings>> Get([FromHeader] string gameServerId, string? functionName)
+        public async Task<ActionResult<FunctionSettings>> Get([FromHeader] string gameServerId, [FromQuery] string? functionName)
         {
             var entity = await DB.Find<FunctionSettings>()
                 .Match(p => p.GameServerId == gameServerId && p.FunctionName == functionName).ExecuteSingleAsync();
@@ -61,7 +46,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        public async Task<ActionResult<FunctionSettings>> Create([FromHeader] string gameServerId, [FromBody] CreateFunctionSettingsDto dto)
+        public async Task<ActionResult<FunctionSettings>> Create([FromHeader] string gameServerId, [FromBody] FunctionSettingsCreateDto dto)
         {
             var entity = new FunctionSettings()
             {
@@ -69,6 +54,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                 GameServerId = gameServerId,
                 Settings = dto.Settings
             };
+
             if (_functionManager.UpdateFunctionSettings(entity) == false)
             {
                 return BadRequest($"Function with name '{entity.FunctionName}' does not exist.");
@@ -82,15 +68,18 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <summary>
         /// Updates the function settings by the specified ID.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(string id, [FromBody] UpdateFunctionSettingsDto dto)
+        public async Task<IActionResult> Update([FromHeader] string gameServerId, [FromRoute] string id, [FromBody] FunctionSettingsUpdateDto dto)
         {
             var entity = await DB.Find<FunctionSettings>().OneAsync(id);
             if (entity == null)
                 return NotFound();
+
+            if (entity.GameServerId != gameServerId)
+            {
+                return Forbid();
+            }
 
             entity.Settings = dto.Settings;
             _functionManager.UpdateFunctionSettings(entity);
@@ -101,20 +90,29 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         }
 
         /// <summary>
-        /// Deletes the function settings by the specified ID.
+        /// Deletes the function settings by the specified IDs.
         /// </summary>
-        /// <param name="id"></param>
         /// <returns></returns>
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id)
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromHeader] string gameServerId, [FromQuery] IEnumerable<string> ids, [FromQuery] bool deleteAll = false)
         {
-            var entity = await DB.Find<FunctionSettings>().OneAsync(id);
-            if (entity == null)
-                return NotFound();
+            if (deleteAll)
+            {
+                await DB.DeleteAsync<FunctionSettings>(p => p.GameServerId == gameServerId);
+            }
+            else
+            {
+                foreach (var id in ids)
+                {
+                    var entity = await DB.Find<FunctionSettings>().OneAsync(id);
+                    if (entity != null && entity.GameServerId != gameServerId)
+                    {
+                        await entity.DeleteAsync();
+                    }
+                }
+            }
 
-            await entity.DeleteAsync();
             return NoContent();
         }
-
     }
 }

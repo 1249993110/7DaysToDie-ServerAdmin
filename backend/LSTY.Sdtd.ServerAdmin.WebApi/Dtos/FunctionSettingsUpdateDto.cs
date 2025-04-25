@@ -5,7 +5,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Dtos
     /// <summary>
     /// Represents the data required to update existing function settings.
     /// </summary>
-    public class UpdateFunctionSettingsDto
+    public class FunctionSettingsUpdateDto
     {
         /// <summary>
         /// A dictionary of key-value pairs representing the function's configuration settings.

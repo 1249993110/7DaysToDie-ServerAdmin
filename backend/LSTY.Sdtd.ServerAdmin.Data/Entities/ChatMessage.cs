@@ -54,8 +54,9 @@ namespace LSTY.Sdtd.ServerAdmin.Data.Entities
                 .CreateAsync();
 
             DB.Index<ChatMessage>()
-                .Key(e => e.SenderName, KeyType.Text)
-                .Key(e => e.Message, KeyType.Text)
+                .Key(e => e.GameServerId, KeyType.Ascending)
+                .Key(e => e.CreatedOn, KeyType.Descending)
+                .Key(e => e.SenderName, KeyType.Ascending)
                 .CreateAsync();
         }
     }

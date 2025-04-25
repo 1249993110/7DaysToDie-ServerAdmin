@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents the data required to create a new function setting.
     /// </summary>
-    public class CreateFunctionSettingsDto : UpdateFunctionSettingsDto
+    public class FunctionSettingsCreateDto : FunctionSettingsUpdateDto
     {
         /// <summary>
         /// The name of the function being configured.

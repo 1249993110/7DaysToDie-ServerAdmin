@@ -12,8 +12,9 @@ namespace LSTY.Sdtd.ServerAdmin.Data.Entities
         public required string Name { get; set; }
         public required string Ip { get; set; }
         public required int Port { get; set; }
-        public required string? PfxPassword { get; set; }
+        public string? PfxPassword { get; set; }
         public required bool IsEnabled { get; set; }
+        public string? Description { get; set; }
         public required string UserId { get; set; }
 
         static GameServerConfig()

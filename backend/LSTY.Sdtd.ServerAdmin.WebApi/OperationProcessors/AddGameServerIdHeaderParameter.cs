@@ -23,16 +23,26 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.OperationProcessors
             if (context.ControllerType.CustomAttributes.Any(p => p.AttributeType == typeof(AuthorizeAttribute)
                     && p.ConstructorArguments.FirstOrDefault().Value?.ToString() == AuthorizationPolicys.GameServerOwner))
             {
-                if (context.Parameters.Any(p => Name.Equals(p.Key.Name, StringComparison.OrdinalIgnoreCase)) == false)
+                var parameters = context.OperationDescription.Operation.Parameters;
+
+                const string description = "The ID of the game server.";
+
+                var param = parameters.FirstOrDefault(p => Name.Equals(p.Name, StringComparison.OrdinalIgnoreCase));
+                if (param == null)
                 {
-                    context.OperationDescription.Operation.Parameters.Add(new OpenApiParameter
+                    parameters.Add(new OpenApiParameter
                     {
                         Name = Name,
                         Kind = OpenApiParameterKind.Header,
                         Type = NJsonSchema.JsonObjectType.String,
                         IsRequired = true,
-                        Description = "The ID of the game server."
+                        Description = description
                     });
+                }
+                else
+                {
+                    param.IsRequired = true;
+                    param.Description = description;
                 }
             }
 

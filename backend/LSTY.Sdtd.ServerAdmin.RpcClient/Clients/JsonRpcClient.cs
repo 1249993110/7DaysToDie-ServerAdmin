@@ -206,7 +206,7 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Clients
 
                 _jsonRpc.StartListening();
 
-                await _logger.LogInformationAsync($"Listening for RPC with {_client.Client.RemoteEndPoint}");
+                await _logger.LogInformationAsync($"Connected and listening for RPC with {_client.Client.RemoteEndPoint}");
 
                 lock (_lock)
                 {
