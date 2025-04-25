@@ -14,6 +14,7 @@ using LSTY.Sdtd.ServerAdmin.WebApi.OperationProcessors;
 using LSTY.Sdtd.ServerAdmin.WebApi.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
+using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using MongoDB.Entities;
 using NSwag;
@@ -286,6 +287,10 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
         {
             //var objectSerializer = new ObjectSerializer(ObjectSerializer.AllAllowedTypes);
             //BsonSerializer.RegisterSerializer(objectSerializer);
+
+            //var camelCaseConvention = new ConventionPack() { new CamelCaseElementNameConvention() };
+            //ConventionRegistry.Register("CamelCase", camelCaseConvention, type => true);
+
             return DB.InitAsync(options.DatabaseName, MongoClientSettings.FromConnectionString(options.ConnectionString));
         }
     }

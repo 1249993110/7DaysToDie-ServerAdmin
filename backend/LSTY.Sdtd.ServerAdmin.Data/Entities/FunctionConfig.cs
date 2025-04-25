@@ -2,15 +2,26 @@
 
 namespace LSTY.Sdtd.ServerAdmin.Data.Entities
 {
-    public class FunctionSettings : EntityBase
+    public class FunctionConfig : EntityBase
     {
         public required string GameServerId { get; set; }
-        public required string? FunctionName { get; set; } // nameof(CommonSettings)
-        public required Dictionary<string, object?> Settings { get; set; }
 
-        static FunctionSettings()
+        /// <summary>
+        /// Function name.
+        /// </summary>
+        /// <remarks>
+        /// Use `CommonSettings` for common settings.
+        /// </remarks>
+        public required string FunctionName { get; set; }
+
+        /// <summary>
+        /// Serialized settings.
+        /// </summary>
+        public required string Settings { get; set; }
+
+        static FunctionConfig()
         {
-            DB.Index<FunctionSettings>()
+            DB.Index<FunctionConfig>()
                 .Key(e => e.GameServerId, KeyType.Ascending)
                 .Key(e => e.FunctionName, KeyType.Ascending)
                 .Option(o =>

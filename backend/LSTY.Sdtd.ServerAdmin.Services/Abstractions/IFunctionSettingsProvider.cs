@@ -1,9 +1,7 @@
-﻿using MongoDB.Bson;
-
-namespace LSTY.Sdtd.ServerAdmin.Services.Abstractions
+﻿namespace LSTY.Sdtd.ServerAdmin.Services.Abstractions
 {
     public interface IFunctionSettingsProvider
     {
-        Task<IReadOnlyDictionary<string, object?>?> GetAsync(string gameServerId, string? functionName);
+        Task<string?> GetAsync(string gameServerId, string functionName);
     }
 }

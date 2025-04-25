@@ -39,20 +39,14 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
             var filterBulid = Builders<ChatMessage>.Filter;
             if (string.IsNullOrEmpty(dto.SenderIdOrName) == false)
             {
-                FilterDefinition<ChatMessage> filter;
                 if (int.TryParse(dto.SenderIdOrName, out int entityId))
                 {
-                    filter = filterBulid.Or(
-                        filterBulid.Eq(p => p.EntityId, entityId),
-                        filterBulid.Eq(p => p.SenderName, dto.SenderIdOrName));
+                    query.Match(filterBulid.Eq(p => p.EntityId, entityId) | filterBulid.Eq(p => p.SenderName, dto.SenderIdOrName));
                 }
                 else
                 {
-                    filter = filterBulid.Or(
-                        filterBulid.Eq(p => p.PlayerId, dto.SenderIdOrName),
-                        filterBulid.Eq(p => p.SenderName, dto.SenderIdOrName));
+                    query.Match(filterBulid.Eq(p => p.PlayerId, dto.SenderIdOrName) | filterBulid.Eq(p => p.SenderName, dto.SenderIdOrName));
                 }
-                query.Match(filter);
             }
      
             if (string.IsNullOrEmpty(dto.Keyword) == false)

@@ -49,7 +49,7 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
                     var function = (IFunction)ActivatorUtilities.CreateInstance(_serviceProvider, type);
                     string functionName = function.Name;
                     var settingsDict = await _functionSettingsProvider.GetAsync(serverId, functionName);
-                    var functionSettings = AdaptSettings(function.GetSettingsType(), settingsDict);
+                    var functionSettings = CreateSettings(function.GetSettingsType(), settingsDict);
 
                     function.Init(sharedState, commandRegistry);
                     function.OnSettingsChanged(functionSettings);
@@ -65,34 +65,31 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
             return result;
         }
 
-        private ISettings AdaptSettings(Type settingsType, IReadOnlyDictionary<string, object?>? settingsDict)
+        private ISettings CreateSettings(Type settingsType, string? serializedSettings)
         {
             ISettings? settings;
-            
-            if (settingsDict == null)
+            if (serializedSettings == null)
             {
                 settings = Activator.CreateInstance(settingsType) as ISettings;
             }
             else
             {
-                string json = JsonSerializer.Serialize(settingsDict, _jsonOptions.Value.JsonSerializerOptions);
-                settings = JsonSerializer.Deserialize(json, settingsType, _jsonOptions.Value.JsonSerializerOptions) as ISettings;
+                settings = JsonSerializer.Deserialize(serializedSettings, settingsType, _jsonOptions.Value.JsonSerializerOptions) as ISettings;
             }
             if (settings == null)
             {
                 throw new InvalidOperationException($"Cannot create instance of {settingsType}");
             }
 
-            //settingsDict.Adapt(settings);
             return settings;
         }
 
-        public bool UpdateFunctionSettings(FunctionSettings entity)
+        public bool UpdateFunctionConfig(FunctionConfig entity)
         {
             // Check if the function name is null, which means CommonSettings are changed
-            if (string.IsNullOrEmpty(entity.FunctionName))
+            if (entity.FunctionName == nameof(CommonSettings))
             {
-                var commonSettings = AdaptSettings(typeof(CommonSettings), entity.Settings);
+                var commonSettings = CreateSettings(typeof(CommonSettings), entity.Settings);
                 // Update all functions with the new CommonSettings
                 if (_runningFunctions.TryGetValue(entity.GameServerId, out var functionGroup))
                 {
@@ -105,7 +102,7 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
                 if (functionGroup.Functions.TryGetValue(entity.FunctionName, out var function))
                 {
                     var settingsType = function.GetSettingsType();
-                    var _settings = AdaptSettings(settingsType, entity.Settings);
+                    var _settings = CreateSettings(settingsType, entity.Settings);
                     function.OnSettingsChanged(_settings);
                     return true;
                 }
@@ -117,8 +114,8 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
         public async Task RegisterFunctionsAsync(string serverId, IReadOnlyDictionary<Type, IProxy> rpcProxies)
         {
             // Load common settings from database
-            var commonSettingsDict = await _functionSettingsProvider.GetAsync(serverId, null);
-            var commonSettings = (CommonSettings)AdaptSettings(typeof(CommonSettings), commonSettingsDict);
+            var commonSettingsDict = await _functionSettingsProvider.GetAsync(serverId, nameof(CommonSettings));
+            var commonSettings = (CommonSettings)CreateSettings(typeof(CommonSettings), commonSettingsDict);
 
             var modEventProxy = (IModEventProxy)rpcProxies[typeof(IModEventProxy)];
             var sharedState = new SharedState()
