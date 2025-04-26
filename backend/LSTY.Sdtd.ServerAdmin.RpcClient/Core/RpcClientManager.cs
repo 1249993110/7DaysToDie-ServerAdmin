@@ -66,17 +66,13 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Core
 
         public async Task RemoveClientAsync(string id)
         {
-            var logger = _customLoggerFactory.CreateLogger(Data.Enums.ServiceModule.RpcClientManager, id);
-
             if (_clients.TryRemove(id, out var client))
             {
                 await client.DisconnectAsync();
                 client.Dispose();
+
+                var logger = _customLoggerFactory.CreateLogger(Data.Enums.ServiceModule.RpcClientManager, id);
                 await logger.LogInformationAsync($"Rpc Client {client.Name} disposed.");
-            }
-            else
-            {
-                await logger.LogWarningAsync($"Rpc Client {id} not found.");
             }
         }
 
@@ -100,7 +96,7 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Core
             await client.ConnectAsync();
 
             var logger = _customLoggerFactory.CreateLogger(Data.Enums.ServiceModule.RpcClientManager, config.Id);
-            await logger.LogInformationAsync($"Rpc Client {config.Name} added or updated.");
+            await logger.LogInformationAsync($"Rpc Client [{config.Name}] added or updated.");
         }
 
         public bool TryGetClient(string id, out IRpcClient? rpcClient)

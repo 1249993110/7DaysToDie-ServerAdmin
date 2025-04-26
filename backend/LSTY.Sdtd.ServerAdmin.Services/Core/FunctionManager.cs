@@ -48,8 +48,8 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
                 {
                     var function = (IFunction)ActivatorUtilities.CreateInstance(_serviceProvider, type);
                     string functionName = function.Name;
-                    var settingsDict = await _functionSettingsProvider.GetAsync(serverId, functionName);
-                    var functionSettings = CreateSettings(function.GetSettingsType(), settingsDict);
+                    string? serializedSettings = await _functionSettingsProvider.GetAsync(serverId, functionName);
+                    var functionSettings = CreateSettings(function.GetSettingsType(), serializedSettings);
 
                     function.Init(sharedState, commandRegistry);
                     function.OnSettingsChanged(functionSettings);
@@ -114,8 +114,8 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
         public async Task RegisterFunctionsAsync(string serverId, IReadOnlyDictionary<Type, IProxy> rpcProxies)
         {
             // Load common settings from database
-            var commonSettingsDict = await _functionSettingsProvider.GetAsync(serverId, nameof(CommonSettings));
-            var commonSettings = (CommonSettings)CreateSettings(typeof(CommonSettings), commonSettingsDict);
+            var commonSettingsJson = await _functionSettingsProvider.GetAsync(serverId, nameof(CommonSettings));
+            var commonSettings = (CommonSettings)CreateSettings(typeof(CommonSettings), commonSettingsJson);
 
             var modEventProxy = (IModEventProxy)rpcProxies[typeof(IModEventProxy)];
             var sharedState = new SharedState()

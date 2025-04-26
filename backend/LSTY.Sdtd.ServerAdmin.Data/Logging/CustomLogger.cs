@@ -50,7 +50,7 @@ namespace LSTY.Sdtd.ServerAdmin.Data.Logging
         {
             var logEntry = new LogEntry()
             {
-                Level = level,
+                LogLevel = level,
                 Content = message,
                 AdditionalData = exception?.ToString(),
                 ServiceModule = _serviceModule,

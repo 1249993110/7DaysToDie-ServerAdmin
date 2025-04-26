@@ -10,14 +10,14 @@ using MongoDB.Entities;
 namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
 {
     /// <summary>
-    /// Chat Messages.
+    /// Chat Message.
     /// </summary>
     [Authorize(AuthorizationPolicys.GameServerOwner)]
     [Route("api/[controller]")]
-    public class ChatMessagesController : ControllerBase
+    public class ChatMessageController : ControllerBase
     {
         /// <summary>
-        /// Gets the chat messages by
+        /// Gets the chat messages by the specified game server ID and chat message query DTO.
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -69,7 +69,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         }
 
         /// <summary>
-        /// Deletes the chat message by the specified IDs.
+        /// Deletes the chat messages by the specified game server ID and the specified IDs or deletes all messages if deleteAll is true.
         /// </summary>
         /// <returns></returns>
         [HttpDelete]

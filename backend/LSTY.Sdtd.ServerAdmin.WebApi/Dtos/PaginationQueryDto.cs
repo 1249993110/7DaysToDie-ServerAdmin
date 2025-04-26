@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Converters;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace LSTY.Sdtd.ServerAdmin.WebApi.Dtos
 {
@@ -9,25 +8,25 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Dtos
     public class PaginationQuery
     {
         /// <summary>
-        /// Gets or sets the page number. Default value is 1.
+        /// The page number. Default value is 1.
         /// </summary>
         [DefaultValue(1)]
         public int PageNumber { get; set; } = 1;
 
         /// <summary>
-        /// Gets or sets the number of items per page. 
+        /// The number of items per page. 
         /// If the value is less than 0, all records will be returned. Default value is 10.
         /// </summary>
         [DefaultValue(10)]
         public int PageSize { get; set; } = 10;
 
         /// <summary>
-        /// Gets or sets the search keyword for filtering results.
+        /// The search keyword for filtering results.
         /// </summary>
         public string? Keyword { get; set; }
 
         /// <summary>
-        /// Gets or sets the field by which the results should be ordered.
+        /// The field by which the results should be ordered.
         /// </summary>
         public string? Order { get; set; }
 
@@ -44,30 +43,30 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Dtos
     public class PaginationQuery<TOrder> where TOrder : Enum
     {
         /// <summary>
-        /// Gets or sets the page number. Default value is 1.
+        /// The page number. Default value is 1.
         /// </summary>
         [DefaultValue(1)]
         public int PageNumber { get; set; } = 1;
 
         /// <summary>
-        /// Gets or sets the number of items per page. 
+        /// The number of items per page. 
         /// If the value is less than 0, all records will be returned. Default value is 10.
         /// </summary>
         [DefaultValue(10)]
         public int PageSize { get; set; } = 10;
 
         /// <summary>
-        /// Gets or sets the search keyword for filtering results.
+        /// The search keyword for filtering results.
         /// </summary>
         public string? Keyword { get; set; }
 
         /// <summary>
-        /// Gets or sets the field by which the results should be ordered.
+        /// The field by which the results should be ordered.
         /// </summary>
         public TOrder? Order { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the results should be sorted in descending order.
+        /// A value indicating whether the results should be sorted in descending order.
         /// </summary>
         public bool Desc { get; set; }
     }

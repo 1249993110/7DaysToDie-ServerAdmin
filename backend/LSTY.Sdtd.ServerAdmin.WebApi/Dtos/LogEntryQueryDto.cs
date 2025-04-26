@@ -1,11 +1,12 @@
-﻿using LSTY.Sdtd.ServerAdmin.Shared.Models;
+﻿using LSTY.Sdtd.ServerAdmin.Data.Enums;
+using LogLevel = LSTY.Sdtd.ServerAdmin.Data.Enums.LogLevel;
 
 namespace LSTY.Sdtd.ServerAdmin.WebApi.Dtos
 {
     /// <summary>
     /// 
     /// </summary>
-    public class ChatMessageQueryDto : PaginationQuery<CreatedOnQueryOrder>
+    public class LogEntryQueryDto : PaginationQuery<CreatedOnQueryOrder>
     {
         /// <summary>
         /// Start Date Time
@@ -18,13 +19,13 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Dtos
         public DateTime? EndDateTime { get; set; }
 
         /// <summary>
-        /// Chat Type
+        /// Service Module
         /// </summary>
-        public ChatType? ChatType { get; set; }
+        public ServiceModule? ServiceModule { get; set; }
 
         /// <summary>
-        /// The ID or name of the sender to search for.
+        /// Log Level
         /// </summary>
-        public string? SenderIdOrName { get; set; }
+        public LogLevel? LogLevel { get; set; }
     }
 }

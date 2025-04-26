@@ -3,17 +3,16 @@ using LSTY.Sdtd.ServerAdmin.Services.Core;
 using LSTY.Sdtd.ServerAdmin.WebApi.Authorization;
 using LSTY.Sdtd.ServerAdmin.WebApi.Dtos;
 using Microsoft.AspNetCore.Authorization;
-using MongoDB.Bson;
 using MongoDB.Entities;
 
 namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
 {
     /// <summary>
-    /// Function Settings.
+    /// Function Config.
     /// </summary>
     [Authorize(AuthorizationPolicys.GameServerOwner)]
     [Route("api/[controller]")]
-    public class FunctionConfigsController : ControllerBase
+    public class FunctionConfigController : ControllerBase
     {
         private readonly FunctionManager _functionManager;
         private readonly IOptions<JsonOptions> _jsonOptions;
@@ -21,14 +20,14 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <summary>
         /// 
         /// </summary>
-        public FunctionConfigsController(FunctionManager functionManager, IOptions<JsonOptions> jsonOptions)
+        public FunctionConfigController(FunctionManager functionManager, IOptions<JsonOptions> jsonOptions)
         {
             _functionManager = functionManager;
             _jsonOptions = jsonOptions;
         }
 
         /// <summary>
-        /// Gets the function settings by the specified game server ID and function name.
+        /// Gets the function config by the specified game server ID and function name.
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -51,7 +50,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         }
 
         /// <summary>
-        /// Creates a new function setting.
+        /// Creates a new function config.
         /// </summary>
         /// <returns></returns>
         [HttpPost]
@@ -78,7 +77,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         }
 
         /// <summary>
-        /// Updates the function settings by the specified ID.
+        /// Updates the function config by the game server ID and the specified IDs.
         /// </summary>
         /// <returns></returns>
         [HttpPut("{id}")]
@@ -105,7 +104,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         }
 
         /// <summary>
-        /// Deletes the function settings by the specified IDs.
+        /// Deletes the function config by the game server ID and the specified IDs.
         /// </summary>
         /// <returns></returns>
         [HttpDelete]
