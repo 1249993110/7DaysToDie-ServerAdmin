@@ -3,11 +3,9 @@ using LSTY.Sdtd.ServerAdmin.RpcClient.Core;
 using LSTY.Sdtd.ServerAdmin.RpcClient.Models;
 using LSTY.Sdtd.ServerAdmin.WebApi.Dtos;
 using LSTY.Sdtd.ServerAdmin.WebApi.Extensions;
+using Mapster;
 using MongoDB.Entities;
-using SkiaSharp;
-using System.IO;
 using System.Security.Cryptography.X509Certificates;
-using System.Threading;
 
 namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
 {
@@ -39,7 +37,14 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
             if (entity == null)
                 return NotFound();
 
-            return Ok(entity.Adapt<GameServerConfigDto>());
+            var result = entity.Adapt<GameServerConfigDto>();
+
+            if(_manager.TryGetClient(id, out var client))
+            {
+                result.IsConnected = client!.State == RpcClient.Clients.ConnectionState.Connected;
+            }
+            
+            return Ok(result);
         }
 
         /// <summary>
@@ -53,7 +58,20 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
             if (entities == null)
                 return NotFound();
 
-            return Ok(entities.Adapt<IEnumerable<GameServerConfigDto>>());
+            var result = new List<GameServerConfigDto>(entities.Count);
+            foreach (var item in entities)
+            {
+                var dto = item.Adapt<GameServerConfigDto>();
+
+                if (_manager.TryGetClient(item.ID, out var client))
+                {
+                    dto.IsConnected = client!.State == RpcClient.Clients.ConnectionState.Connected;
+                }
+
+                result.Add(dto);
+            }
+
+            return Ok(result);
         }
 
         /// <summary>

@@ -49,5 +49,10 @@
         /// The user ID associated with the game server configuration.
         /// </summary>
         public required string UserId { get; set; }
+
+        /// <summary>
+        /// The connection state of the game server.
+        /// </summary>
+        public required bool IsConnected { get; set; }
     }
 }
