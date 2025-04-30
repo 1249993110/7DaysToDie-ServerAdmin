@@ -14,12 +14,14 @@ using LSTY.Sdtd.ServerAdmin.WebApi.OperationProcessors;
 using LSTY.Sdtd.ServerAdmin.WebApi.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.ResponseCompression;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using MongoDB.Entities;
 using NSwag;
 using Serilog;
 using Serilog.Events;
+using System.IO.Compression;
 using System.Text.Json.Serialization;
 
 [assembly: ApiController]
@@ -104,6 +106,24 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
                     .SetFallbackPolicy(new AuthorizationPolicyBuilder()
                         .RequireAuthenticatedUser()
                         .Build());
+
+               // services.AddResponseCompression(options =>
+               // {
+               //     options.Providers.Add<BrotliCompressionProvider>();
+               //     options.Providers.Add<GzipCompressionProvider>();
+               //     options.EnableForHttps = true; // Enable for HTTPS responses
+               //     options.MimeTypes = new[] { "application/json" };
+               // });
+
+               // services.Configure<BrotliCompressionProviderOptions>(options =>
+               // {
+               //     options.Level = CompressionLevel.Optimal;
+               // });
+
+               //services.Configure<GzipCompressionProviderOptions>(options =>
+               // {
+               //     options.Level = CompressionLevel.Optimal;
+               // });
 
                 #region Serilog
 
@@ -265,6 +285,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
                 app.UseAuthentication();
                 app.UseAuthorization();
 
+                //app.UseResponseCompression();
                 app.MapControllers();
 
                 #endregion

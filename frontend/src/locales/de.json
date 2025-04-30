@@ -1,0 +1,24 @@
+{
+    "common": {
+        "appTitle": "TianYi 7 Days to Die Server Admin",
+        "formRule": {
+            "required": "Erforderlich"
+        }
+    },
+    "components": {
+    },
+    "layout": {
+    },
+    "store": {
+    },
+    "views": {
+        "login": {
+            "failed": "Anmeldung fehlgeschlagen: Benutzername oder Passwort ist falsch. Bitte versuchen Sie es erneut",
+            "login": "Einloggen",
+            "password": "Passwort",
+            "success": "Erfolgreich anmelden, springen ...",
+            "username": "Benutzername",
+            "welcome": "Willkommen, melden Sie sich an, um fortzufahren"
+        }
+    }
+}

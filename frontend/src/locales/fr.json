@@ -1,0 +1,24 @@
+{
+    "common": {
+        "appTitle": "TianYi 7 Days to Die Server Admin",
+        "formRule": {
+            "required": "Requis"
+        }
+    },
+    "components": {
+    },
+    "layout": {
+    },
+    "store": {
+    },
+    "views": {
+        "login": {
+            "failed": "Échec de la connexion: le nom d'utilisateur ou le mot de passe est incorrect, veuillez réessayer",
+            "login": "Se connecter",
+            "password": "mot de passe",
+            "success": "Connectez-vous avec succès, sautant ...",
+            "username": "nom d'utilisateur",
+            "welcome": "Bienvenue, connectez-vous pour continuer"
+        }
+    }
+}

@@ -1,0 +1,24 @@
+{
+    "common": {
+        "appTitle": "TianYi 7 Days to Die Server Admin",
+        "formRule": {
+            "required": "필수의"
+        }
+    },
+    "components": {
+    },
+    "layout": {
+    },
+    "store": {
+    },
+    "views": {
+        "login": {
+            "failed": "로그인 실패 : 사용자 이름 또는 비밀번호가 올바르지 않아 다시 시도하십시오.",
+            "login": "로그인하십시오",
+            "password": "비밀번호",
+            "success": "성공적으로 로그인, 점프 ...",
+            "username": "사용자 이름",
+            "welcome": "오신 것을 환영합니다. 계속하려면 로그인하십시오"
+        }
+    }
+}

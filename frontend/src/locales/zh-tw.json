@@ -1,0 +1,18 @@
+{
+    "common": {
+        "appTitle": "天依七日杀伺服管家",
+        "formRule": {
+            "required": "必填項"
+        }
+    },
+    "views": {
+        "login": {
+            "failed": "登錄失敗: 用戶名或密碼錯誤, 請重試",
+            "login": "登 錄",
+            "password": "密碼",
+            "success": "登錄成功, 正在跳轉...",
+            "username": "使用者名稱",
+            "welcome": "歡迎，登錄繼續"
+        }
+    }
+}

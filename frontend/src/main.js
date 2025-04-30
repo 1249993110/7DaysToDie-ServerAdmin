@@ -1,5 +1,18 @@
-import { createApp } from 'vue'
-import './style.css'
-import App from './App.vue'
+import { createApp } from 'vue';
+import App from './App.vue';
+import router from './router';
+import usePinia from './plugins/pinia';
+import useI18n from './plugins/i18n';
 
-createApp(App).mount('#app')
+import './plugins/dayjs';
+import 'virtual:uno.css'
+
+const app = createApp(App);
+app.use(router);
+usePinia(app);
+useI18n(app);
+
+// Support async router
+router.isReady().then(() => {
+    app.mount('#app');
+});

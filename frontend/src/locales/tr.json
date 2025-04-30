@@ -1,0 +1,24 @@
+{
+    "common": {
+        "appTitle": "TianYi 7 Days to Die Server Admin",
+        "formRule": {
+            "required": "Gerekli"
+        }
+    },
+    "components": {
+    },
+    "layout": {
+    },
+    "store": {
+    },
+    "views": {
+        "login": {
+            "failed": "Giriş başarısız: Kullanıcı adı veya şifre yanlış, lütfen tekrar deneyin",
+            "login": "Giriş yapmak",
+            "password": "şifre",
+            "success": "Başarılı bir şekilde giriş yapın, zıplama ...",
+            "username": "kullanıcı adı",
+            "welcome": "Hoş geldiniz, devam etmek için giriş yapın"
+        }
+    }
+}
