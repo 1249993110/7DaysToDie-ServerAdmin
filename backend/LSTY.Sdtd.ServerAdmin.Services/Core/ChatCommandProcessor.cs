@@ -2,8 +2,6 @@
 using LSTY.Sdtd.ServerAdmin.Data.Entities;
 using LSTY.Sdtd.ServerAdmin.Shared.EventArgs;
 using LSTY.Sdtd.ServerAdmin.Shared.Models;
-using MongoDB.Bson;
-using MongoDB.Entities;
 
 namespace LSTY.Sdtd.ServerAdmin.Services.Core
 {
@@ -53,11 +51,11 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
                     }
                     catch (Exception ex)
                     {
-                        string logId = await _logger.LogErrorAsync(ex, "An error occurred while processing a chat command.");
+                        Guid correlationId = await _logger.LogErrorAsync(ex, "An error occurred while processing a chat command.");
 
                         await _sharedState.GameManageProxy.SendPrivateMessageAsync(new PrivateMessage()
                         {
-                            Message = $"An error occurred while processing your command. Please contact the server administrator. Error ID: {logId}",
+                            Message = $"An error occurred while processing your command. Please contact the server administrator. Error ID: {correlationId}",
                             SenderName = _sharedState.CommonSettings.WhisperServerName,
                             TargetPlayerIdOrName = playerId,
                         });
@@ -68,8 +66,7 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
             {
                 var chatMessage = new ChatMessage()
                 {
-                    ID = ObjectId.GenerateNewId().ToString(),
-                    CreatedOn = chatMessageEventArgs.Timestamp,
+                    CreatedAt = chatMessageEventArgs.Timestamp,
                     EntityId = chatMessageEventArgs.EntityId,
                     PlayerId = chatMessageEventArgs.PlayerId,
                     SenderName = chatMessageEventArgs.SenderName,
@@ -77,7 +74,7 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
                     Message = chatMessageEventArgs.Message,
                     GameServerId = _sharedState.GameServerId,
                 };
-                await DB.SaveAsync(chatMessage);
+                await Db.Insert(chatMessage).ExecuteAsync();
             }
         }
     }

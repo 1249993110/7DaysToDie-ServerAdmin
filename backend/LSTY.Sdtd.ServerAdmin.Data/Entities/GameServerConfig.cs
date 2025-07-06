@@ -1,31 +1,26 @@
-﻿using LSTY.Sdtd.ServerAdmin.Data.Abstractions;
-
-namespace LSTY.Sdtd.ServerAdmin.Data.Entities
+﻿namespace LSTY.Sdtd.ServerAdmin.Data.Entities
 {
-    public class GameServerConfig : FileEntityBase
+    public class GameServerConfig
     {
         /// <summary>
-        /// The default file name for the PFX certificate.
+        /// Gets or sets the unique identifier for the entity.
         /// </summary>
-        public const string PfxFileName = "cert.pfx";
+        [UniqueKey]
+        public required Guid Id { get; set; }
 
+        /// <summary>
+        /// The date and time when the entity was created. If manually set, it should be in UTC format and must set ID of the entity.
+        /// </summary>
+        [DatabaseGenerated]
+        public DateTime CreatedAt { get; set; }
+
+        public required string UserId { get; set; }
         public required string Name { get; set; }
         public required string Ip { get; set; }
         public required int Port { get; set; }
+        public required byte[] PfxFile { get; set; }
         public string? PfxPassword { get; set; }
         public required bool IsEnabled { get; set; }
         public string? Description { get; set; }
-        public required string UserId { get; set; }
-
-        static GameServerConfig()
-        {
-            DB.Index<GameServerConfig>()
-                .Key(e => e.IsEnabled, KeyType.Ascending)
-                .CreateAsync();
-
-            DB.Index<GameServerConfig>()
-                .Key(e => e.UserId, KeyType.Ascending)
-                .CreateAsync();
-        }
     }
 }

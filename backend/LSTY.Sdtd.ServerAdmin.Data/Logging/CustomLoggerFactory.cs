@@ -5,7 +5,7 @@ namespace LSTY.Sdtd.ServerAdmin.Data.Logging
 {
     public class CustomLoggerFactory : ICustomLoggerFactory
     {
-        public ICustomLogger CreateLogger(ServiceModule serviceModule, string gameServerId)
+        public ICustomLogger CreateLogger(ServiceModule serviceModule, Guid gameServerId)
         {
             return new CustomLogger(serviceModule, gameServerId);
         }

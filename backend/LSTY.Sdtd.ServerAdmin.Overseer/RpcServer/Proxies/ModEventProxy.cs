@@ -4,13 +4,14 @@ using LSTY.Sdtd.ServerAdmin.Shared.EventArgs;
 using LSTY.Sdtd.ServerAdmin.Shared.Models;
 using LSTY.Sdtd.ServerAdmin.Shared.Proxies;
 using System.Text;
+using static ModEvents;
 
 namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer.Proxies
 {
     public class ModEventProxy : IModEventProxy
     {
-        #region Events
-        
+        #region Event Handlers
+
         /// <summary>
         /// Event that is triggered when a log entry is received.
         /// </summary>
@@ -100,7 +101,7 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer.Proxies
         /// <summary>
         /// Runs once when the server is ready for interaction and GameManager.Instance.World is set.
         /// </summary>
-        internal void OnGameAwake()
+        internal void OnGameAwake(ref SGameAwakeData sGameAwakeData)
         {
             GameAwake?.Invoke(this, null);
         }
@@ -108,7 +109,7 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer.Proxies
         /// <summary>
         /// Runs once when the server is ready for players to join.
         /// </summary>
-        internal void OnGameStartDone()
+        internal void OnGameStartDone(ref SGameStartDoneData sGameStartDoneData)
         {
             GameStartDone?.Invoke(this, null);
         }
@@ -116,7 +117,7 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer.Proxies
         /// <summary>
         /// Runs once when the server is about to shut down.
         /// </summary>
-        internal void OnGameShutdown()
+        internal void OnGameShutdown(ref SGameShutdownData sGameShutdownData)
         {
             GameShutdown?.Invoke(this, null);
         }
@@ -140,12 +141,14 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer.Proxies
         /// <param name="mainName">The main name.</param>
         /// <param name="recipientEntityIds">The recipient entity IDs.</param>
         /// <returns>True to pass the message on to the next mod or output to chat, false to prevent the message from being passed on or output to chat.</returns>
-        public bool OnChatMessage(ClientInfo? clientInfo, EChatType eChatType, int senderEntityId, string message, string mainName, List<int>? recipientEntityIds)
+        public EModEventResult OnChatMessage(ref SChatMessageData sChatMessageData)
         {
-            if(ChatMessage == null)
-            {
-                return true;
-            }
+            var clientInfo = sChatMessageData.ClientInfo;
+            string message = sChatMessageData.Message;
+            int senderEntityId = sChatMessageData.SenderEntityId;
+            string? mainName = sChatMessageData.MainName;
+            EChatType eChatType = sChatMessageData.ChatType;
+            var recipientEntityIds = sChatMessageData.RecipientEntityIds;
 
             string senderName;
             if (clientInfo == ModMain.CmdExecuteDelegate)
@@ -174,9 +177,29 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer.Proxies
                 RecipientEntityIds = recipientEntityIds
             };
 
-            ChatMessage.Invoke(this, chatMessage);
+            ChatMessage?.Invoke(this, chatMessage);
 
-            return true;
+            return EModEventResult.Continue;
+        }
+
+        /// <summary>
+        /// Runs on initial connection from a player. The client info is usually null at this point.
+        /// </summary>
+        /// <param name="clientInfo">The client info.</param>
+        /// <param name="compatibilityVersion">The compatibility version.</param>
+        /// <param name="stringBuilder">The string builder for kick player.</param>
+        /// <returns>True to allow the player to log in, false otherwise.</returns>
+        public EModEventResult OnPlayerLogin(ref SPlayerLoginData sPlayerLoginData)
+        {
+            PlayerLogin?.Invoke(this, new PlayerLoginEventArgs()
+            {
+                PlayerInfo = sPlayerLoginData.ClientInfo.ToPlayerInfo(),
+                CompatibilityVersion = sPlayerLoginData.CustomMessage,
+                CustomMessage = sPlayerLoginData.CustomMessage,
+                Timestamp = DateTime.UtcNow,
+            });
+
+            return EModEventResult.Continue;
         }
 
         /// <summary>
@@ -184,8 +207,11 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer.Proxies
         /// </summary>
         /// <param name="victim">The killed entity.</param>
         /// <param name="killer">The entity that killed the entity.</param>
-        internal void OnEntityKilled(Entity victim, Entity killer)
+        internal void OnEntityKilled(ref SEntityKilledData sEntityKilledData)
         {
+            var victim = sEntityKilledData.KilledEntitiy;
+            var killer = sEntityKilledData.KillingEntity;
+
             if (EntityKilled == null)
             {
                 return;
@@ -222,33 +248,16 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer.Proxies
         /// </summary>
         /// <param name="clientInfo">The client info.</param>
         /// <param name="shutdown">Indicates if the server is shutting down.</param>
-        internal void OnPlayerDisconnected(ClientInfo clientInfo, bool shutdown)
+        internal void OnPlayerDisconnected(ref SPlayerDisconnectedData sPlayerDisconnectedData)
         {
             PlayerDisconnected?.Invoke(this, new PlayerDisconnectedEventArgs() 
             { 
-                PlayerInfo = clientInfo.ToPlayerInfo(),
-                Shutdown = shutdown,
+                PlayerInfo = sPlayerDisconnectedData.ClientInfo.ToPlayerInfo(),
+                GameShuttingDown = sPlayerDisconnectedData.GameShuttingDown,
                 Timestamp = DateTime.UtcNow,
             });
         }
 
-        /// <summary>
-        /// Runs on initial connection from a player. The client info is usually null at this point.
-        /// </summary>
-        /// <param name="clientInfo">The client info.</param>
-        /// <param name="compatibilityVersion">The compatibility version.</param>
-        /// <param name="stringBuilder">The string builder for kick player.</param>
-        /// <returns>True to allow the player to log in, false otherwise.</returns>
-        public bool OnPlayerLogin(ClientInfo clientInfo, string compatibilityVersion, StringBuilder stringBuilder)
-        {
-            PlayerLogin?.Invoke(this, new PlayerLoginEventArgs()
-            {
-                PlayerInfo = clientInfo.ToPlayerInfo(),
-                CompatibilityVersion = compatibilityVersion,
-                Timestamp = DateTime.UtcNow,
-            });
-            return true;
-        }
 
         /// <summary>
         /// Runs each time a player spawns, including on login, respawn from death, and teleport.
@@ -256,12 +265,12 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer.Proxies
         /// <param name="clientInfo">The client info.</param>
         /// <param name="respawnType">The respawn type.</param>
         /// <param name="position">The position.</param>
-        internal void OnPlayerSpawnedInWorld(ClientInfo clientInfo, RespawnType respawnType, Vector3i position)
+        internal void OnPlayerSpawnedInWorld(ref SPlayerSpawnedInWorldData sPlayerSpawnedInWorldData)
         {
             PlayerSpawnedInWorld?.Invoke(this, new PlayerSpawnedInWorldEventArgs()
             {
-                PlayerInfo = clientInfo.ToPlayerInfo(position.ToPosition()),
-                RespawnType = (Shared.Models.RespawnType)respawnType,
+                PlayerInfo = sPlayerSpawnedInWorldData.ClientInfo.ToPlayerInfo(sPlayerSpawnedInWorldData.Position.ToPosition()),
+                RespawnType = (Shared.Models.RespawnType)sPlayerSpawnedInWorldData.RespawnType,
                 Timestamp = DateTime.UtcNow,
             });
         }
@@ -272,13 +281,13 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer.Proxies
         /// <param name="clientInfo">The client info.</param>
         /// <param name="chunkViewDim">The chunk view dimension.</param>
         /// <param name="playerProfile">The player profile.</param>
-        internal void OnPlayerSpawning(ClientInfo clientInfo, int chunkViewDim, PlayerProfile playerProfile)
+        internal void OnPlayerSpawning(ref SPlayerSpawningData sPlayerSpawningData)
         {
             PlayerSpawning?.Invoke(this, new PlayerSpawningEventArgs()
             {
-                PlayerInfo = clientInfo.ToPlayerInfo(),
-                ChunkViewDim = chunkViewDim,
-                PlayerProfile = playerProfile.ToModel(),
+                PlayerInfo = sPlayerSpawningData.ClientInfo.ToPlayerInfo(),
+                ChunkViewDim = sPlayerSpawningData.ChunkViewDim,
+                PlayerProfile = sPlayerSpawningData.PlayerProfile.ToModel(),
                 Timestamp = DateTime.UtcNow,
             });
         }
@@ -289,11 +298,11 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer.Proxies
         /// </summary>
         /// <param name="clientInfo">The client info.</param>
         /// <param name="pdf">The player data file.</param>
-        internal void OnSavePlayerData(ClientInfo clientInfo, PlayerDataFile pdf)
+        internal void OnSavePlayerData(ref SSavePlayerDataData sSavePlayerDataData)
         {
             SavePlayerData?.Invoke(this, new SavePlayerDataEventArgs()
             {
-                PlayerDetails = clientInfo.ToPlayerDetails(),
+                PlayerDetails = sSavePlayerDataData.ClientInfo.ToPlayerDetails(),
                 Timestamp = DateTime.UtcNow,
             });
         }

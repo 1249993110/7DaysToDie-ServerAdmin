@@ -1,10 +1,11 @@
 ﻿using GameEvent.SequenceActions;
+using IceCoffee.Common.Extensions;
 using Noemax.GZip;
 using System.Reflection;
-using System.Xml.Linq;
 using System.Xml;
+using System.Xml.Linq;
+using static ModEvents;
 using static WorldStaticData;
-using IceCoffee.Common.Extensions;
 
 namespace LSTY.Sdtd.ServerAdmin.Overseer.Hooks
 {
@@ -16,7 +17,7 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.Hooks
         /// <summary>
         /// Impl Remove Player Inventory Items
         /// </summary>
-        public static void ReplaceXmls()
+        public static void ReplaceXmls(ref SGameStartDoneData sGameStartDoneData)
         {
             var xmlsToLoad = WorldStaticData.xmlsToLoad;
             var addedTags = new HashSet<string>();

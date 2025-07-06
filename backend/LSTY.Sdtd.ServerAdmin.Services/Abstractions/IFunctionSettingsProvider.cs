@@ -2,6 +2,6 @@
 {
     public interface IFunctionSettingsProvider
     {
-        Task<string?> GetAsync(string gameServerId, string functionName);
+        Task<string?> GetAsync(Guid gameServerId, string functionName);
     }
 }

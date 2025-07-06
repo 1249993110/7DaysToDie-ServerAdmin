@@ -5,7 +5,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Dtos
     /// <summary>
     /// 
     /// </summary>
-    public class ChatMessageQueryDto : PaginationQuery<CreatedOnQueryOrder>
+    public class ChatMessageQueryDto : PaginationQuery<CreatedAtQueryOrder>
     {
         /// <summary>
         /// Start Date Time

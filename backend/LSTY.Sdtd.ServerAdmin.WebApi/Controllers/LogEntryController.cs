@@ -1,11 +1,7 @@
 ﻿using LSTY.Sdtd.ServerAdmin.Data.Entities;
-using LSTY.Sdtd.ServerAdmin.Data.Extensions;
 using LSTY.Sdtd.ServerAdmin.WebApi.Authorization;
 using LSTY.Sdtd.ServerAdmin.WebApi.Dtos;
 using Microsoft.AspNetCore.Authorization;
-using MongoDB.Bson;
-using MongoDB.Driver;
-using MongoDB.Entities;
 
 namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
 {
@@ -21,40 +17,20 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<PagedDto<LogEntry>>> Get([FromHeader] string gameServerId, [FromQuery] LogEntryQueryDto dto)
+        public async Task<ActionResult<PagedDto<LogEntry>>> Get([FromHeader] Guid gameServerId, [FromQuery] LogEntryQueryDto dto)
         {
-            var query = DB.PagedSearch<LogEntry>();
+            var query = Db.QueryPaged<LogEntry>()
+                .WhereEq(p => p.GameServerId, gameServerId)
+                .WhereGte(dto.StartDateTime.HasValue, p => p.CreatedAt, dto.StartDateTime)
+                .WhereLte(dto.EndDateTime.HasValue, p => p.CreatedAt, dto.EndDateTime)
+                .WhereEq(dto.LogLevel.HasValue, p => p.LogLevel, dto.LogLevel)
+                .WhereLike(string.IsNullOrEmpty(dto.Keyword) == false, p => p.Message, dto.Keyword)
+                .OrderBy(dto.Order, dto.Desc)
+                .PageSize(dto.PageSize)
+                .PageNumber(dto.PageNumber);
 
-            query.Match(p => p.GameServerId == gameServerId);
-
-            if (dto.StartDateTime.HasValue)
-                query.Match(p => p.CreatedOn >= dto.StartDateTime.Value);
-
-            if (dto.EndDateTime.HasValue)
-                query.Match(p => p.CreatedOn <= dto.EndDateTime.Value);
-
-            if (dto.LogLevel.HasValue)
-                query.Match(p => p.LogLevel == dto.LogLevel.Value);
-
-            if (string.IsNullOrEmpty(dto.Keyword) == false)
-            {
-                var filterBulid = Builders<LogEntry>.Filter;
-                var exp = new BsonRegularExpression(dto.Keyword, "i");
-                query.Match(filterBulid.Regex(p => p.Content, exp) | filterBulid.Regex(p => p.AdditionalData, exp));
-            }
-
-            query.Sort(sortBulid => dto.Order.ToSortDefinition(sortBulid, dto.Desc));
-
-            query.PageSize(dto.PageSize)
-                 .PageNumber(dto.PageNumber);
-
-            var result = await query.ExecuteAsync();
-
-            return new PagedDto<LogEntry>()
-            {
-                Items = result.Results,
-                Total = result.TotalCount,
-            };
+            var pagedResult = await query.GetPagedResultAsync();
+            return Ok(pagedResult.Adapt<PagedDto<LogEntry>>());
         }
 
         /// <summary>
@@ -62,20 +38,21 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpDelete]
-        public async Task<IActionResult> Delete([FromHeader] string gameServerId, [FromQuery] IEnumerable<string> ids, [FromQuery] bool deleteAll = false)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> Delete([FromHeader] Guid gameServerId, [FromQuery] int[] ids, [FromQuery] bool deleteAll = false)
         {
             if (deleteAll)
             {
-                await DB.DeleteAsync<LogEntry>(p => p.GameServerId == gameServerId);
+                await Db.Delete<LogEntry>().WhereEq(p => p.GameServerId, gameServerId).ExecuteAsync();
             }
             else
             {
                 foreach (var id in ids)
                 {
-                    var entity = await DB.Find<LogEntry>().OneAsync(id);
-                    if (entity != null && entity.GameServerId != gameServerId)
+                    var entity = await Db.Query<LogEntry>(id).GetSingleOrDefaultAsync();
+                    if (entity != null && entity.GameServerId == gameServerId)
                     {
-                        await entity.DeleteAsync();
+                        await Db.Delete<LogEntry>(id).ExecuteAsync();
                     }
                 }
             }

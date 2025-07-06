@@ -6,7 +6,7 @@ namespace LSTY.Sdtd.ServerAdmin.Shared.EventArgs
     {
         public required PlayerInfo PlayerInfo { get; set; }
 
-        public required bool Shutdown { get; set; }
+        public required bool GameShuttingDown { get; set; }
 
         public required DateTime Timestamp { get; set; }
     }

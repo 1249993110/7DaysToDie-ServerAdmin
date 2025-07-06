@@ -156,7 +156,7 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer
             }
         }
 
-        private static void GetMapTileCache()
+        private static void GetMapTileCache(ref ModEvents.SGameStartDoneData sGameStartDoneData)
         {
             try
             {

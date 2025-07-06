@@ -6,7 +6,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Dtos
     /// <summary>
     /// 
     /// </summary>
-    public class LogEntryQueryDto : PaginationQuery<CreatedOnQueryOrder>
+    public class LogEntryQueryDto : PaginationQuery<CreatedAtQueryOrder>
     {
         /// <summary>
         /// Start Date Time

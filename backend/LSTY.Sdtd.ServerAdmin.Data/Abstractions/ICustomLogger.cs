@@ -2,11 +2,11 @@
 {
     public interface ICustomLogger
     {
-        Task<string> LogInformationAsync(Exception exception, string message);
-        Task<string> LogInformationAsync(string message);
-        Task<string> LogWarningAsync(Exception exception, string message);
-        Task<string> LogWarningAsync(string message);
-        Task<string> LogErrorAsync(Exception exception, string message);
-        Task<string> LogErrorAsync(string message);
+        Task<Guid> LogInformationAsync(Exception exception, string message);
+        Task<Guid> LogInformationAsync(string message);
+        Task<Guid> LogWarningAsync(Exception exception, string message);
+        Task<Guid> LogWarningAsync(string message);
+        Task<Guid> LogErrorAsync(Exception exception, string message);
+        Task<Guid> LogErrorAsync(string message);
     }
 }

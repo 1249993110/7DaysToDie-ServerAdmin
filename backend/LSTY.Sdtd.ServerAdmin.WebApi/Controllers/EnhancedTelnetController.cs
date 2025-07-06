@@ -1,4 +1,5 @@
-﻿using LSTY.Sdtd.ServerAdmin.Services.Core;
+﻿using IceCoffee.Common.Extensions;
+using LSTY.Sdtd.ServerAdmin.Services.Core;
 using LSTY.Sdtd.ServerAdmin.Shared.Constants;
 using LSTY.Sdtd.ServerAdmin.Shared.Proxies;
 using LSTY.Sdtd.ServerAdmin.WebApi.Authorization;
@@ -6,10 +7,8 @@ using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
-using System;
 using System.Net.WebSockets;
 using System.Text;
-using static FastExpressionCompiler.ExpressionCompiler;
 
 namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
 {
@@ -50,12 +49,13 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         {
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {
-                string gameServerId = HttpContext.WebSockets.WebSocketRequestedProtocols.ElementAt(1);
                 var webSocketAcceptContext = new WebSocketAcceptContext()
                 {
                     DangerousEnableCompression = true,
-                    SubProtocol = gameServerId
+                    SubProtocol = HttpContext.WebSockets.WebSocketRequestedProtocols[1]
                 };
+
+                Guid gameServerId = webSocketAcceptContext.SubProtocol.ToGuid();
                 using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync(webSocketAcceptContext);
 
                 if (_functionManager.TryGetFunctionGroup(gameServerId, out var functionGroup))

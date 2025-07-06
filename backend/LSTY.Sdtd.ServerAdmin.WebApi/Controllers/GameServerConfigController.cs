@@ -1,10 +1,9 @@
-﻿using LSTY.Sdtd.ServerAdmin.Data.Entities;
+﻿using IceCoffee.Db4Net.Extensions;
+using LSTY.Sdtd.ServerAdmin.Data.Entities;
 using LSTY.Sdtd.ServerAdmin.RpcClient.Core;
 using LSTY.Sdtd.ServerAdmin.RpcClient.Models;
 using LSTY.Sdtd.ServerAdmin.WebApi.Dtos;
 using LSTY.Sdtd.ServerAdmin.WebApi.Extensions;
-using Mapster;
-using MongoDB.Entities;
 using System.Security.Cryptography.X509Certificates;
 
 namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
@@ -31,9 +30,11 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public async Task<ActionResult<GameServerConfigDto>> Get([FromRoute] string id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<GameServerConfigDto>> Get([FromRoute] Guid id)
         {
-            var entity = await DB.Find<GameServerConfig>().OneAsync(id);
+            var entity = await Db.Query<GameServerConfig>(id).GetSingleOrDefaultAsync();
             if (entity == null)
                 return NotFound();
 
@@ -52,18 +53,20 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<GameServerConfigDto>>> Get()
         {
-            var entities = await DB.Find<GameServerConfig>().ManyAsync(p => p.UserId == User.GetUserId());
-            if (entities == null)
+            var entities = await Db.Query<GameServerConfig>().WhereEq(p => p.UserId, User.GetUserId()).GetListAsync();
+            if (entities.Any() == false)
                 return NotFound();
 
-            var result = new List<GameServerConfigDto>(entities.Count);
+            var result = new List<GameServerConfigDto>();
             foreach (var item in entities)
             {
                 var dto = item.Adapt<GameServerConfigDto>();
 
-                if (_manager.TryGetClient(item.ID, out var client))
+                if (_manager.TryGetClient(item.Id, out var client))
                 {
                     dto.IsConnected = client!.State == RpcClient.Clients.ConnectionState.Connected;
                 }
@@ -80,6 +83,8 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<GameServerConfigDto>> Create([FromForm] GameServerConfigCreateDto dto)
         {
             int fileLength = (int)dto.PfxFile.Length;
@@ -88,37 +93,39 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                 return BadRequest("Pfx file size must be less than 1MB.");
             }
 
+            using var memoryStream = new MemoryStream(fileLength);
+            await dto.PfxFile.CopyToAsync(memoryStream);
+
             var entity = new GameServerConfig()
             {
+                Id = Guid.NewGuid(),
                 Name = dto.Name,
                 Ip = dto.Ip,
                 Port = dto.Port,
+                PfxFile = memoryStream.ToArray(),
                 PfxPassword = dto.PfxPassword,
                 IsEnabled = dto.IsEnabled,
                 Description = dto.Description,
                 UserId = User.GetUserId()
             };
 
-            using var memoryStream = new MemoryStream(fileLength);
-            await dto.PfxFile.CopyToAsync(memoryStream);
-            X509Certificate2? x509Certificate2 = null;
-            try
-            {
-                x509Certificate2 = X509CertificateLoader.LoadPkcs12(memoryStream.ToArray(), entity.PfxPassword);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Failed to load PFX file: {ex.Message}");
-            }
-
-            await entity.SaveAsync();
-            await entity.Data.UploadAsync(memoryStream);
+            int id = await Db.InsertAndGetId(entity).ExecuteAsync<int>();
 
             if (entity.IsEnabled)
             {
+                X509Certificate2? x509Certificate2 = null;
+                try
+                {
+                    x509Certificate2 = X509CertificateLoader.LoadPkcs12(entity.PfxFile, dto.PfxPassword);
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest($"Failed to load PFX file: {ex.Message}");
+                }
+
                 var rpcClientConfig = new RpcClientConfig()
                 {
-                    Id = entity.ID,
+                    Id = entity.Id,
                     Url = $"tcp://{entity.Ip}:{entity.Port}",
                     Certificate = x509Certificate2,
                     Name = entity.Name,
@@ -127,7 +134,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                 await _manager.AddOrUpdateClientAsync(rpcClientConfig);
             }
 
-            return CreatedAtAction(nameof(Get), new { id = entity.ID }, entity.Adapt<GameServerConfigDto>());
+            return CreatedAtAction(nameof(Get), new { id }, entity.Adapt<GameServerConfigDto>());
         }
 
         /// <summary>
@@ -137,9 +144,13 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPut("{id}")]
-        public async Task<ActionResult> Update([FromRoute] string id, [FromForm] GameServerConfigCreateDto dto)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult> Update([FromRoute] Guid id, [FromForm] GameServerConfigCreateDto dto)
         {
-            var entity = await DB.Find<GameServerConfig>().OneAsync(id);
+            var entity = await Db.Query<GameServerConfig>(id).GetSingleOrDefaultAsync();
             if (entity == null)
                 return NotFound();
 
@@ -148,33 +159,35 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                 return Forbid();
             }
 
+            using var memoryStream = new MemoryStream((int)dto.PfxFile.Length);
+            await dto.PfxFile.CopyToAsync(memoryStream);
+
             entity.Name = dto.Name;
             entity.Ip = dto.Ip;
             entity.Port = dto.Port;
+            entity.PfxFile = memoryStream.ToArray();
             entity.PfxPassword = dto.PfxPassword;
             entity.IsEnabled = dto.IsEnabled;
             entity.Description = dto.Description;
 
-            using var memoryStream = new MemoryStream((int)dto.PfxFile.Length);
-            await dto.PfxFile.CopyToAsync(memoryStream);
-            X509Certificate2? x509Certificate2 = null;
-            try
-            {
-                x509Certificate2 = X509CertificateLoader.LoadPkcs12(memoryStream.ToArray(), entity.PfxPassword);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest($"Failed to load PFX file: {ex.Message}");
-            }
-
-            await entity.SaveAsync();
-            await entity.Data.UploadAsync(memoryStream);
+            
+            await Db.Update(entity).ExecuteAsync();
 
             if (entity.IsEnabled)
             {
+                X509Certificate2? x509Certificate2 = null;
+                try
+                {
+                    x509Certificate2 = X509CertificateLoader.LoadPkcs12(entity.PfxFile, entity.PfxPassword);
+                }
+                catch (Exception ex)
+                {
+                    return BadRequest($"Failed to load PFX file: {ex.Message}");
+                }
+
                 var rpcClientConfig = new RpcClientConfig()
                 {
-                    Id = entity.ID,
+                    Id = entity.Id,
                     Url = $"tcp://{entity.Ip}:{entity.Port}",
                     Certificate = x509Certificate2,
                     Name = entity.Name,
@@ -186,7 +199,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                 await _manager.RemoveClientAsync(id);
             }
 
-            return Ok();
+            return NoContent();
         }
 
         /// <summary>
@@ -195,9 +208,12 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete([FromRoute] string id)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<ActionResult> Delete([FromRoute] Guid id)
         {
-            var entity = await DB.Find<GameServerConfig>().OneAsync(id);
+            var entity = await Db.Query<GameServerConfig>(id).GetSingleOrDefaultAsync();
             if (entity == null)
                 return NotFound();
 
@@ -208,12 +224,14 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
 
             await _manager.RemoveClientAsync(id);
 
-            await entity.Data.DeleteBinaryChunks();
-            await entity.DeleteAsync();
+            using var unitOfWork = Db.CreateUnitOfWork();
 
-            await DB.DeleteAsync<ChatMessage>(p => p.GameServerId == id);
-            await DB.DeleteAsync<LogEntry>(p => p.GameServerId == id);
-            await DB.DeleteAsync<FunctionConfig>(p => p.GameServerId == id);
+            await Db.Delete<GameServerConfig>(id).ExecuteAsync(unitOfWork.DbTransaction);
+            await Db.Delete<ChatMessage>().WhereEq(p => p.GameServerId, id).ExecuteAsync(unitOfWork.DbTransaction);
+            await Db.Delete<LogEntry>().WhereEq(p => p.GameServerId, id).ExecuteAsync(unitOfWork.DbTransaction);
+            await Db.Delete<FunctionConfig>().WhereEq(p => p.GameServerId, id).ExecuteAsync(unitOfWork.DbTransaction);
+
+            await unitOfWork.CommitAsync();
 
             return NoContent();
         }

@@ -1,2 +1,2 @@
-﻿global using MongoDB.Entities;
-global using MongoDB.Bson.Serialization.Attributes;
+﻿global using IceCoffee.Db4Net;
+global using IceCoffee.Db4Net.Core.OptionalAttributes;

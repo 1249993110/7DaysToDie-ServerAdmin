@@ -1,6 +1,4 @@
-﻿using Microsoft;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json.Linq;
+﻿using Microsoft.Extensions.Configuration;
 
 namespace LSTY.Sdtd.ServerAdmin.Overseer.Config
 {

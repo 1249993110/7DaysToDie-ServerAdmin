@@ -1,6 +1,5 @@
 ﻿using LSTY.Sdtd.ServerAdmin.Data.Entities;
 using LSTY.Sdtd.ServerAdmin.Services.Abstractions;
-using MongoDB.Entities;
 
 namespace LSTY.Sdtd.ServerAdmin.WebApi.Providers
 {
@@ -15,10 +14,12 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Providers
         /// <param name="gameServerId"></param>
         /// <param name="functionName"></param>
         /// <returns></returns>
-        public async Task<string?> GetAsync(string gameServerId, string functionName)
+        public async Task<string?> GetAsync(Guid gameServerId, string functionName)
         {
-            var functionSettings = await DB.Find<FunctionConfig>()
-                .Match(p => p.GameServerId == gameServerId && p.FunctionName == functionName).ExecuteSingleAsync();
+            var functionSettings = await Db.Query<FunctionConfig>()
+                .WhereEq(p => p.GameServerId, gameServerId)
+                .WhereEq(p => p.FunctionName, functionName)
+                .GetSingleOrDefaultAsync();
 
             return functionSettings?.Settings;
         }

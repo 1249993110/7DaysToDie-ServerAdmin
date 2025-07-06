@@ -1,9 +1,8 @@
-﻿using LSTY.Sdtd.ServerAdmin.Data.Entities;
+﻿using IceCoffee.Common.Extensions;
+using LSTY.Sdtd.ServerAdmin.Data.Entities;
 using LSTY.Sdtd.ServerAdmin.WebApi.Extensions;
 using LSTY.Sdtd.ServerAdmin.WebApi.OperationProcessors;
 using Microsoft.AspNetCore.Authorization;
-using MongoDB.Entities;
-using System.Security.Claims;
 
 namespace LSTY.Sdtd.ServerAdmin.WebApi.Authorization
 {
@@ -39,9 +38,10 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Authorization
 
                     if (string.IsNullOrEmpty(gameServerId) == false)
                     {
-                        bool exists = await DB.Find<GameServerConfig>()
-                            .Match(p => p.ID == gameServerId.ToString() && p.UserId == userId)
-                            .ExecuteAnyAsync();
+                        bool exists = await Db.QueryExists<GameServerConfig>()
+                            .WhereEq(p => p.Id, gameServerId.ToGuid())
+                            .WhereEq(p => p.UserId, userId)
+                            .GetAsync();
 
                         if (exists)
                         {

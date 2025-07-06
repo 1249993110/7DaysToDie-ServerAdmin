@@ -2,9 +2,24 @@
 
 namespace LSTY.Sdtd.ServerAdmin.Data.Entities
 {
-    public class FunctionConfig : EntityBase
+    public class FunctionConfig
     {
-        public required string GameServerId { get; set; }
+        /// <summary>
+        /// Gets or sets the unique identifier for the entity.
+        /// </summary>
+        [UniqueKey, DatabaseGenerated]
+        public int Id { get; set; }
+
+        /// <summary>
+        /// The date and time when the entity was created. If manually set, it should be in UTC format and must set ID of the entity.
+        /// </summary>
+        [DatabaseGenerated]
+        public DateTime CreatedAt { get; set; }
+
+        /// <summary>
+        /// Gets or sets the unique identifier for the game server.
+        /// </summary>
+        public required Guid GameServerId { get; set; }
 
         /// <summary>
         /// Function name.
@@ -18,18 +33,5 @@ namespace LSTY.Sdtd.ServerAdmin.Data.Entities
         /// Serialized settings.
         /// </summary>
         public required string Settings { get; set; }
-
-        static FunctionConfig()
-        {
-            DB.Index<FunctionConfig>()
-                .Key(e => e.GameServerId, KeyType.Ascending)
-                .Key(e => e.FunctionName, KeyType.Ascending)
-                .Option(o =>
-                {
-                    o.Background = true;
-                    o.Unique = true;
-                })
-                .CreateAsync();
-        }
     }
 }

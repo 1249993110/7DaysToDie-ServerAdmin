@@ -1,11 +1,8 @@
-﻿using LSTY.Sdtd.ServerAdmin.Data.Entities;
-using LSTY.Sdtd.ServerAdmin.Data.Extensions;
+﻿using IceCoffee.Db4Net.Core.SqlBuilders;
+using LSTY.Sdtd.ServerAdmin.Data.Entities;
 using LSTY.Sdtd.ServerAdmin.WebApi.Authorization;
 using LSTY.Sdtd.ServerAdmin.WebApi.Dtos;
 using Microsoft.AspNetCore.Authorization;
-using MongoDB.Bson;
-using MongoDB.Driver;
-using MongoDB.Entities;
 
 namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
 {
@@ -21,51 +18,32 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<PagedDto<ChatMessage>>> Get([FromHeader] string gameServerId, [FromQuery] ChatMessageQueryDto dto)
+        public async Task<ActionResult<PagedDto<ChatMessage>>> Get([FromHeader] Guid gameServerId, [FromQuery] ChatMessageQueryDto dto)
         {
-            var query = DB.PagedSearch<ChatMessage>();
+            var query = Db.QueryPaged<ChatMessage>()
+                .WhereEq(p => p.GameServerId, gameServerId)
+                .WhereGte(dto.StartDateTime.HasValue, p => p.CreatedAt, dto.StartDateTime)
+                .WhereLte(dto.EndDateTime.HasValue, p => p.CreatedAt, dto.EndDateTime)
+                .WhereLike(string.IsNullOrEmpty(dto.Keyword) == false, p => p.Message, dto.Keyword)
+                .OrderBy(dto.Order, dto.Desc)
+                .PageSize(dto.PageSize)
+                .PageNumber(dto.PageNumber);
 
-            query.Match(p => p.GameServerId == gameServerId);
-
-            if (dto.StartDateTime.HasValue)
-                query.Match(p => p.CreatedOn >= dto.StartDateTime.Value);
-
-            if (dto.EndDateTime.HasValue)
-                query.Match(p => p.CreatedOn <= dto.EndDateTime.Value);
-
-            if (dto.ChatType.HasValue)
-                query.Match(p => p.ChatType == dto.ChatType.Value);
-
-            var filterBulid = Builders<ChatMessage>.Filter;
+            var filter = SqlBuilder<ChatMessage>.Filter;
             if (string.IsNullOrEmpty(dto.SenderIdOrName) == false)
             {
                 if (int.TryParse(dto.SenderIdOrName, out int entityId))
                 {
-                    query.Match(filterBulid.Eq(p => p.EntityId, entityId) | filterBulid.Eq(p => p.SenderName, dto.SenderIdOrName));
+                    query.Where(filter.Eq(p => p.EntityId, entityId) | filter.Eq(p => p.SenderName, dto.SenderIdOrName));
                 }
                 else
                 {
-                    query.Match(filterBulid.Eq(p => p.PlayerId, dto.SenderIdOrName) | filterBulid.Eq(p => p.SenderName, dto.SenderIdOrName));
+                    query.Where(filter.Eq(p => p.PlayerId, dto.SenderIdOrName) | filter.Eq(p => p.SenderName, dto.SenderIdOrName));
                 }
             }
-     
-            if (string.IsNullOrEmpty(dto.Keyword) == false)
-            {
-                query.Match(filterBulid.Regex(p => p.Message, new BsonRegularExpression(dto.Keyword, "i")));
-            }
 
-            query.Sort(sortBulid => dto.Order.ToSortDefinition(sortBulid, dto.Desc));
-
-            query.PageSize(dto.PageSize)
-                 .PageNumber(dto.PageNumber);
-
-            var result = await query.ExecuteAsync();
-
-            return new PagedDto<ChatMessage>()
-            {
-                Items = result.Results,
-                Total = result.TotalCount,
-            };
+            var pagedResult = await query.GetPagedResultAsync();
+            return Ok(pagedResult.Adapt<PagedDto<ChatMessage>>());
         }
 
         /// <summary>
@@ -73,20 +51,21 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpDelete]
-        public async Task<IActionResult> Delete([FromHeader] string gameServerId, [FromQuery] IEnumerable<string> ids, [FromQuery] bool deleteAll = false)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<IActionResult> Delete([FromHeader] Guid gameServerId, [FromQuery] int[] ids, [FromQuery] bool deleteAll = false)
         {
             if (deleteAll)
             {
-                await DB.DeleteAsync<ChatMessage>(p => p.GameServerId == gameServerId);
+                await Db.Delete<ChatMessage>().WhereEq(p => p.GameServerId, gameServerId).ExecuteAsync();
             }
             else
             {
                 foreach (var id in ids)
                 {
-                    var entity = await DB.Find<ChatMessage>().OneAsync(id);
-                    if (entity != null && entity.GameServerId != gameServerId)
+                    var entity = await Db.Query<ChatMessage>(id).GetSingleOrDefaultAsync();
+                    if (entity != null && entity.GameServerId == gameServerId)
                     {
-                        await entity.DeleteAsync();
+                        await Db.Delete(id).ExecuteAsync();
                     }
                 }
             }

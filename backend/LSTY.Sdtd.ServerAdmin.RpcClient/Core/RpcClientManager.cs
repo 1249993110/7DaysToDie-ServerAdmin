@@ -9,7 +9,7 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Core
 {
     public class RpcClientManager
     {
-        private readonly ConcurrentDictionary<string, IRpcClient> _clients = new();
+        private readonly ConcurrentDictionary<Guid, IRpcClient> _clients = new();
         private readonly ICustomLoggerFactory _customLoggerFactory;
         private readonly IServiceProvider _serviceProvider;
         private readonly IRpcClientConfigProvider _configProvider;
@@ -64,7 +64,7 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Core
             await Task.WhenAll(tasks);
         }
 
-        public async Task RemoveClientAsync(string id)
+        public async Task RemoveClientAsync(Guid id)
         {
             if (_clients.TryRemove(id, out var client))
             {
@@ -99,7 +99,7 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Core
             await logger.LogInformationAsync($"Rpc Client [{config.Name}] added or updated.");
         }
 
-        public bool TryGetClient(string id, out IRpcClient? rpcClient)
+        public bool TryGetClient(Guid id, out IRpcClient? rpcClient)
         {
             return _clients.TryGetValue(id, out rpcClient);
         }

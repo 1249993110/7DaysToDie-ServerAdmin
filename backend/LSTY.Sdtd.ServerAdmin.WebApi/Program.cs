@@ -1,7 +1,10 @@
+using Dapper;
 using FastExpressionCompiler;
+using IceCoffee.Db4Net.DependencyInjection;
+using IceCoffee.Db4Net.SqliteTypeHandlers;
 using LSTY.Sdtd.ServerAdmin.Data.Abstractions;
+using LSTY.Sdtd.ServerAdmin.Data.Enums;
 using LSTY.Sdtd.ServerAdmin.Data.Logging;
-using LSTY.Sdtd.ServerAdmin.Data.Options;
 using LSTY.Sdtd.ServerAdmin.RpcClient.Extensions;
 using LSTY.Sdtd.ServerAdmin.Services.Abstractions;
 using LSTY.Sdtd.ServerAdmin.Services.Core;
@@ -14,14 +17,13 @@ using LSTY.Sdtd.ServerAdmin.WebApi.OperationProcessors;
 using LSTY.Sdtd.ServerAdmin.WebApi.Providers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.ResponseCompression;
-using MongoDB.Bson.Serialization.Conventions;
-using MongoDB.Driver;
-using MongoDB.Entities;
+using Microsoft.Data.Sqlite;
 using NSwag;
 using Serilog;
 using Serilog.Events;
-using System.IO.Compression;
+using System.Data;
+using System.Reflection.Metadata;
+using System.Text;
 using System.Text.Json.Serialization;
 
 [assembly: ApiController]
@@ -36,7 +38,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
         /// The main entry point for the application.
         /// </summary>
         /// <param name="args"></param>
-        public static async Task Main(string[] args)
+        public static void Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Information)
@@ -57,10 +59,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
                 var services = builder.Services;
 
                 #region Services
-
-                var databaseOptions = config.GetRequiredSection(nameof(DatabaseOptions)).Get<DatabaseOptions>();
-                ArgumentNullException.ThrowIfNull(databaseOptions);
-                await InitDatabase(databaseOptions);
+                services.AddDbConnection<Repository>(string.Empty, "DbConnectionOptions:Default");
 
                 // Add services to the container.
                 services.AddControllers()
@@ -82,6 +81,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
                 {
                     cfg.RegisterServicesFromAssemblies(typeof(FunctionManager).Assembly);
                     cfg.NotificationPublisherType = typeof(ParallelForeachPublisher);
+                    cfg.LicenseKey = config.GetValue<string>("MediatR:LicenseKey");
                 });
 
                 services.AddMemoryCache();
@@ -220,6 +220,8 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
 
                 var app = builder.Build();
 
+                InitDatabase(app.Services.GetRequiredService<Repository>(), app.Environment);
+
                 #region Pipeline
                 // Configure the HTTP request pipeline.
 
@@ -303,16 +305,65 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
                 Log.CloseAndFlush();
             }
         }
-
-        private static Task InitDatabase(DatabaseOptions options)
+       
+        private static void InitDatabase(Repository repository, IWebHostEnvironment env)
         {
-            //var objectSerializer = new ObjectSerializer(ObjectSerializer.AllAllowedTypes);
-            //BsonSerializer.RegisterSerializer(objectSerializer);
+            Log.Information("Initializing database...");
 
-            //var camelCaseConvention = new ConventionPack() { new CamelCaseElementNameConvention() };
-            //ConventionRegistry.Register("CamelCase", camelCaseConvention, type => true);
+            SqlMapper.AddTypeHandler(new GuidHandler());
+            try
+            {
+                using (var dbConnection = repository.CreateDbConnection())
+                {
+                    var fileInfo = new FileInfo(dbConnection.DataSource);
+                    if (fileInfo.Directory?.Exists == false)
+                    {
+                        fileInfo.Directory.Create();
+                    }
 
-            return DB.InitAsync(options.DatabaseName, MongoClientSettings.FromConnectionString(options.ConnectionString));
+                    string path;
+                    if (env.IsDevelopment())
+                    {
+                        path = Path.Combine(env.ContentRootPath, "../LSTY.Sdtd.ServerAdmin.Data/sql");
+                    }
+                    else
+                    {
+                        path = Path.Combine(AppContext.BaseDirectory, "sql");
+                    }
+
+                    if (Directory.Exists(path) == false)
+                    {
+                        Log.Error("SQL directory does not exist: {Path}", path);
+                        return;
+                    }
+
+                    dbConnection.Open();
+                    using (var dbTransaction = dbConnection.BeginTransaction())
+                    {
+                        try
+                        {
+                            foreach (var sqlPath in Directory.GetFiles(path, "*.sql").Order())
+                            {
+                                string sql = File.ReadAllText(sqlPath, Encoding.UTF8);
+                                dbConnection.Execute(sql, transaction: dbTransaction);
+                            }
+
+                            dbTransaction.Commit();
+                        }
+                        catch (Exception)
+                        {
+                            dbTransaction.Rollback();
+                            throw;
+                        }
+                    }
+                }
+
+                Log.Information("Database initialized successfully.");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "An error occurred while initializing the database.");
+            }
         }
     }
 }

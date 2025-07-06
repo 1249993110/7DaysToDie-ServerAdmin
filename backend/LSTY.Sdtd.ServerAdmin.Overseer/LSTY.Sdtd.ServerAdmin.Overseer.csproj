@@ -26,10 +26,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Bcl.Cryptography" Version="9.0.4" />
-		<PackageReference Include="BouncyCastle.Cryptography" Version="2.5.1" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.4" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.4" />
+		<PackageReference Include="Microsoft.Bcl.Cryptography" Version="9.0.6" />
+		<PackageReference Include="BouncyCastle.Cryptography" Version="2.6.1" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.6" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.6" />
 		<PackageReference Include="PolySharp" Version="1.15.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

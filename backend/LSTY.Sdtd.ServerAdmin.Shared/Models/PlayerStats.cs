@@ -16,11 +16,6 @@
         public required float Stamina { get; set; }
 
         /// <summary>
-        /// Gets or sets the core temperature of the player.
-        /// </summary>
-        public required float CoreTemp { get; set; }
-
-        /// <summary>
         /// Gets or sets the food level of the player.
         /// </summary>
         public required float Food { get; set; }

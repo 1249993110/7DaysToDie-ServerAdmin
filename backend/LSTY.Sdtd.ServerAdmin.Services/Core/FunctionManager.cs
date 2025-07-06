@@ -14,7 +14,7 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
 {
     public class FunctionManager
     {
-        private readonly ConcurrentDictionary<string, FunctionGroup> _runningFunctions;
+        private readonly ConcurrentDictionary<Guid, FunctionGroup> _runningFunctions;
         private readonly IServiceProvider _serviceProvider;
         private readonly IFunctionSettingsProvider _functionSettingsProvider;
         private readonly ICustomLoggerFactory _customLoggerFactory;
@@ -22,7 +22,7 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
 
         public FunctionManager(IServiceProvider serviceProvider, IFunctionSettingsProvider functionSettingsProvider, ILogger<FunctionManager> logger, ICustomLoggerFactory customLoggerFactory, IOptions<Microsoft.AspNetCore.Mvc.JsonOptions> jsonOptions)
         {
-            _runningFunctions = new ConcurrentDictionary<string, FunctionGroup>();
+            _runningFunctions = new ConcurrentDictionary<Guid, FunctionGroup>();
             _serviceProvider = serviceProvider;
             _functionSettingsProvider = functionSettingsProvider;
             _customLoggerFactory = customLoggerFactory;
@@ -40,7 +40,7 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
         {
             var result = new Dictionary<string, IFunction>();
             var types = GetFunctionTypes();
-            string serverId = sharedState.GameServerId;
+            Guid serverId = sharedState.GameServerId;
             var logger = _customLoggerFactory.CreateLogger(Data.Enums.ServiceModule.FunctionManager, serverId);
             foreach (var type in types)
             {
@@ -111,7 +111,7 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
             return false;
         }
 
-        public async Task RegisterFunctionsAsync(string serverId, IReadOnlyDictionary<Type, IProxy> rpcProxies)
+        public async Task RegisterFunctionsAsync(Guid serverId, IReadOnlyDictionary<Type, IProxy> rpcProxies)
         {
             // Load common settings from database
             var commonSettingsJson = await _functionSettingsProvider.GetAsync(serverId, nameof(CommonSettings));
@@ -152,7 +152,7 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
             }, functionGroup);
         }
 
-        public void UnregisterFunctions(string serverId)
+        public void UnregisterFunctions(Guid serverId)
         {
             if (_runningFunctions.TryRemove(serverId, out var functionGroup))
             {
@@ -160,7 +160,7 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
             }
         }
 
-        public bool TryGetFunctionGroup(string serverId, out FunctionGroup? functionGroup)
+        public bool TryGetFunctionGroup(Guid serverId, out FunctionGroup? functionGroup)
         {
             return _runningFunctions.TryGetValue(serverId, out functionGroup);
         }

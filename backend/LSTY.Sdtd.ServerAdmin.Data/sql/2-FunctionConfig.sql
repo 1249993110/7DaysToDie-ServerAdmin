@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS FunctionConfig(
+	[Id] INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	[CreatedAt] TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	[GameServerId] TEXT NOT NULL,
+	[FunctionName] TEXT NOT NULL,
+	[Settings] TEXT NOT NULL
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS Index_FunctionConfig_0 ON FunctionConfig([GameServerId], [FunctionName]);
+

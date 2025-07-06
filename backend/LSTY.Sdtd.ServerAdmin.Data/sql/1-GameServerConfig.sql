@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS GameServerConfig(
+	[Id] TEXT NOT NULL PRIMARY KEY,
+	[CreatedAt] TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	[UserId] TEXT NOT NULL,
+	[Name] TEXT NOT NULL,
+	[Ip] TEXT NOT NULL,
+	[Port] INTEGER NOT NULL,
+	[PfxFile] BLOB NOT NULL,
+	[PfxPassword] TEXT NULL,
+	[IsEnabled] INTEGER NOT NULL,
+	[Description] TEXT NULL
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS Index_GameServerConfig_0 ON GameServerConfig([UserId]);
+CREATE UNIQUE INDEX IF NOT EXISTS Index_GameServerConfig_1 ON GameServerConfig([IsEnabled]);
+

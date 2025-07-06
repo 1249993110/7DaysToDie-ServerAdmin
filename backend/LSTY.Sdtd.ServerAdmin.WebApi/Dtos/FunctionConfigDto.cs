@@ -8,7 +8,7 @@
         /// <summary>
         /// Game server ID.
         /// </summary>
-        public required string GameServerId { get; set; }
+        public required Guid GameServerId { get; set; }
 
         /// <summary>
         /// Function name.

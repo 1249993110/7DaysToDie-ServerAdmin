@@ -49,6 +49,7 @@ export default defineConfig(({ mode }) => {
                     // Auto import element API
                     elementPlusResolver,
                 ],
+                ignore: ['h'],
             }),
             Components({
                 resolvers: [
@@ -93,7 +94,7 @@ export default defineConfig(({ mode }) => {
         },
         resolve: {
             alias: {
-                '~/': `${path.resolve(__dirname, './src')}/`,
+                '~/': `${path.resolve(__dirname, 'src')}/`,
             },
         },
     };

@@ -8,6 +8,8 @@ namespace LSTY.Sdtd.ServerAdmin.Shared.EventArgs
 
         public required string CompatibilityVersion { get; set; }
 
+        public required string CustomMessage { get; set; }
+
         public required DateTime Timestamp { get; set; }
     }
 }

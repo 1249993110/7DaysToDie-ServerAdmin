@@ -1,7 +1,4 @@
 ﻿using LSTY.Sdtd.ServerAdmin.Shared.Models;
-using static SleeperVolume;
-using static vp_Timer;
-using System.Reflection.Emit;
 
 namespace LSTY.Sdtd.ServerAdmin.Overseer.Extensions
 {
@@ -83,9 +80,8 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.Extensions
                 {
                     Health = stats.Health.Value,
                     Stamina = stats.Stamina.Value,
-                    CoreTemp = stats.CoreTemp.Value,
+                    Water = stats.Water.Value,
                     Food = stats.Food.Value,
-                    Water = stats.Water.Value
                 },
                 Level = level,
                 ExpToNextLevel = expToNextLevel,
@@ -94,7 +90,7 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.Extensions
                 DistanceWalked = playerDataFile.distanceWalked,
                 TotalItemsCrafted = playerDataFile.totalItemsCrafted,
                 LongestLife = playerDataFile.longestLife,
-                CurrentLife = playerDataFile.ecd.health,
+                CurrentLife = playerDataFile.currentLife,
                 TotalTimePlayed = playerDataFile.totalTimePlayed,
                 RentedVMPosition = playerDataFile.rentedVMPosition.ToPosition(),
                 RentalEndTime = playerDataFile.rentalEndTime,

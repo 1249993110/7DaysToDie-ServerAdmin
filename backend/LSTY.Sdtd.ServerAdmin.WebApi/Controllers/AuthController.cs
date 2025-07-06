@@ -14,6 +14,8 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <returns></returns>
         [HttpGet("status")]
         [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult GetLoginStatus()
         {
             if (User.Identity?.IsAuthenticated == true)

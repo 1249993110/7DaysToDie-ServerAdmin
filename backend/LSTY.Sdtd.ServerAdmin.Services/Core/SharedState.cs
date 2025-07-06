@@ -6,7 +6,7 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
 {
     public class SharedState
     {
-        public required string GameServerId { get; set; }
+        public required Guid GameServerId { get; set; }
         public required CommonSettings CommonSettings { get; set; }
         public required IReadOnlyDictionary<Type, IProxy> RpcProxies { get; set; }
         public required IModEventProxy ModEventProxy { get; set; }

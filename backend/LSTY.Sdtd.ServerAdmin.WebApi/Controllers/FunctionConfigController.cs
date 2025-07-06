@@ -3,7 +3,6 @@ using LSTY.Sdtd.ServerAdmin.Services.Core;
 using LSTY.Sdtd.ServerAdmin.WebApi.Authorization;
 using LSTY.Sdtd.ServerAdmin.WebApi.Dtos;
 using Microsoft.AspNetCore.Authorization;
-using MongoDB.Entities;
 
 namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
 {
@@ -31,12 +30,16 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<FunctionConfigDto>> Get(
-            [FromHeader] string gameServerId, 
+            [FromHeader] Guid gameServerId, 
             [FromQuery] string? functionName)
         {
-            var entity = await DB.Find<FunctionConfig>()
-                .Match(p => p.GameServerId == gameServerId && p.FunctionName == functionName).ExecuteSingleAsync();
+            var entity = await Db.Query<FunctionConfig>()
+                .WhereEq(p => p.GameServerId, gameServerId)
+                .WhereEq(p => p.FunctionName, functionName)
+                .GetSingleOrDefaultAsync();
 
             if (entity == null)
                 return NotFound();
@@ -54,8 +57,10 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<FunctionConfig>> Create(
-            [FromHeader] string gameServerId, 
+            [FromHeader] Guid gameServerId, 
             [FromBody] FunctionConfigCreateDto dto)
         {
             var settings = JsonSerializer.Serialize(dto.Settings, _jsonOptions.Value.JsonSerializerOptions);
@@ -71,9 +76,9 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                 return BadRequest($"Function with name '{entity.FunctionName}' does not exist.");
             }
 
-            await entity.SaveAsync();
+            int id = await Db.InsertAndGetId(entity).ExecuteAsync<int>();
 
-            return CreatedAtAction(nameof(Get), new { id = entity.ID }, entity);
+            return CreatedAtAction(nameof(Get), new { id }, entity);
         }
 
         /// <summary>
@@ -81,12 +86,16 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Update(
-            [FromHeader] string gameServerId, 
-            [FromRoute] string id, 
+            [FromHeader] Guid gameServerId, 
+            [FromRoute] int id, 
             [FromBody] FunctionConfigUpdateDto dto)
         {
-            var entity = await DB.Find<FunctionConfig>().OneAsync(id);
+            var entity = await Db.Query<FunctionConfig>(id).GetSingleOrDefaultAsync();
             if (entity == null)
                 return NotFound();
 
@@ -98,9 +107,9 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
             entity.Settings = JsonSerializer.Serialize(dto.Settings, _jsonOptions.Value.JsonSerializerOptions);
             _functionManager.UpdateFunctionConfig(entity);
 
-            await entity.SaveAsync();
+            await Db.Update(entity).ExecuteAsync();
 
-            return Ok();
+            return NoContent();
         }
 
         /// <summary>
@@ -108,23 +117,24 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<IActionResult> Delete(
-            [FromHeader] string gameServerId, 
-            [FromQuery] IEnumerable<string> ids, 
+            [FromHeader] Guid gameServerId, 
+            [FromQuery] int[] ids, 
             [FromQuery] bool deleteAll = false)
         {
             if (deleteAll)
             {
-                await DB.DeleteAsync<FunctionConfig>(p => p.GameServerId == gameServerId);
+                await Db.Delete<FunctionConfig>().WhereEq(p => p.GameServerId, gameServerId).ExecuteAsync();
             }
             else
             {
                 foreach (var id in ids)
                 {
-                    var entity = await DB.Find<FunctionConfig>().OneAsync(id);
-                    if (entity != null && entity.GameServerId != gameServerId)
+                    var entity = await Db.Query<FunctionConfig>(id).GetSingleOrDefaultAsync();
+                    if (entity != null && entity.GameServerId == gameServerId)
                     {
-                        await entity.DeleteAsync();
+                        await Db.Delete(id).ExecuteAsync();
                     }
                 }
             }

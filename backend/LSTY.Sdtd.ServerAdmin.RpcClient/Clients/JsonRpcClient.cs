@@ -17,6 +17,13 @@ using System.Threading.Tasks;
 
 namespace LSTY.Sdtd.ServerAdmin.RpcClient.Clients
 {
+    /// <summary>
+    /// Represents a client for establishing and managing JSON-RPC connections over a secure TCP connection.
+    /// </summary>
+    /// <remarks>The <see cref="JsonRpcClient"/> class provides functionality to connect to a remote server
+    /// using JSON-RPC protocol over a secure SSL/TLS connection. It supports automatic reconnection attempts, proxy
+    /// creation for remote procedure calls, and state management for the connection lifecycle. This class is
+    /// thread-safe and ensures proper resource cleanup during disconnection or disposal.</remarks>
     public class JsonRpcClient : IRpcClient
     {
         private readonly object _lock = new object();
@@ -29,7 +36,7 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Clients
         private readonly IMediator _mediator;
         private readonly ICustomLogger _logger;
 
-        private readonly string _id;
+        private readonly Guid _id;
         private readonly string _name;
         private readonly string _url;
         private readonly X509Certificate2 _certificate;
@@ -37,7 +44,7 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Clients
         private const int _maxRetry = 3;
         private bool _isReconnecting = false;
 
-        public string Id => _id;
+        public Guid Id => _id;
         public string Name => _name;
         public string Url => _url;
         public ConnectionState State
@@ -51,9 +58,19 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Clients
             }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JsonRpcClient"/> class with the specified configuration, application lifetime, mediator, and custom logger factory.
+        /// </summary>
+        /// <remarks>This constructor initializes the <see cref="JsonRpcClient"/> with the provided
+        /// dependencies and configuration.  The <paramref name="rpcClientConfig"/> parameter is used to set the
+        /// client's unique identifier, name, URL, and certificate. The <paramref name="customLoggerFactory"/> is used
+        /// to create a logger specific to the <see cref="JsonRpcClient"/> module.</remarks>
+        /// <param name="rpcClientConfig">The configuration settings for the RPC client, including its ID, name, URL, and certificate.</param>
+        /// <param name="appLifetime">The application lifetime instance used to monitor application start and shutdown events.</param>
+        /// <param name="mediator">The mediator instance used for handling inter-component communication within the application.</param>
+        /// <param name="customLoggerFactory">The custom logger factory used to create a specialized logger for the <see cref="JsonRpcClient"/>.</param>
         public JsonRpcClient(
             RpcClientConfig rpcClientConfig, 
-            ILogger<JsonRpcClient> logger, 
             IHostApplicationLifetime appLifetime, 
             IMediator mediator,
             ICustomLoggerFactory customLoggerFactory)

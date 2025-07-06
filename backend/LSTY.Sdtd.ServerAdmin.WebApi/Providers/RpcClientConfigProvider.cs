@@ -1,7 +1,6 @@
 ﻿using LSTY.Sdtd.ServerAdmin.Data.Entities;
 using LSTY.Sdtd.ServerAdmin.RpcClient.Abstractions;
 using LSTY.Sdtd.ServerAdmin.RpcClient.Models;
-using MongoDB.Entities;
 using System.Security.Cryptography.X509Certificates;
 
 namespace LSTY.Sdtd.ServerAdmin.WebApi.Providers
@@ -25,39 +24,36 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Providers
         {
             var configs = new List<RpcClientConfig>();
 
-            var count = await DB.CountAsync<GameServerConfig>(cancellation: cancellationToken);
+            long count = await Db.QueryCount<GameServerConfig>().GetAsync();
             if (count == 0)
             {
-                var config = new GameServerConfig()
+                byte[] pfxFile = File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "cert.pfx"));
+
+                var entity = new GameServerConfig()
                 {
-                    Ip = "172.16.168.25",
+                    Id = Guid.NewGuid(),
+                    Ip = "7dtdserver.local",
                     Port = 8088,
                     IsEnabled = true,
                     Name = "Test",
+                    PfxFile = pfxFile,
                     PfxPassword = null,
                     UserId = "admin",
                 };
 
-                await config.SaveAsync(cancellation: cancellationToken);
-
-                using var fileStream = File.OpenRead(Path.Combine(AppContext.BaseDirectory, GameServerConfig.PfxFileName));
-                await config.Data.UploadAsync(fileStream, cancellation: cancellationToken);
+                await Db.Insert(entity).ExecuteAsync();
             }
 
-            var gameServerConfigs = await DB.Find<GameServerConfig>().ManyAsync(p => p.IsEnabled, cancellationToken);
+            var gameServerConfigs = await Db.Query<GameServerConfig>().WhereEq(p => p.IsEnabled, true).GetListAsync();
             foreach (var config in gameServerConfigs)
             {
                 try
                 {
-                    using var ms = new MemoryStream((int)config.FileSize);
-                    await config.Data.DownloadAsync(ms, cancellation: cancellationToken);
-                    byte[] data = ms.ToArray();
-
                     var rpcClientConfig = new RpcClientConfig()
                     {
-                        Id = config.ID,
+                        Id = config.Id,
                         Url = $"tcp://{config.Ip}:{config.Port}",
-                        Certificate = X509CertificateLoader.LoadPkcs12(data, config.PfxPassword),
+                        Certificate = X509CertificateLoader.LoadPkcs12(config.PfxFile, config.PfxPassword),
                         Name = config.Name,
                     };
 
@@ -65,12 +61,11 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Providers
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to load rpc client config with ID: {Id}", config.ID);
+                    _logger.LogError(ex, "Failed to load rpc client config with ID: {Id}", config.Id);
                 }
             }
 
             return configs;
-
         }
     }
 }

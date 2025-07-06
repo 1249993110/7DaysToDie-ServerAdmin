@@ -5,7 +5,7 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Abstractions
 {
     public interface IRpcClient : IDisposable
     {
-        string Id { get; }
+        Guid Id { get; }
         string Name { get; }
         string Url { get; }
         ConnectionState State { get; }
