@@ -1,6 +1,4 @@
-﻿using MediatR;
-
-namespace LSTY.Sdtd.ServerAdmin.Data.Notifications
+﻿namespace LSTY.Sdtd.ServerAdmin.Data.Notifications
 {
     public class GameServerDisconnected : INotification
     {

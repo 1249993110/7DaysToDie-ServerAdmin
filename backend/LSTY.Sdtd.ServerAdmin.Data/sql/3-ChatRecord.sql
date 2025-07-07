@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS ChatMessage(
 	[GameServerId] TEXT NOT NULL,
 	[EntityId] INTEGER NOT NULL,
 	[PlayerId] TEXT NULL,
-	[ChatType] TEXT NOT NULL,
+	[ChatType] INTEGER NOT NULL,
 	[SenderName] TEXT NOT NULL,
 	[Message] TEXT NOT NULL
 );

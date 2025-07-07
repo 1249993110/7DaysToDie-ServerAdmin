@@ -1,5 +1,4 @@
 ﻿using LSTY.Sdtd.ServerAdmin.Shared.Abstractions;
-using MediatR;
 
 namespace LSTY.Sdtd.ServerAdmin.Data.Notifications
 {

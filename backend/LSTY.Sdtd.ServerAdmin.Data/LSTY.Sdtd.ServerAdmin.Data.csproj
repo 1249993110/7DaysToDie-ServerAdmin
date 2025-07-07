@@ -9,8 +9,8 @@
 	<ItemGroup>
 		<PackageReference Include="IceCoffee.Db4Net" Version="1.0.8" />
 		<PackageReference Include="IceCoffee.Db4Net.Core" Version="1.0.6" />
+		<PackageReference Include="IceCoffee.Mediator" Version="1.0.0" />
 		<PackageReference Include="Mapster" Version="7.4.0" />
-		<PackageReference Include="MediatR" Version="13.0.0" />
 		<PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.6" />
 	</ItemGroup>
 

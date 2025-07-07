@@ -2,6 +2,7 @@ using Dapper;
 using FastExpressionCompiler;
 using IceCoffee.Db4Net.DependencyInjection;
 using IceCoffee.Db4Net.SqliteTypeHandlers;
+using IceCoffee.Mediator;
 using LSTY.Sdtd.ServerAdmin.Data.Abstractions;
 using LSTY.Sdtd.ServerAdmin.Data.Enums;
 using LSTY.Sdtd.ServerAdmin.Data.Logging;
@@ -12,7 +13,6 @@ using LSTY.Sdtd.ServerAdmin.WebApi.Authentication;
 using LSTY.Sdtd.ServerAdmin.WebApi.Authorization;
 using LSTY.Sdtd.ServerAdmin.WebApi.JsonConverters;
 using LSTY.Sdtd.ServerAdmin.WebApi.Middlewares;
-using LSTY.Sdtd.ServerAdmin.WebApi.NotificationPublishers;
 using LSTY.Sdtd.ServerAdmin.WebApi.OperationProcessors;
 using LSTY.Sdtd.ServerAdmin.WebApi.Providers;
 using Microsoft.AspNetCore.Authorization;
@@ -77,12 +77,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
                 services.AddSingleton<IFunctionSettingsProvider, FunctionSettingsProvider>();
                 services.AddSingleton<ICustomLoggerFactory, CustomLoggerFactory>();
 
-                services.AddMediatR(cfg =>
-                {
-                    cfg.RegisterServicesFromAssemblies(typeof(FunctionManager).Assembly);
-                    cfg.NotificationPublisherType = typeof(ParallelForeachPublisher);
-                    cfg.LicenseKey = config.GetValue<string>("MediatR:LicenseKey");
-                });
+                services.AddMediatR<ParallelForeachPublisher>(ServiceLifetime.Singleton, typeof(FunctionManager).Assembly);
 
                 services.AddMemoryCache();
 

@@ -1,19 +1,17 @@
-﻿using LSTY.Sdtd.ServerAdmin.Data.Abstractions;
+﻿using IceCoffee.Mediator;
+using LSTY.Sdtd.ServerAdmin.Data.Abstractions;
 using LSTY.Sdtd.ServerAdmin.Data.Notifications;
 using LSTY.Sdtd.ServerAdmin.RpcClient.Abstractions;
 using LSTY.Sdtd.ServerAdmin.RpcClient.Models;
 using LSTY.Sdtd.ServerAdmin.Shared.Abstractions;
 using LSTY.Sdtd.ServerAdmin.Shared.Constants;
 using LSTY.Sdtd.ServerAdmin.Shared.Helpers;
-using MediatR;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using StreamJsonRpc;
 using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
 
 namespace LSTY.Sdtd.ServerAdmin.RpcClient.Clients
 {
@@ -236,6 +234,7 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Clients
                     RpcProxies = _proxies 
                 }, cancellationToken);
 
+                // If the application is stopping, the notification will be not sent.
                 _ = _jsonRpc.Completion.ContinueWith(async task =>
                 {
                     await _mediator.Publish(new GameServerDisconnected()

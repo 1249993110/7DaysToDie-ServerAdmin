@@ -152,12 +152,14 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
             }, functionGroup);
         }
 
-        public void UnregisterFunctions(Guid serverId)
+        public Task UnregisterFunctionsAsync(Guid serverId)
         {
             if (_runningFunctions.TryRemove(serverId, out var functionGroup))
             {
                 functionGroup.Dispose();
             }
+
+            return Task.CompletedTask;
         }
 
         public bool TryGetFunctionGroup(Guid serverId, out FunctionGroup? functionGroup)
