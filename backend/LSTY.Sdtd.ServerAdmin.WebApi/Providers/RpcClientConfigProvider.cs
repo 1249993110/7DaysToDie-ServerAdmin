@@ -32,7 +32,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Providers
                 var entity = new GameServerConfig()
                 {
                     Id = Guid.NewGuid(),
-                    Ip = "7dtdserver.local",
+                    Host = "7dtdserver.local",
                     Port = 8088,
                     IsEnabled = true,
                     Name = "Test",
@@ -47,22 +47,17 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Providers
             var gameServerConfigs = await Db.Query<GameServerConfig>().WhereEq(p => p.IsEnabled, true).GetListAsync();
             foreach (var config in gameServerConfigs)
             {
-                try
+                var rpcClientConfig = new RpcClientConfig()
                 {
-                    var rpcClientConfig = new RpcClientConfig()
-                    {
-                        Id = config.Id,
-                        Url = $"tcp://{config.Ip}:{config.Port}",
-                        Certificate = X509CertificateLoader.LoadPkcs12(config.PfxFile, config.PfxPassword),
-                        Name = config.Name,
-                    };
+                    Id = config.Id,
+                    Host = config.Host,
+                    Port = config.Port,
+                    PfxFile = config.PfxFile,
+                    PfxPassword = config.PfxPassword,
+                    Name = config.Name,
+                };
 
-                    configs.Add(rpcClientConfig);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Failed to load rpc client config with ID: {Id}", config.Id);
-                }
+                configs.Add(rpcClientConfig);
             }
 
             return configs;

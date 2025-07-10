@@ -4,10 +4,11 @@ using LSTY.Sdtd.ServerAdmin.RpcClient.Clients;
 using LSTY.Sdtd.ServerAdmin.RpcClient.Models;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 
 namespace LSTY.Sdtd.ServerAdmin.RpcClient.Core
 {
-    public class RpcClientManager
+    public class RpcClientManager : IAsyncDisposable
     {
         private readonly ConcurrentDictionary<Guid, IRpcClient> _clients = new();
         private readonly ICustomLoggerFactory _customLoggerFactory;
@@ -42,37 +43,14 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Core
             return count;
         }
 
-        public async Task StartAllAsync(CancellationToken cancellationToken)
-        {
-            var tasks = new List<Task>();
-            foreach (var client in _clients.Values)
-            {
-                tasks.Add(client.ConnectAsync(cancellationToken));
-            }
-
-            await Task.WhenAll(tasks);
-        }
-
-        public async Task StopAllAsync()
-        {
-            var tasks = new List<Task>();
-            foreach (var client in _clients.Values)
-            {
-                tasks.Add(client.DisconnectAsync());
-            }
-
-            await Task.WhenAll(tasks);
-        }
-
         public async Task RemoveClientAsync(Guid id)
         {
             if (_clients.TryRemove(id, out var client))
             {
-                await client.DisconnectAsync();
-                client.Dispose();
+                await client.DisposeAsync();
 
                 var logger = _customLoggerFactory.CreateLogger(Data.Enums.ServiceModule.RpcClientManager, id);
-                await logger.LogInformationAsync($"Rpc Client {client.Name} disposed.");
+                await logger.LogInformationAsync($"Rpc Client {client.Config.Name} disposed.");
             }
         }
 
@@ -84,24 +62,37 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Core
         public async Task AddOrUpdateClientAsync(RpcClientConfig config)
         {
             var client = CreateJsonRpcClient(config);
-            _clients.AddOrUpdate(config.Id, (key, client) =>
-            {
-                return client;
-            }, (key, oldValue, client) =>
-            {
-                oldValue.Dispose();
-                return client;
-            }, client);
 
-            await client.ConnectAsync();
+            IRpcClient? oldClient = null;
+
+            _clients.AddOrUpdate(config.Id, client, (key, _oldClient) =>
+            {
+                oldClient = _oldClient;
+                return client;
+            });
+
+            if (oldClient != null)
+            {
+                await oldClient.DisposeAsync();
+            }
 
             var logger = _customLoggerFactory.CreateLogger(Data.Enums.ServiceModule.RpcClientManager, config.Id);
             await logger.LogInformationAsync($"Rpc Client [{config.Name}] added or updated.");
         }
 
-        public bool TryGetClient(Guid id, out IRpcClient? rpcClient)
+        public bool TryGetClient(Guid id, [MaybeNullWhen(false)] out IRpcClient rpcClient)
         {
             return _clients.TryGetValue(id, out rpcClient);
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            foreach (var client in _clients.Values)
+            {
+                await client.DisposeAsync();
+            }
+
+            _clients.Clear();
         }
     }
 }

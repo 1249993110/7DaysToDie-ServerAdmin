@@ -147,6 +147,7 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer
                 WorldPatcher.Init(modEventProxy.OnEntitySpawned);
                 ModEvents.GameStartDone.RegisterHandler(GetMapTileCache);
                 ModEvents.GameStartDone.RegisterHandler(WorldStaticDataHook.ReplaceXmls);
+                ModEvents.GameShutdown.RegisterHandler(RpcServerManager.Dispose);
 
                 CustomLogger.Info("Registered mod event handlers success.");
             }

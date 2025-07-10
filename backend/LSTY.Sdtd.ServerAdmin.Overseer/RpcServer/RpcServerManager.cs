@@ -10,11 +10,11 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer
 {
     public static class RpcServerManager
     {
-        private static JsonRpcServer _jsonRpcServer = null!;
+        private static JsonRpcServer? _jsonRpcServer;
         private static string _certPath = null!;
         private static string? _certPassword;
 
-        public static JsonRpcServer JsonRpcServer  => _jsonRpcServer;
+        public static JsonRpcServer JsonRpcServer => _jsonRpcServer ?? throw new InvalidOperationException("The RPC server has not been initialized.");
         public static ModEventProxy ModEventProxy => (ModEventProxy)JsonRpcServer.GetProxy<IModEventProxy>();
 
         public static void Init(int port, string certPath, string? certPassword)
@@ -26,7 +26,6 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer
             CustomLogger.Info($"Loaded certificate from {_certPath}.");
 
             _jsonRpcServer = new JsonRpcServer(port, certificate, CreateProxies());
-            _jsonRpcServer.Start();
         }
 
         private static Dictionary<Type, IProxy> CreateProxies()
@@ -67,9 +66,22 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer
             {
                 File.Delete(_certPath);
             }
-                
+
             var certificate = LoadCertificate();
-            _jsonRpcServer.UpdateSslCertificate(certificate);
+            JsonRpcServer.UpdateSslCertificate(certificate);
+        }
+
+        public static void Dispose(ref ModEvents.SGameShutdownData sGameShutdownData)
+        {
+            try
+            {
+                _jsonRpcServer?.Dispose();
+                _jsonRpcServer = null;
+            }
+            catch (Exception ex)
+            {
+                CustomLogger.Error(ex, "Failed to dispose RPC server.");
+            }
         }
     }
 }

@@ -14,12 +14,9 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer
 {
     public sealed class JsonRpcServer : IDisposable
     {
-        private readonly object _lock = new object();
-        private ServerState _state = ServerState.Stopped;
-
         private readonly ConcurrentDictionary<int, TcpClient> _clients = new();
-        private CancellationTokenSource? _cts;
-        private Task? _acceptTask;
+        private CancellationTokenSource _cts;
+        private Task _acceptTask;
 
         private readonly TcpListener _tcpListener;
         private X509Certificate2 _sslCertificate;
@@ -34,64 +31,19 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer
             throw new InvalidOperationException($"Proxy of type {typeof(TProxy).Name} not found.");
         }
 
-        public ServerState State
-        {
-            get
-            {
-                lock (_lock)
-                {
-                    return _state;
-                }
-            }
-        }
-
         public JsonRpcServer(int port, X509Certificate2 sslCertificate, IReadOnlyDictionary<Type, IProxy> proxies)
         {
+            _sslCertificate = sslCertificate;
+            _proxies = proxies;
+            _cts = new CancellationTokenSource();
+
             _tcpListener = new TcpListener(IPAddress.Any, port);
             _tcpListener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
             _tcpListener.Server.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, true);
-            
-            _sslCertificate = sslCertificate;
-            _proxies = proxies;
-        }
-
-        public void Start()
-        {
-            lock (_lock)
-            {
-                if (_state != ServerState.Stopped)
-                {
-                    throw new InvalidOperationException($"Start is only allowed in Stopped state, current state: {_state}");
-                }
-
-                _state = ServerState.Starting;
-            }
-
-            _cts = new CancellationTokenSource();
-
-            try
-            {
-                _tcpListener.Start();
-            }
-            catch
-            {
-                _cts?.Dispose();
-                _cts = null;
-                lock (_lock)
-                {
-                    _state = ServerState.Stopped;
-                }
-                throw;
-            }
-
-            _acceptTask = AcceptClientsAsync(_cts.Token);
-
-            lock (_lock)
-            {
-                _state = ServerState.Started;
-            }
-
+            _tcpListener.Start();
             CustomLogger.Info($"Json RPC Server started on port {((IPEndPoint)_tcpListener.LocalEndpoint).Port}");
+
+            _acceptTask = AcceptClientsAsync();
         }
 
         public void UpdateSslCertificate(X509Certificate2 certificate)
@@ -100,11 +52,11 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer
             _sslCertificate = certificate;
         }
 
-        private async Task AcceptClientsAsync(CancellationToken token)
+        private async Task AcceptClientsAsync()
         {
             try
             {
-                while (token.IsCancellationRequested == false)
+                while (_cts.IsCancellationRequested == false)
                 {
                     var tcpClient = await _tcpListener.AcceptTcpClientAsync().ConfigureAwait(false);
                     ThreadPool.UnsafeQueueUserWorkItem(new WaitCallback(HandleClientAsync), tcpClient);
@@ -206,107 +158,54 @@ namespace LSTY.Sdtd.ServerAdmin.Overseer.RpcServer
             }
         }
 
-        public void Stop()
+        public void Dispose()
         {
-            lock (_lock)
+            if (_cts.IsCancellationRequested == false)
             {
-                if (_state == ServerState.Stopped 
-                    || _state == ServerState.Stopping 
-                    || _state == ServerState.Disposed
-                    || _state == ServerState.Disposing)
-                {
-                    return;
-                }
-
-                if (_state == ServerState.Starting)
-                {
-                    throw new InvalidOperationException("Cannot stop server while starting.");
-                }
-
-                _state = ServerState.Stopping;
+                _cts.Cancel();
             }
 
-            StopCore();
-
-            lock (_lock)
-            {
-                _state = ServerState.Stopped;
-            }
-        }
-
-        private void StopCore()
-        {
             try
             {
                 _tcpListener.Stop();
+
+                foreach (var client in _clients.Values)
+                {
+                    try
+                    {
+                        client.Client.Shutdown(SocketShutdown.Both);
+                    }
+                    catch
+                    {
+                    }
+
+                    try
+                    {
+                        client.Close();
+                        client.Dispose();
+                    }
+                    catch
+                    {
+                    }
+                }
+                _clients.Clear();
             }
-            catch
+            finally
             {
+                _tcpListener.Server.Dispose();
             }
 
             try
             {
-                _cts?.Cancel();
+                _acceptTask.Wait();
             }
-            finally
+            catch /*(OperationCanceledException)*/
             {
-                _cts?.Dispose();
-                _cts = null;
             }
 
-            foreach (var client in _clients.Values)
-            {
-                try
-                {
-                    client.Client.Shutdown(SocketShutdown.Both);
-                }
-                catch
-                {
-                }
+            _cts.Dispose();
 
-                try
-                {
-                    client.Close();
-                    client.Dispose();
-                }
-                catch
-                {
-                }
-            }
-            _clients.Clear();
-
-            try
-            {
-                _acceptTask?.Wait();
-            }
-            finally
-            {
-                _acceptTask?.Dispose();
-                _acceptTask = null;
-            }
-        }
-
-        public void Dispose()
-        {
-            lock (_lock)
-            {
-                if (_state == ServerState.Disposed || _state == ServerState.Disposing)
-                {
-                    return;
-                }
-
-                _state = ServerState.Disposing;
-            }
-
-            StopCore();
-
-            _tcpListener.Server.Dispose();
             _sslCertificate.Dispose();
-
-            lock (_lock)
-            {
-                _state = ServerState.Disposed;
-            }
         }
     }
 }

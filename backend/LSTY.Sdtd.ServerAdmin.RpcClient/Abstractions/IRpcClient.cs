@@ -1,17 +1,15 @@
-﻿using LSTY.Sdtd.ServerAdmin.RpcClient.Clients;
+﻿using LSTY.Sdtd.ServerAdmin.RpcClient.Models;
 using LSTY.Sdtd.ServerAdmin.Shared.Abstractions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace LSTY.Sdtd.ServerAdmin.RpcClient.Abstractions
 {
-    public interface IRpcClient : IDisposable
+    public interface IRpcClient : IAsyncDisposable
     {
-        Guid Id { get; }
-        string Name { get; }
-        string Url { get; }
-        ConnectionState State { get; }
+        RpcClientConfig Config { get; }
 
-        Task<bool> ConnectAsync(CancellationToken cancellationToken = default);
-        Task DisconnectAsync();
-        bool TryGetProxy<TProxy>(out TProxy? proxy) where TProxy : class, IProxy;
+        bool IsConnected { get; }
+
+        bool TryGetProxy<TProxy>([MaybeNullWhen(false)] out TProxy proxy) where TProxy : class, IProxy;
     }
 }

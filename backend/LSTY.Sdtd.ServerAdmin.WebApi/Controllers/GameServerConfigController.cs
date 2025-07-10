@@ -42,7 +42,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
 
             if(_manager.TryGetClient(id, out var client))
             {
-                result.IsConnected = client!.State == RpcClient.Clients.ConnectionState.Connected;
+                result.IsConnected = client.IsConnected;
             }
             
             return Ok(result);
@@ -68,7 +68,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
 
                 if (_manager.TryGetClient(item.Id, out var client))
                 {
-                    dto.IsConnected = client!.State == RpcClient.Clients.ConnectionState.Connected;
+                    dto.IsConnected = client.IsConnected;
                 }
 
                 result.Add(dto);
@@ -100,7 +100,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
             {
                 Id = Guid.NewGuid(),
                 Name = dto.Name,
-                Ip = dto.Ip,
+                Host = dto.Host,
                 Port = dto.Port,
                 PfxFile = memoryStream.ToArray(),
                 PfxPassword = dto.PfxPassword,
@@ -109,7 +109,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                 UserId = User.GetUserId()
             };
 
-            int id = await Db.InsertAndGetId(entity).ExecuteAsync<int>();
+            await Db.Insert(entity).ExecuteAsync();
 
             if (entity.IsEnabled)
             {
@@ -126,15 +126,17 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                 var rpcClientConfig = new RpcClientConfig()
                 {
                     Id = entity.Id,
-                    Url = $"tcp://{entity.Ip}:{entity.Port}",
-                    Certificate = x509Certificate2,
                     Name = entity.Name,
+                    Host = entity.Host,
+                    Port = entity.Port,
+                    PfxFile = entity.PfxFile,
+                    PfxPassword = entity.PfxPassword,
                 };
 
                 await _manager.AddOrUpdateClientAsync(rpcClientConfig);
             }
 
-            return CreatedAtAction(nameof(Get), new { id }, entity.Adapt<GameServerConfigDto>());
+            return CreatedAtAction(nameof(Get), new { entity.Id }, entity.Adapt<GameServerConfigDto>());
         }
 
         /// <summary>
@@ -163,7 +165,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
             await dto.PfxFile.CopyToAsync(memoryStream);
 
             entity.Name = dto.Name;
-            entity.Ip = dto.Ip;
+            entity.Host = dto.Host;
             entity.Port = dto.Port;
             entity.PfxFile = memoryStream.ToArray();
             entity.PfxPassword = dto.PfxPassword;
@@ -188,9 +190,11 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                 var rpcClientConfig = new RpcClientConfig()
                 {
                     Id = entity.Id,
-                    Url = $"tcp://{entity.Ip}:{entity.Port}",
-                    Certificate = x509Certificate2,
                     Name = entity.Name,
+                    Host = entity.Host,
+                    Port = entity.Port,
+                    PfxFile = entity.PfxFile,
+                    PfxPassword = entity.PfxPassword,
                 };
                 await _manager.AddOrUpdateClientAsync(rpcClientConfig);
             }

@@ -8,17 +8,12 @@
         /// <summary>
         /// The unique identifier of the game server configuration.
         /// </summary>
-        public required string ID { get; set; }
+        public required string Id { get; set; }
 
         /// <summary>
         /// The date and time when the configuration was created.
         /// </summary>
-        public required DateTime CreatedOn { get; set; }
-
-        /// <summary>
-        /// The date and time when the configuration was last modified.
-        /// </summary>
-        public required DateTime ModifiedOn { get; set; }
+        public required DateTime CreatedAt { get; set; }
 
         /// <summary>
         /// The name of the game server.
@@ -26,9 +21,9 @@
         public required string Name { get; set; }
 
         /// <summary>
-        /// The IP address of the game server.
+        /// The host of the game server.
         /// </summary>
-        public required string Ip { get; set; }
+        public required string Host { get; set; }
 
         /// <summary>
         /// The port number used by the game server.

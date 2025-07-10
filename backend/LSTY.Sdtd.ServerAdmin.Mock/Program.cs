@@ -1,4 +1,5 @@
 ﻿using LSTY.Sdtd.ServerAdmin.Overseer;
+using LSTY.Sdtd.ServerAdmin.Overseer.RpcServer;
 
 namespace LSTY.Sdtd.ServerAdmin.Mock
 {
@@ -26,6 +27,8 @@ namespace LSTY.Sdtd.ServerAdmin.Mock
                 var input = Console.ReadLine();
                 if (input == "exit")
                 {
+                    var sGameShutdownData = new ModEvents.SGameShutdownData();
+                    RpcServerManager.Dispose(ref sGameShutdownData);
                     break;
                 }
             }

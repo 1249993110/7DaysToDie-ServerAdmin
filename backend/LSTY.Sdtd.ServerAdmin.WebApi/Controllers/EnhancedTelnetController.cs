@@ -4,11 +4,13 @@ using LSTY.Sdtd.ServerAdmin.Shared.Constants;
 using LSTY.Sdtd.ServerAdmin.Shared.Proxies;
 using LSTY.Sdtd.ServerAdmin.WebApi.Authorization;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.VisualStudio.Threading;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using System.Net.WebSockets;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
 {
@@ -21,6 +23,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
     {
         private readonly FunctionManager _functionManager;
         private readonly ILogger<EnhancedTelnetController> _logger;
+        private readonly IHostApplicationLifetime _applicationLifetime;
 
         private readonly static JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings()
         {
@@ -34,10 +37,11 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <summary>
         /// Constructor.
         /// </summary>
-        public EnhancedTelnetController(FunctionManager functionManager, ILogger<EnhancedTelnetController> logger)
+        public EnhancedTelnetController(FunctionManager functionManager, ILogger<EnhancedTelnetController> logger, IHostApplicationLifetime applicationLifetime)
         {
             _functionManager = functionManager;
             _logger = logger;
+            _applicationLifetime = applicationLifetime;
         }
 
         /// <summary>
@@ -60,7 +64,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
 
                 if (_functionManager.TryGetFunctionGroup(gameServerId, out var functionGroup))
                 {
-                    string welcome = await functionGroup!.SharedState.GameManageProxy.GetWelcome();
+                    string welcome = await functionGroup.SharedState.GameManageProxy.GetWelcome();
                     string json = JsonConvert.SerializeObject(new
                     {
                         eventName = ModEventName.Welcome.ToString(),
@@ -68,12 +72,12 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                     }, _jsonSerializerSettings);
                     await SendAsync(webSocket, json);
 
-                    void OnEventRaised(string eventName, EventArgs eventArgs)
+                    async void OnEventRaised(string eventName, EventArgs eventArgs)
                     {
                         if (webSocket.State == WebSocketState.Open)
                         {
                             string json = JsonConvert.SerializeObject(new { eventName, eventArgs }, _jsonSerializerSettings);
-                            webSocket.SendAsync(Encoding.UTF8.GetBytes(json), WebSocketMessageType.Text, true, CancellationToken.None);
+                            await SendAsync(webSocket, json);
                         }
                     }
 
@@ -84,6 +88,10 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                     try
                     {
                         await Telnet(webSocket, functionGroup.SharedState.GameManageProxy);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        // Ignore cancellation exceptions
                     }
                     catch (Exception ex)
                     {
@@ -109,10 +117,10 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
             }
         }
 
-        private static async Task Telnet(WebSocket webSocket, IGameManageProxy gameManageProxy)
+        private async Task Telnet(WebSocket webSocket, IGameManageProxy gameManageProxy)
         {
             var buffer = new byte[1024];
-            var receiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+            var receiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), _applicationLifetime.ApplicationStopping);
 
             while (receiveResult.CloseStatus.HasValue == false)
             {
@@ -128,15 +136,26 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                     await SendAsync(webSocket, json);
                 }
 
-                receiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                receiveResult = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), _applicationLifetime.ApplicationStopping);
             }
 
-            await webSocket.CloseAsync(receiveResult.CloseStatus.Value, receiveResult.CloseStatusDescription, CancellationToken.None);
+            await webSocket.CloseAsync(receiveResult.CloseStatus.Value, receiveResult.CloseStatusDescription, _applicationLifetime.ApplicationStopping);
         }
 
-        private static Task SendAsync(WebSocket webSocket, string content)
+        private async Task SendAsync(WebSocket webSocket, string content)
         {
-            return webSocket.SendAsync(Encoding.UTF8.GetBytes(content), WebSocketMessageType.Text, true, CancellationToken.None);
+            try
+            {
+                await webSocket.SendAsync(Encoding.UTF8.GetBytes(content), WebSocketMessageType.Text, true, _applicationLifetime.ApplicationStopping);
+            }
+            catch (OperationCanceledException)
+            {
+                // Ignore cancellation exceptions
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error in EnhancedTelnetController.SendAsync");
+            }
         }
     }
 }

@@ -26,20 +26,20 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Authorization
                 string userId = user.GetUserId();
                 if (context.Resource is DefaultHttpContext httpContext)
                 {
-                    string? gameServerId;
+                    string? gameServerIdStr;
                     if (httpContext.WebSockets.IsWebSocketRequest)
                     {
-                        gameServerId = httpContext.WebSockets.WebSocketRequestedProtocols.ElementAtOrDefault(1);
+                        gameServerIdStr = httpContext.WebSockets.WebSocketRequestedProtocols.ElementAtOrDefault(1);
                     }
                     else
                     {
-                        gameServerId = httpContext.Request.Headers[AddGameServerIdHeaderParameter.Name].ToString();
+                        gameServerIdStr = httpContext.Request.Headers[AddGameServerIdHeaderParameter.Name].ToString();
                     }
 
-                    if (string.IsNullOrEmpty(gameServerId) == false)
+                    if (string.IsNullOrEmpty(gameServerIdStr) == false && Guid.TryParse(gameServerIdStr, out Guid gameServerId))
                     {
                         bool exists = await Db.QueryExists<GameServerConfig>()
-                            .WhereEq(p => p.Id, gameServerId.ToGuid())
+                            .WhereEq(p => p.Id, gameServerId)
                             .WhereEq(p => p.UserId, userId)
                             .GetAsync();
 

@@ -45,7 +45,7 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
                                     PlayerName = chatMessageEventArgs.SenderName,
                                 };
 
-                                await commandInfo!.Execute(commandParseResult.Arguments, commandSender);
+                                await commandInfo.Execute(commandParseResult.Arguments, commandSender);
                             }
                         }
                     }

@@ -40,7 +40,6 @@
 		<ProjectReference Include="..\LSTY.Sdtd.ServerAdmin.Shared\LSTY.Sdtd.ServerAdmin.Shared.csproj" />
 	</ItemGroup>
 
-
 	<ItemGroup>
 		<None Update="Config\appsettings.json">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

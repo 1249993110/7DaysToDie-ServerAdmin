@@ -11,9 +11,9 @@
         public required string Name { get; set; }
 
         /// <summary>
-        /// The IP address of the game server.
+        /// The host of the game server.
         /// </summary>
-        public required string Ip { get; set; }
+        public required string Host { get; set; }
 
         /// <summary>
         /// The port number used by the game server.

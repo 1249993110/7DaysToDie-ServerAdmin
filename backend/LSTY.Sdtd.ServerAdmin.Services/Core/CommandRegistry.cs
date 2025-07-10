@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 
 namespace LSTY.Sdtd.ServerAdmin.Services.Core
 {
@@ -65,7 +66,7 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
         /// <param name="name">The name or alias of the command.</param>
         /// <param name="command">The retrieved command, or null if not found.</param>
         /// <returns>True if the command was found; otherwise, false.</returns>
-        public bool TryGetCommand(string name, out CommandInfo? command)
+        public bool TryGetCommand(string name, [MaybeNullWhen(false)] out CommandInfo command)
         {
             if (string.IsNullOrWhiteSpace(name))
             {

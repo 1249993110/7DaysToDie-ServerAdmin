@@ -11,45 +11,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\LSTY.Sdtd.ServerAdmin.Overseer\LSTY.Sdtd.ServerAdmin.Overseer.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
+		<ProjectReference Include="..\LSTY.Sdtd.ServerAdmin.Overseer\LSTY.Sdtd.ServerAdmin.Overseer.csproj" />
 		<Reference Include="Assembly-CSharp">
 			<Private>true</Private>
 			<HintPath>..\LSTY.Sdtd.ServerAdmin.Overseer\7dtd-binaries\Assembly-CSharp.dll</HintPath>
 		</Reference>
-		<Reference Include="Assembly-CSharp-firstpass">
-			<Private>true</Private>
-			<HintPath>..\LSTY.Sdtd.ServerAdmin.Overseer\7dtd-binaries\Assembly-CSharp-firstpass.dll</HintPath>
-		</Reference>
-		<Reference Include="UnityEngine.CoreModule">
-			<Private>true</Private>
-			<HintPath>..\LSTY.Sdtd.ServerAdmin.Overseer\7dtd-binaries\UnityEngine.CoreModule.dll</HintPath>
-		</Reference>
-		<Reference Include="LogLibrary">
-			<Private>true</Private>
-			<HintPath>..\LSTY.Sdtd.ServerAdmin.Overseer\7dtd-binaries\LogLibrary.dll</HintPath>
-		</Reference>
-		<Reference Include="0Harmony">
-			<Private>true</Private>
-			<HintPath>..\LSTY.Sdtd.ServerAdmin.Overseer\7dtd-binaries\0Harmony.dll</HintPath>
-		</Reference>
-		<Reference Include="Noemax.GZip">
-			<Private>true</Private>
-			<HintPath>..\LSTY.Sdtd.ServerAdmin.Overseer\7dtd-binaries\Noemax.GZip.dll</HintPath>
-		</Reference>
-		<Reference Include="MapRendering">
-			<Private>true</Private>
-			<HintPath>..\LSTY.Sdtd.ServerAdmin.Overseer\7dtd-binaries\MapRendering.dll</HintPath>
-		</Reference>
-		<Reference Include="WebServer">
-			<Private>true</Private>
-			<HintPath>..\LSTY.Sdtd.ServerAdmin.Overseer\7dtd-binaries\WebServer.dll</HintPath>
-		</Reference>
-	</ItemGroup>
-	
-	<ItemGroup>
-		<Reference Include="netstandard" />
 	</ItemGroup>
 </Project>

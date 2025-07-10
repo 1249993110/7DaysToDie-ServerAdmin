@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 namespace LSTY.Sdtd.ServerAdmin.Services.Core
@@ -162,7 +163,7 @@ namespace LSTY.Sdtd.ServerAdmin.Services.Core
             return Task.CompletedTask;
         }
 
-        public bool TryGetFunctionGroup(Guid serverId, out FunctionGroup? functionGroup)
+        public bool TryGetFunctionGroup(Guid serverId, [MaybeNullWhen(false)] out FunctionGroup functionGroup)
         {
             return _runningFunctions.TryGetValue(serverId, out functionGroup);
         }

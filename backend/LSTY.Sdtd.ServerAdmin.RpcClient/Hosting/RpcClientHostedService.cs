@@ -21,13 +21,11 @@ namespace LSTY.Sdtd.ServerAdmin.RpcClient.Hosting
 
             int count = await _manager.LoadClientsFromConfigAsync(cancellationToken);
             _logger.LogInformation("Loaded {ClientCount} RPC clients from config.", count);
-
-            await _manager.StartAllAsync(cancellationToken);
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            await _manager.StopAllAsync();
+            await _manager.DisposeAsync();
             _logger.LogInformation("{Name} stopped.", nameof(RpcClientHostedService));
         }
     }

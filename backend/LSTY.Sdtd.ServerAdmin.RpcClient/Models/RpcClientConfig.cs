@@ -1,12 +1,12 @@
-﻿using System.Security.Cryptography.X509Certificates;
-
-namespace LSTY.Sdtd.ServerAdmin.RpcClient.Models
+﻿namespace LSTY.Sdtd.ServerAdmin.RpcClient.Models
 {
     public class RpcClientConfig
     {
         public required Guid Id { get; set; }
         public required string Name { get; set; }
-        public required string Url { get; set; }
-        public required X509Certificate2 Certificate { get; set; }
+        public required string Host { get; set; }
+        public required int Port { get; set; }
+        public required byte[] PfxFile { get; set; }
+        public string? PfxPassword { get; set; }
     }
 }
