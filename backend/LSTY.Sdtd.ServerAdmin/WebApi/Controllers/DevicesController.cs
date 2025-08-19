@@ -1,0 +1,65 @@
+﻿using LSTY.Sdtd.ServerAdmin.Helpers;
+using LSTY.Sdtd.ServerAdmin.Shared.Models;
+using System.Web.Http;
+
+namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
+{
+    /// <summary>
+    /// Devices
+    /// </summary>
+    [Authorize]
+    [RoutePrefix("api/Devices")]
+    public class DevicesController : ApiController
+    {
+        /// <summary>
+        /// Get cpu times.
+        /// </summary>
+        [HttpGet]
+        [Route("CpuTimes")]
+        public CpuTimes? GetCpuTimes()
+        {
+            return DeviceHelper.GetCpuTimes();
+        }
+
+        /// <summary>
+        /// Get memory info.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("MemoryInfo")]
+        public MemoryInfo? GetMemoryInfo()
+        {
+            return DeviceHelper.GetMemoryInfo();
+        }
+
+        /// <summary>
+        /// Get disk infos.
+        /// </summary>
+        [HttpGet]
+        [Route("DiskInfos")]
+        public IEnumerable<DiskInfo> GetDiskInfos()
+        {
+            return DeviceHelper.GetDiskInfos();
+        }
+
+        /// <summary>
+        /// Get network infos.
+        /// </summary>
+        [HttpGet]
+        [Route("NetworkInfos")]
+        public List<NetworkInfo> GetNetworkInfos()
+        {
+            return DeviceHelper.GetNetworkInfos();
+        }
+
+        /// <summary>
+        /// Get system platform info.
+        /// </summary>
+        [HttpGet]
+        [Route("SystemPlatformInfo")]
+        public SystemPlatformInfo GetSystemPlatformInfo()
+        {
+            return DeviceHelper.GetSystemPlatformInfo();
+        }
+    }
+}
