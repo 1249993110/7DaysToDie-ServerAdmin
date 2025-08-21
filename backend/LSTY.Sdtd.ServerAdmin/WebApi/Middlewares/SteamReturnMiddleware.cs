@@ -16,7 +16,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Middlewares
         /// <summary>
         /// OAuth steam return path
         /// </summary>
-        public const string OAuthSteamReturnPath = "/oauth/steam/return";
+        public const string OAuthSteamReturnPath = "/api/oauth/steam/return";
 
         /// <summary>
         ///

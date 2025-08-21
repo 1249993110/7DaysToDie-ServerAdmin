@@ -35,7 +35,7 @@ namespace LSTY.Sdtd.ServerAdmin.Helpers
                 {
                     IdleTime = idleTime1.ToULong(),
                     KernelTime = kernelTime1.ToULong(),
-                    UserTime = userTime1.ToULong()
+                    UserTime = userTime1.ToULong(),
                 };
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
@@ -124,7 +124,7 @@ namespace LSTY.Sdtd.ServerAdmin.Helpers
                         AvailablePhysicalMemory = memStatus.ullAvailPhys,
                         TotalVirtualMemory = memStatus.ullTotalVirtual,
                         AvailableVirtualMemory = memStatus.ullAvailVirtual,
-                        UsedPercentage = memStatus.dwMemoryLoad
+                        UsedPercentage = memStatus.dwMemoryLoad,
                     };
                 }
                 else
@@ -157,7 +157,7 @@ namespace LSTY.Sdtd.ServerAdmin.Helpers
                         AvailablePhysicalMemory = available * 1024,
                         TotalVirtualMemory = totalSwap * 1024,
                         AvailableVirtualMemory = freeSwap * 1024,
-                        UsedPercentage = usedPercentage
+                        UsedPercentage = usedPercentage,
                     };
                 }
                 catch
@@ -193,33 +193,26 @@ namespace LSTY.Sdtd.ServerAdmin.Helpers
 
         #region Disk
 
-        public static IEnumerable<DiskInfo> GetDiskInfos()
+        public static List<DiskInfo> GetDiskInfos()
         {
-            var disks = DriveInfo.GetDrives()
-                .Where(x => x.DriveType == DriveType.Fixed && x.TotalSize != 0 && x.DriveFormat != "overlay");
-
-            return disks.Select(x => new DiskInfo() 
+            var result = new List<DiskInfo>();
+            foreach (var item in DriveInfo.GetDrives())
             {
-                DriveType = x.DriveType,
-                DriveFormat = x.DriveFormat,
-                FreeSpace = x.AvailableFreeSpace,
-                Name = x.Name,
-                RootPath = x.RootDirectory.FullName,
-                TotalSize = x.TotalSize
-            }).Distinct(new DiskInfoEquality());
-        }
-
-        private class DiskInfoEquality : IEqualityComparer<DiskInfo>
-        {
-            public bool Equals(DiskInfo? x, DiskInfo? y)
-            {
-                return x?.Name == y?.Name;
+                if (item.DriveType == DriveType.Fixed && item.TotalSize != 0 && item.DriveFormat != "overlay")
+                {
+                    result.Add(new DiskInfo()
+                    {
+                        Name = item.Name,
+                        DriveType = item.DriveType,
+                        DriveFormat = item.DriveFormat,
+                        FreeSpace = item.AvailableFreeSpace,
+                        RootPath = item.RootDirectory.FullName,
+                        TotalSize = item.TotalSize
+                    });
+                }
             }
 
-            public int GetHashCode(DiskInfo obj)
-            {
-                return obj.Name.GetHashCode();
-            }
+            return result;
         }
         #endregion
 
@@ -230,7 +223,7 @@ namespace LSTY.Sdtd.ServerAdmin.Helpers
             var hostAddrs = Dns.GetHostAddresses(hostName).Where(i => i.AddressFamily == AddressFamily.InterNetwork).ToHashSet();
             
             var allNetworkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
-            var result = new List<NetworkInfo>(allNetworkInterfaces.Length);
+            var result = new List<NetworkInfo>();
             foreach (var item in allNetworkInterfaces)
             {
                 if (item.OperationalStatus != OperationalStatus.Up || item.NetworkInterfaceType == NetworkInterfaceType.Loopback)

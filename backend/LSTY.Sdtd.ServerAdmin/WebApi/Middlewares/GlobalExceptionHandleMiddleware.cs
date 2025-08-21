@@ -56,6 +56,9 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Middlewares
                 {
                     TraceId = traceId,
                     Message = "Internal server error.",
+                    ExceptionMessage = ex.Message,
+                    ExceptionType = ex.GetType().FullName,
+                    StackTrace = ex.StackTrace
                 }, _jsonSerializerSettings);
                 await response.WriteAsync(json);
 

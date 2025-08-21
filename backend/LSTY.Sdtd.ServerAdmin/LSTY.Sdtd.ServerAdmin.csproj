@@ -8,7 +8,6 @@
 		<RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
 		<Platform>x64</Platform>
 		<OutputType>Library</OutputType>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		
 		<Authors>IceCoffee</Authors>
 		<Company>LuoShuiTianYi</Company>

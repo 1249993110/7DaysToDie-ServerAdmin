@@ -61,5 +61,22 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         {
             return DeviceHelper.GetSystemPlatformInfo();
         }
+
+        /// <summary>
+        /// Get system metrics snapshot.
+        /// </summary>
+        [HttpGet]
+        [Route("SystemMetricsSnapshot")]
+        public SystemMetricsSnapshot GetSystemMetricsSnapshot()
+        {
+            return new SystemMetricsSnapshot()
+            {
+                Timestamp = DateTime.UtcNow,
+                CpuTimes = DeviceHelper.GetCpuTimes(),
+                MemoryInfo = DeviceHelper.GetMemoryInfo(),
+                DiskInfos = DeviceHelper.GetDiskInfos(),
+                NetworkInfos = DeviceHelper.GetNetworkInfos()
+            };
+        }
     }
 }

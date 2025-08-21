@@ -87,7 +87,7 @@ namespace LSTY.Sdtd.ServerAdmin
         /// <param name="message">The log message.</param>
         /// <param name="trace">The stack trace.</param>
         /// <param name="type">The log type.</param>
-        internal void OnLogCallback(string message, string trace, UnityEngine.LogType type)
+        public void OnLogCallback(string message, string trace, UnityEngine.LogType type)
         {
             var logEntry = new LogCallbackEventArgs()
             {
@@ -102,7 +102,7 @@ namespace LSTY.Sdtd.ServerAdmin
         /// <summary>
         /// Runs once when the server is ready for interaction and GameManager.Instance.World is set.
         /// </summary>
-        internal void OnGameAwake(ref SGameAwakeData sGameAwakeData)
+        public void OnGameAwake(ref SGameAwakeData sGameAwakeData)
         {
             GameAwake?.Invoke(this, null);
         }
@@ -110,7 +110,7 @@ namespace LSTY.Sdtd.ServerAdmin
         /// <summary>
         /// Runs once when the server is ready for players to join.
         /// </summary>
-        internal void OnGameStartDone(ref SGameStartDoneData sGameStartDoneData)
+        public void OnGameStartDone(ref SGameStartDoneData sGameStartDoneData)
         {
             GameStartDone?.Invoke(this, null);
         }
@@ -118,7 +118,7 @@ namespace LSTY.Sdtd.ServerAdmin
         /// <summary>
         /// Runs once when the server is about to shut down.
         /// </summary>
-        internal void OnGameShutdown(ref SGameShutdownData sGameShutdownData)
+        public void OnGameShutdown(ref SGameShutdownData sGameShutdownData)
         {
             GameShutdown?.Invoke(this, null);
         }
@@ -127,7 +127,7 @@ namespace LSTY.Sdtd.ServerAdmin
         ///// Runs each time a chunk has its colors re-calculated. For example, this is used to generate the images for Allocs Game Map mod.
         ///// </summary>
         ///// <param name="chunk">The chunk.</param>
-        //internal void OnCalcChunkColorsDone(Chunk chunk)
+        //public void OnCalcChunkColorsDone(Chunk chunk)
         //{
         //    CalcChunkColorsDone?.Invoke(chunk);
         //}
@@ -208,7 +208,7 @@ namespace LSTY.Sdtd.ServerAdmin
         /// </summary>
         /// <param name="victim">The killed entity.</param>
         /// <param name="killer">The entity that killed the entity.</param>
-        internal void OnEntityKilled(ref SEntityKilledData sEntityKilledData)
+        public void OnEntityKilled(ref SEntityKilledData sEntityKilledData)
         {
             var victim = sEntityKilledData.KilledEntitiy;
             var killer = sEntityKilledData.KillingEntity;
@@ -235,7 +235,7 @@ namespace LSTY.Sdtd.ServerAdmin
         /// Runs when an entity is spawned.
         /// </summary>
         /// <param name="entity">The spawned entity.</param>
-        internal void OnEntitySpawned(EntityInfo entity)
+        public void OnEntitySpawned(EntityInfo entity)
         {
             EntitySpawned?.Invoke(this, new EntitySpawnedEventArgs()
             {
@@ -249,7 +249,7 @@ namespace LSTY.Sdtd.ServerAdmin
         /// </summary>
         /// <param name="clientInfo">The client info.</param>
         /// <param name="shutdown">Indicates if the server is shutting down.</param>
-        internal void OnPlayerDisconnected(ref SPlayerDisconnectedData sPlayerDisconnectedData)
+        public void OnPlayerDisconnected(ref SPlayerDisconnectedData sPlayerDisconnectedData)
         {
             PlayerDisconnected?.Invoke(this, new PlayerDisconnectedEventArgs()
             {
@@ -266,7 +266,7 @@ namespace LSTY.Sdtd.ServerAdmin
         /// <param name="clientInfo">The client info.</param>
         /// <param name="respawnType">The respawn type.</param>
         /// <param name="position">The position.</param>
-        internal void OnPlayerSpawnedInWorld(ref SPlayerSpawnedInWorldData sPlayerSpawnedInWorldData)
+        public void OnPlayerSpawnedInWorld(ref SPlayerSpawnedInWorldData sPlayerSpawnedInWorldData)
         {
             PlayerSpawnedInWorld?.Invoke(this, new PlayerSpawnedInWorldEventArgs()
             {
@@ -282,7 +282,7 @@ namespace LSTY.Sdtd.ServerAdmin
         /// <param name="clientInfo">The client info.</param>
         /// <param name="chunkViewDim">The chunk view dimension.</param>
         /// <param name="playerProfile">The player profile.</param>
-        internal void OnPlayerSpawning(ref SPlayerSpawningData sPlayerSpawningData)
+        public void OnPlayerSpawning(ref SPlayerSpawningData sPlayerSpawningData)
         {
             PlayerSpawning?.Invoke(this, new PlayerSpawningEventArgs()
             {
@@ -299,7 +299,7 @@ namespace LSTY.Sdtd.ServerAdmin
         /// </summary>
         /// <param name="clientInfo">The client info.</param>
         /// <param name="pdf">The player data file.</param>
-        internal void OnSavePlayerData(ref SSavePlayerDataData sSavePlayerDataData)
+        public void OnSavePlayerData(ref SSavePlayerDataData sSavePlayerDataData)
         {
             SavePlayerData?.Invoke(this, new SavePlayerDataEventArgs()
             {
@@ -312,7 +312,7 @@ namespace LSTY.Sdtd.ServerAdmin
         /// Runs when the game sky changes.
         /// </summary>
         /// <param name="skyChangedEventArgs">The sky changed event arguments.</param>
-        internal void OnSkyChanged(SkyChangedEventArgs skyChangedEventArgs)
+        public void OnSkyChanged(SkyChangedEventArgs skyChangedEventArgs)
         {
             SkyChanged?.Invoke(this, skyChangedEventArgs);
         }

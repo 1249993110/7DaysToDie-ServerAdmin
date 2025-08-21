@@ -22,6 +22,7 @@ using System.Net.Http.Formatting;
 using System.Reflection;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
+using System.Web.Http.ExceptionHandling;
 
 namespace LSTY.Sdtd.ServerAdmin.WebApi
 {
@@ -40,7 +41,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
             ContractResolver = new CamelCasePropertyNamesContractResolver(),
             MissingMemberHandling = MissingMemberHandling.Ignore,
             TypeNameHandling = TypeNameHandling.None,
-            DateFormatString = "yyyy-MM-dd HH:mm:ss",
+            DateFormatString = "yyyy-MM-ddTHH:mm:ss.fffZ",
             Converters = new List<JsonConverter>()
             {
                 new Newtonsoft.Json.Converters.StringEnumConverter()
@@ -54,10 +55,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
         public void Configuration(IAppBuilder app)
         {
             // Configure Web API for self-host.
-            var config = new HttpConfiguration()
-            {
-                IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always,
-            };
+            var config = new HttpConfiguration();
             config.MapHttpAttributeRoutes();
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
@@ -70,8 +68,10 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
             //config.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html")); // Default return json
             config.Filters.Add(new ValidateModelAttribute());
 
+            config.Services.Replace(typeof(IHttpControllerTypeResolver), new CustomHttpControllerTypeResolver());
+            config.Services.Replace(typeof(IExceptionHandler), new PassThroughExceptionHandler());
+
             app.Use<GlobalExceptionHandleMiddleware>(_jsonSerializerSettings);
-            
 
             app.Use<SteamReturnMiddleware>();
 
@@ -186,8 +186,6 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
 
             // Adds the Web API runtime (middleware) to the OWIN pipeline, responsible for handling HTTP requests and routing them to the correct Web API controllers and action methods
             app.UseWebApi(config);
-
-            config.Services.Replace(typeof(IHttpControllerTypeResolver), new CustomHttpControllerTypeResolver());
             config.EnsureInitialized();
         }
 
