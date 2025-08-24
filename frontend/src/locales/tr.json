@@ -1,0 +1,19 @@
+{
+  "common": {
+    "appTitle": "7 Days to Die Server Admin"
+  },
+  "components": {},
+  "layout": {},
+  "store": {},
+  "views": {
+    "login": {
+      "password": "şifre",
+      "username": "kullanıcı adı",
+      "submit": "Giriş yapmak",
+      "forgotPassword": "Parolanızı mı unuttunuz?",
+      "rememberMe": "Beni Hatırla",
+      "successTitle": "Tekrar hoşgeldiniz!",
+      "successMessage": "Başarılı bir şekilde oturum açtınız."
+    }
+  }
+}

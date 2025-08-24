@@ -1,0 +1,34 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "esnext",
+        "moduleResolution": "node",
+        "allowJs": true,
+        "types": [
+            "vite/client", // https://vitejs.cn/vite3-cn/guide/features.html#typescript
+            "@intlify/unplugin-vue-i18n/messages", // https://github.com/intlify/bundle-tools/blob/main/packages/unplugin-vue-i18n/README.md#types
+        ],
+        "baseUrl": "./",
+        "outDir": "dist",
+        "paths": {
+            "~/*": [
+                "src/*"
+            ]
+        },
+        "lib": [
+            "esnext",
+            "dom"
+        ],
+        "esModuleInterop": true, // No need import * as xx from 'xx'. allow use CommonJS modules in ES module code.
+        // "resolveJsonModule": true, // Allow importing JSON files
+    },
+    "include": [
+        "src/**/*.js",
+        "src/**/*.vue"
+    ],
+    "files": [
+        "src/components/shims-vue.d.ts",
+        "auto-imports.d.ts",
+        "components.d.ts"
+    ]
+}

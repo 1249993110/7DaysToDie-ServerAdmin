@@ -1,0 +1,33 @@
+html {
+    font-size: 16px;
+    --primary-color: var(--p-primary-color);
+}
+
+.animate-fadeout {
+    animation: fadeout 0.15s linear;
+
+    @keyframes fadeout {
+        0% {
+            opacity: 1;
+        }
+        100% {
+            opacity: 0;
+        }
+    }
+}
+
+.animate-scalein {
+    animation: scalein 0.15s linear;
+
+    @keyframes scalein {
+        0% {
+            opacity: 0;
+            transform: scaleY(0.8);
+            transition: transform 0.12s cubic-bezier(0, 0, 0.2, 1), opacity 0.12s cubic-bezier(0, 0, 0.2, 1);
+        }
+        100% {
+            opacity: 1;
+            transform: scaleY(1);
+        }
+    }
+}

@@ -1,0 +1,21 @@
+{
+  "common": {
+    "appTitle": "7 Days to Die Server Admin"
+  },
+  "components": {},
+  "layout": {},
+  "store": {},
+  "views": {
+    "login": {
+      "failedTitle": "Login failed!",
+      "password": "Password",
+      "username": "Username",
+      "submit": "Sign in",
+      "forgotPassword": "Forgot Password?",
+      "rememberMe": "Remember Me",
+      "successTitle": "Welcome Back!",
+      "failedMessage": "Username or password is incorrect, please try again",
+      "successMessage": "You have been successfully signed in."
+    }
+  }
+}

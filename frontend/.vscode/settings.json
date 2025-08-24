@@ -1,0 +1,33 @@
+{
+    "prettier.singleQuote": true,
+    "prettier.semi": true,
+    "prettier.tabWidth": 4,
+    "prettier.printWidth": 180,
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        "**/node_modules": true,
+        "**/dist": false
+        // "auto-imports.d.ts": true,
+        // "components.d.ts": true
+    },
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/dist": true,
+        // "auto-imports.d.ts": true,
+        // "components.d.ts": true,
+        "package-lock.json": true
+    },
+    "path-intellisense.mappings": {
+        "~/": "${workspaceFolder}/src"
+    },
+    "i18n-ally.localesPaths": [
+        "src/locales"
+    ],
+    "i18n-ally.keystyle": "nested",
+    "i18n-ally.sourceLanguage": "en",
+}
