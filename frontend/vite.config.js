@@ -24,19 +24,22 @@ export default defineConfig(({ mode }) => {
                     'vue-router',
                     'pinia',
                     '@vueuse/core',
-                    'vue-i18n',
+                    // 'vue-i18n',
                     {
-                        '~/plugins/dayjs': [
-                            // import { default as dayjs } from '~/plugins/dayjs'
+                        '~/plugins/dayjs.js': [
+                            // import { default as dayjs } from '~/plugins/dayjs.js'
                             ['default', 'dayjs'],
                         ],
-                        '~/plugins/sweetalert2': [
+                        '~/plugins/sweetalert2.js': [
                             ['Toast'],
                         ],
-                        '~/plugins/mitt': [
+                        '~/plugins/mitt.js': [
                             ['default', 'emitter'],
                             ['EVENT_TYPES'],
-                        ]
+                        ],
+                        '~/plugins/i18n.js': [
+                            ['useI18n'],
+                        ],
                     },
                 ],
 

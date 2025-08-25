@@ -1,13 +1,14 @@
+
 const stores = [];
 
 export default (app) => {
     const pinia = createPinia();
-    // pinia.use(({ store }) => {
-    //     stores.push(store);
-    //     if (typeof store.init === 'function') {
-    //         nextTick(store.init);
-    //     }
-    // });
+    pinia.use(({ store }) => {
+        stores.push(store);
+        // if (typeof store.init === 'function') {
+        //     nextTick(store.init);
+        // }
+    });
     app.use(pinia);
 };
 

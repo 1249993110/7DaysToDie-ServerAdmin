@@ -77,7 +77,8 @@
 <script setup>
 import Palette from './Palette.vue';
 
-const isDark = useDark();
+const { isDark } = storeToRefs(useAppStore());
+
 const toggleDark = useToggle(isDark);
 const localeStore = useLocaleStore();
 </script>

@@ -1,11 +1,10 @@
-import { i18n } from '~/plugins/i18n';
 import { changeLang as changeDayjsLang } from '~/plugins/dayjs';
 import { changeLang as changeValibotLang } from '~/plugins/valibot';
 import { changeLang as changePrimevueLang } from '~/plugins//primevue';
 import { usePrimeVue } from 'primevue/config';
 
 export const useLocaleStore = defineStore('locale', () => {
-    const lang = i18n.global.locale;
+    const { locale: lang, t } = useI18n();
     const primevue = usePrimeVue();
 
     const languageMap = {
@@ -33,7 +32,7 @@ export const useLocaleStore = defineStore('locale', () => {
     );
 
     const getAppTitle = () => {
-        return i18n.global.t('common.appTitle') + ' ' + import.meta.env.VITE_APP_VERSION;
+        return t('common.appTitle') + ' ' + import.meta.env.VITE_APP_VERSION;
     };
 
     const getLanguageEnglishName = () => {

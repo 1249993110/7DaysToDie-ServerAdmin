@@ -19,9 +19,32 @@ const fullRoutes = [
                 component: () => import('../views/Dashboard/index.vue'),
                 meta: {
                     title: 'Dashboard',
-                    icon: markIcon(() => import('~icons/mdi:dashboard')),
-                    requiresAuth: false,
+                    icon: markIcon(() => import('~icons/mdi/monitor-dashboard')),
+                    requiresAuth: true,
+                    hideInMenu: false,
                 },
+            },
+            {
+                name: 'playerList',
+                path: '/playerList',
+                component: () => import('../views/Dashboard/index.vue'),
+                meta: {
+                    title: 'Player List',
+                    icon: markIcon(() => import('~icons/mdi/account-group')),
+                    // requiresAuth: true,
+                },
+                children: [
+                    {
+                        name: 'playerDetail',
+                        path: '/playerList/:id',
+                        component: () => import('../views/Dashboard/index.vue'),
+                        meta: {
+                            title: 'Player Detail',
+                            icon: markIcon(() => import('~icons/mdi/account-details')),
+                            // requiresAuth: true,
+                        },
+                    },
+                ],
             },
         ],
     },
@@ -53,16 +76,17 @@ const router = createRouter({
     stringifyQuery: qs.stringify,
 });
 
-router.beforeEach((to, from) => {
+router.beforeEach(async (to, from) => {
     nProgress.start();
 
     // Check if this route requires authorization and if the user has logged in
     if (to.meta.requiresAuth) {
-        // const isLoggedIn = useUserInfoStore().isLoggedIn();
-        // if (!isLoggedIn) {
-        //     // If not, redirect to the login page
-        //     return '/login?redirect=' + to.fullPath;
-        // }
+        const isLoggedIn = await useUserInfoStore().isLoggedIn();
+        
+        if (!isLoggedIn) {
+            // If not, redirect to the login page
+            return '/login?redirect=' + to.fullPath;
+        }
     }
 });
 

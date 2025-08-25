@@ -35,6 +35,8 @@ watch(i18n.global.locale, (lang) => {
     localStorage.setItem('lang', lang);
 });
 
-export default (app) => {
-    app.use(i18n);
+export default i18n;
+
+export const useI18n = () => {
+    return i18n.global;
 };

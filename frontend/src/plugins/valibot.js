@@ -18,9 +18,9 @@ const locales = {
 
 // Set the language configuration globally
 export const changeLang = async (lang) => {
-    const load = locales[lang];
-    if (load) {
-        await load();
+    const loader = locales[lang];
+    if (loader) {
+        await loader();
 
         const langMap = {
             kr: 'ko',

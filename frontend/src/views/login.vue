@@ -71,8 +71,6 @@ import v from '~/plugins/valibot';
 
 disposeAllStores();
 
-useDark().value = usePreferredDark().value;
-
 const localeStore = useLocaleStore();
 const userInfoStore = useUserInfoStore();
 

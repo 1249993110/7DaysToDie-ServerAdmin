@@ -26,7 +26,7 @@
                         :class="[
                             'color-button',
                             {
-                                selected: selectedSurfaceColor ? selectedSurfaceColor === s.name : isDark ? s.name === 'zinc' : s.name === 'slate',
+                                selected: selectedSurfaceColor === s.name,
                             },
                         ]"
                         :style="{ backgroundColor: s.palette['500'] }"
@@ -37,8 +37,8 @@
             <div class="config-settings">
                 <span class="config-label">Theme</span>
                 <SelectButton
+                    :pt="{ pcToggleButton: { root: { class: 'capitalize' } } }"
                     v-model="selectedPresetTheme"
-                    @update:modelValue="onPresetChange"
                     :options="presetOptions"
                     optionLabel="label"
                     optionValue="value"
@@ -50,13 +50,13 @@
                 <div class="flex-1">
                     <div class="config-settings">
                         <span class="config-label">Ripple</span>
-                        <ToggleSwitch :modelValue="rippleActive" @update:modelValue="onRippleChange" />
+                        <ToggleSwitch v-model="isRippleActive" />
                     </div>
                 </div>
                 <div class="flex-1">
                     <div class="config-settings items-end">
                         <span class="config-label">RTL</span>
-                        <ToggleSwitch v-model="isRTL" @update:modelValue="onRTLChange" />
+                        <ToggleSwitch v-model="isRTL" />
                     </div>
                 </div>
             </div>
@@ -66,31 +66,20 @@
 
 <script setup>
 import { $t, updatePreset, updatePrimaryPalette, updateSurfacePalette } from '@primeuix/themes';
+import { themePresets } from '~/plugins/primevue';
 import { usePrimeVue } from 'primevue/config';
-import Aura from '@primeuix/themes/aura';
-import Lara from '@primeuix/themes/lara';
-import Material from '@primeuix/themes/material';
-import Nora from '@primeuix/themes/nora';
 
-const presets = {
-    Aura,
-    Material,
-    Lara,
-    Nora,
-};
+const primeVue = usePrimeVue();
+const { theme: selectedPresetTheme, primaryColor: selectedPrimaryColor, surfaceColor: selectedSurfaceColor, isRippleActive, isRTL } = storeToRefs(useAppStore());
 
-const presetOptions = Object.keys(presets).map((key) => ({
+watch(isRippleActive, (val) => {
+    primeVue.config.ripple = val;
+});
+
+const presetOptions = Object.keys(themePresets).map((key) => ({
     label: key,
     value: key,
 }));
-
-const primevue = usePrimeVue();
-const isDark = useDark();
-const textDirection = useTextDirection();
-
-const selectedPrimaryColor = ref('emerald');
-const selectedSurfaceColor = ref(null);
-const selectedPresetTheme = ref(Object.keys(presets).find((key) => presets[key] === toRaw(primevue.config.theme.preset)) || 'Aura');
 
 // const primaryColors = ref([
 //     {
@@ -352,7 +341,7 @@ const selectedPresetTheme = ref(Object.keys(presets).find((key) => presets[key] 
 // ]);
 
 const primaryColors = computed(() => {
-    const presetPalette = presets[selectedPresetTheme.value].primitive;
+    const presetPalette = themePresets[selectedPresetTheme.value].primitive;
     const colors = ['emerald', 'green', 'lime', 'orange', 'amber', 'yellow', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose'];
     const palettes = [{ name: 'noir', palette: {} }];
 
@@ -456,17 +445,17 @@ const surfaces = ref([
         name: 'soho',
         palette: {
             0: '#ffffff',
-            50: '#f4f4f4',
-            100: '#e8e9e9',
-            200: '#d2d2d4',
-            300: '#bbbcbe',
-            400: '#a5a5a9',
-            500: '#8e8f93',
-            600: '#77787d',
-            700: '#616268',
-            800: '#4a4b52',
-            900: '#34343d',
-            950: '#1d1e27',
+            50: '#ececec',
+            100: '#dedfdf',
+            200: '#c4c4c6',
+            300: '#adaeb0',
+            400: '#97979b',
+            500: '#7f8084',
+            600: '#6a6b70',
+            700: '#55565b',
+            800: '#3f4046',
+            900: '#2c2c34',
+            950: '#16161d',
         },
     },
     {
@@ -557,7 +546,7 @@ const getPresetExt = () => {
             },
         };
     } else {
-        if (selectedPresetTheme.value === 'Nora') {
+        if (selectedPresetTheme.value === 'nora') {
             return {
                 semantic: {
                     primary: color.palette,
@@ -593,7 +582,7 @@ const getPresetExt = () => {
                     },
                 },
             };
-        } else if (selectedPresetTheme.value === 'Material') {
+        } else if (selectedPresetTheme.value === 'material') {
             return {
                 semantic: {
                     primary: color.palette,
@@ -676,45 +665,23 @@ const applyTheme = (type, color) => {
         updateSurfacePalette(color.palette);
     }
 
-    emitter.emit(EVENT_TYPES.UI.THEME_CHANGE)
+    emitter.emit(EVENT_TYPES.UI.THEME_CHANGE);
 };
 
-const rippleActive = computed(() => primevue.config.ripple);
-const onRippleChange = (value) => {
-    primevue.config.ripple = value;
-};
-
-const isRTL = computed(() => textDirection.value === 'rtl');
-const toggleRTL = (value) => {
-    textDirection.value = value ? 'rtl' : 'ltr';
-};
-const onRTLChange = (value) => {
-    if (!document.startViewTransition) {
-        toggleRTL(value);
-        return;
-    }
-
-    document.startViewTransition(() => toggleRTL(value));
-};
-
-const onPresetChange = (value) => {
-    console.log('Preset changed to:', value);
-
-    selectedPresetTheme.value = value;
-    const surfacePalette = surfaces.value.find((s) => s.name === selectedSurfaceColor.value)?.palette;
-
-    $t().preset(presets[value]).preset(getPresetExt()).surfacePalette(surfacePalette).use({ useDefaultOptions: true });
-};
+watch(
+    selectedPresetTheme,
+    (value) => {
+        const surfacePalette = surfaces.value.find((s) => s.name === selectedSurfaceColor.value)?.palette;
+        $t().preset(themePresets[value]).preset(getPresetExt()).surfacePalette(surfacePalette).use({ useDefaultOptions: true });
+    },
+    { immediate: true }
+);
 
 const updateColors = (type, color) => {
     if (type === 'primary') {
         selectedPrimaryColor.value = color.name;
-        // const color = primaryColors.value.find((c) => c.name === colorName);
-        // updatePrimaryPalette(color.palette);
     } else if (type === 'surface') {
         selectedSurfaceColor.value = color.name;
-        // const surfaceColor = surfaces.value.find((s) => s.name === colorName);
-        // updateSurfacePalette(surfaceColor.palette);
     }
     applyTheme(type, color);
 };

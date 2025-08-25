@@ -78,7 +78,7 @@ export const useUserInfoStore = defineStore('user-info', () => {
 
     const isLoggedIn = async () => {
         try {
-            if (!!accessToken.value) {
+            if (!accessToken.value) {
                 return false;
             }
 

@@ -7,7 +7,7 @@
   "store": {},
   "views": {
     "login": {
-      "failedTitle": "Login failed!",
+      "failedTitle": "Login Failed!",
       "password": "Password",
       "username": "Username",
       "submit": "Sign in",

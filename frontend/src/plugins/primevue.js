@@ -1,16 +1,27 @@
 import PrimeVue from 'primevue/config';
-import Aura from '@primeuix/themes/aura';
 import StyleClass from 'primevue/styleclass';
+import Aura from '@primeuix/themes/aura';
+import Lara from '@primeuix/themes/lara';
+import Material from '@primeuix/themes/material';
+import Nora from '@primeuix/themes/nora';
+
+export const themePresets = {
+    'aura': Aura,
+    'material': Material,
+    'lara': Lara,
+    'nora': Nora,
+};
 
 export default (app) => {
+    const { theme, isRippleActive } = useAppStore();
     app.use(PrimeVue, {
         theme: {
-            preset: Aura,
+            preset: themePresets[theme],
             options: {
                 darkModeSelector: '.dark',
             },
         },
-        ripple: true,
+        ripple: isRippleActive,
     });
     app.directive('styleclass', StyleClass);
 };
@@ -32,7 +43,7 @@ const locales = {
 };
 
 export const changeLang = async (lang, primevue) => {
-    const load = locales[lang] || locales.en;
-    const preset = await load();
+    const loader = locales[lang] || locales.en;
+    const preset = await loader();
     primevue.config.locale = Object.values(preset)[0];
 };
