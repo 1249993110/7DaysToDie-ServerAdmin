@@ -664,8 +664,6 @@ const applyTheme = (type, color) => {
     } else if (type === 'surface') {
         updateSurfacePalette(color.palette);
     }
-
-    emitter.emit(EVENT_TYPES.UI.THEME_CHANGE);
 };
 
 watch(
@@ -699,7 +697,6 @@ const updateColors = (type, color) => {
     box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
     border: 1px solid var(--p-surface-200);
     transform-origin: top;
-    z-index: 50;
 
     --uno: 'dark:bg-p-surface-900';
     --uno: 'dark:border-p-surface-700';

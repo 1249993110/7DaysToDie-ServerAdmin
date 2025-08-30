@@ -31,7 +31,7 @@ export default defineConfig(({ mode }) => {
                             ['default', 'dayjs'],
                         ],
                         '~/plugins/sweetalert2.js': [
-                            ['Toast'],
+                            ['myToast'], ['myConfirm'],
                         ],
                         '~/plugins/mitt.js': [
                             ['default', 'emitter'],
@@ -84,6 +84,9 @@ export default defineConfig(({ mode }) => {
                     target: env.VITE_DEV_API_PROXY_TARGET,
                     changeOrigin: true,
                     // followRedirects: true
+                },
+                '/swagger': {
+                    target: env.VITE_DEV_API_PROXY_TARGET,
                 }
             },
         },

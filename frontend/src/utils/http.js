@@ -42,6 +42,7 @@ service.interceptors.response.use(
             return Promise.reject(error);
         }
 
+        const data = error.response.data;
         switch (error.response.status) {
             case 401:
                 await useUserInfoStore().signOut();
@@ -50,13 +51,13 @@ service.interceptors.response.use(
                 useRouter().push('/403');
                 break;
             case 404:
-                console.error('The requested resource does not found');
+                myToast.error('The requested resource does not found.');
                 break;
             case 400:
-                console.error(error.response.data.title || 'Bad Request');
+                myToast.error(data.message || data.error || 'Bad Request');
                 break;
             case 500:
-                console.error(error.response.data.message || 'Internal Server Error');
+                myToast.error(data.message || data.error || 'Internal Server Error');
                 break;
             default:
                 console.error(error);

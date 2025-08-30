@@ -7,10 +7,9 @@ export const EVENT_TYPES = {
     CHAT_MESSAGE: 'game:chatMessage',
     CONSOLE_LOG: 'game:consoleLog',
   },
-  UI: {
-    SIDEBAR_TOGGLE: 'ui:sidebarToggle',
-    THEME_CHANGE: 'ui:themeChange',
-  },
+  // UI: {
+  //   THEME_CHANGE: 'ui:themeChange',
+  // },
 };
 
 export default emitter;

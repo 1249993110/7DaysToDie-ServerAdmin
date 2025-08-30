@@ -1,21 +1,123 @@
 {
-  "common": {
-    "appTitle": "7 Days to Die Server Admin"
-  },
-  "components": {},
-  "layout": {},
-  "store": {},
-  "views": {
-    "login": {
-      "failedTitle": "Login Failed!",
-      "password": "Password",
-      "username": "Username",
-      "submit": "Sign in",
-      "forgotPassword": "Forgot Password?",
-      "rememberMe": "Remember Me",
-      "successTitle": "Welcome Back!",
-      "failedMessage": "Username or password is incorrect, please try again",
-      "successMessage": "You have been successfully signed in."
+    "common": {
+        "appTitle": "7 Days to Die Server Admin",
+        "unknown": "Unknown"
+    },
+    "menus": {
+        "dashboard": "Dashboard",
+        "playerList": "Player List",
+        "gpsMap": "GPS Map",
+        "gameChat": "Game Chat",
+        "serverConfig": "Server Config",
+        "blackWhiteList": "Black & White List",
+        "permissions": "Permissions",
+        "modManagement": "Mod Management",
+        "console": "Console",
+        "appSettings": "App Settings",
+        "apiDocumentation": "API Documentation"
+    },
+    "components": {},
+    "layout": {},
+    "store": {},
+    "plugins": {
+        "myConfirm": {
+            "title": "Confirmation",
+            "text": "Are you sure you want to proceed?",
+            "confirmButtonText": "Yes",
+            "cancelButtonText": "No"
+        }
+    },
+    "views": {
+        "login": {
+            "failedTitle": "Login Failed!",
+            "password": "Password",
+            "username": "Username",
+            "submit": "Sign in",
+            "forgotPassword": "Forgot Password?",
+            "rememberMe": "Remember Me",
+            "successTitle": "Welcome Back!",
+            "failedMessage": "Username or password is incorrect, please try again",
+            "successMessage": "You have been successfully signed in."
+        },
+        "dashboard": {
+            "headers": {
+                "overview": "Overview",
+                "status": "Status",
+                "monitor": "Monitor",
+                "recentActivity": "Recent Activity",
+                "systemPlatformInfo": "System Platform Information",
+                "historyPlayers": "History Players",
+                "entities": "Entities",
+                "fps": "FPS",
+                "heap": "Heap",
+                "chunks": "Chunks",
+                "chunkGameObjects": "CGO",
+                "items": "Items"
+            },
+            "overview": {
+                "serverName": "Server Name",
+                "region": "Server Region",
+                "language": "Server Language",
+                "serverIp": "Server IP",
+                "uptime": "Server Uptime",
+                "gameTime": "Game Time",
+                "serverPort": "Server Port",
+                "gameName": "Game Name",
+                "gameMode": "Game Mode",
+                "serverVersion": "Server Version",
+                "gameWorld": "Game World",
+                "gameDifficulty": "Game Difficulty",
+                "gameDifficultys": {
+                    "0": "Scavenger",
+                    "1": "Adventurer",
+                    "2": "Nomad",
+                    "3": "Warrior",
+                    "4": "Survivalist",
+                    "5": "Insane"
+                },
+                "uptimeFormat": "{hours} : {minutes} : {seconds} | {days} : {hours} : {minutes} : {seconds}",
+                "gameTimeFormat": "Day {days}, {hours} : {minutes}"
+            },
+            "status": {
+                "freeSlots": "Free Slots",
+                "players": "Players",
+                "onlinePlayers": "Online Players",
+                "maxOnlinePlayers": "Max Online Players",
+                "zombies": "Zombies",
+                "activeZombies": "Active Zombies",
+                "maxZombies": "Max Zombies",
+                "animals": "Animals",
+                "activeAnimals": "Active Animals",
+                "maxAnimals": "Max Animals",
+                "memory": "Memory",
+                "usedMemory": "Used Memory",
+                "freeMemory": "Free Memory",
+                "totalMemory": "Total Memory",
+                "disk": "Disk",
+                "usedDisk": "Used Disk",
+                "freeDisk": "Free Disk",
+                "totalDisk": "Total Disk"
+            },
+            "monitor": {
+                "cpu": "CPU",
+                "cpuUsage": "CPU Usage (%)",
+                "time": "Time",
+                "network": "Network",
+                "trafficIn": "Traffic In",
+                "trafficOut": "Traffic Out"
+            },
+            "systemInfo": {
+                "deviceName": "Device Name",
+                "deviceModel": "Device Model",
+                "deviceType": "Device Type",
+                "deviceUniqueIdentifier": "Device Unique Identifier",
+                "operatingSystem": "Operating System",
+                "processorType": "Processor Type",
+                "processorCount": "Processor Count",
+                "processorFrequency": "Processor Frequency",
+                "systemMemorySize": "System Memory Size",
+                "userName": "User Name"
+            }
+        }
     }
-  }
 }

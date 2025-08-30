@@ -1,8 +1,11 @@
 <template>
-    <div class="flex flex-col min-h-screen t-bg-1">
-        <Header class="padding" />
-        <div class="flex-grow flex padding p-t-20">
-            <Sidebar />
+    <div class="flex flex-col" :class="{ 'h-screen': isDrawerMenuVisible, 'overflow-hidden': isDrawerMenuVisible }">
+        <Header class="padding z-1" />
+        <div class="flex-grow flex padding pt-20 pb-10">
+            <Sidebar v-if="!isMenuButtonVisible" />
+            <Drawer v-model:visible="isDrawerMenuVisible" header=" " :position="isRTL ? 'right' : 'left'">
+                <Sidebar v-if="isMenuButtonVisible" />
+            </Drawer>
             <div class="flex-grow">
                 <Main />
             </div>
@@ -14,11 +17,12 @@
 import Header from './Header/index.vue';
 import Sidebar from './Sidebar/index.vue';
 import Main from './Main/index.vue';
+
+const { isMenuButtonVisible, isRTL, isDrawerMenuVisible } = storeToRefs(useAppStore());
 </script>
 
 <style lang="scss" scoped>
 .padding {
-    --uno: 'px-1 sm:px-2 md:px-4 lg:px-6 xl:px-10 2xl:px-14';
-    // margin-right: calc(100vw - 100%);
+    --uno: 'px-1 sm:px-2 md:px-4 lg:px-6 xl:px-8 2xl:px-10';
 }
 </style>

@@ -3,7 +3,7 @@
         <!-- From Uiverse.io by themrsami -->
         <div class="relative py-3 sm:max-w-xl sm:mx-auto">
             <div class="relative px-4 py-10 t-bg-2 t-border-card mx-8 md:mx-0 shadow rounded-3xl sm:p-10">
-                <Form :resolver @submit="onFormSubmit" class="max-w-lg mx-auto" :initial-values="initialValues">
+                <Form :resolver @submit="onFormSubmit" class="max-w-lg mx-auto" :initial-values="initialValues" v-focustrap>
                     <div class="flex items-center space-x-5 justify-center">
                         <div class="flex text-2xl font-extrabold tracking-wide">
                             <span class="bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent">{{ localeStore.getAppTitle() }}</span>
@@ -23,7 +23,7 @@
                     </div>
                     <div class="mb-4 flex items-center">
                         <span>
-                            <Checkbox v-model="isRememberMe" binary inputId="rememberMe" />
+                            <Checkbox v-model="userInfoStore.isRememberMe" binary inputId="rememberMe" />
                             <label class="ml-1 text-xs font-semibold text-gray-500 hover:text-gray-600 cursor-pointer" for="rememberMe">
                                 {{ $t('views.login.rememberMe') }}
                             </label>
@@ -40,7 +40,7 @@
                     </div>
                     <div class="flex items-center justify-between mt-4">
                         <span class="w-1/5 border-b border-gray-200 dark:border-gray-400 md:w-1/4"></span>
-                        <a class="text-xs text-gray-500 uppercase dark:text-gray-400 hover:underline" href="#">Or Sign in with</a>
+                        <span class="text-xs text-gray-500 uppercase dark:text-gray-400">Or Sign in with</span>
                         <span class="w-1/5 border-b border-gray-200 dark:border-gray-400 md:w-1/4"></span>
                     </div>
                     <div>
@@ -78,7 +78,6 @@ const initialValues = {
     username: '',
     password: '',
 };
-const isRememberMe = ref(false);
 
 const resolver = valibotResolver(
     v.object({
@@ -89,7 +88,7 @@ const resolver = valibotResolver(
 
 const onFormSubmit = async ({ valid, values }) => {
     if (valid) {
-        await userInfoStore.signIn(values.username, values.password, isRememberMe.value);
+        await userInfoStore.signIn(values.username, values.password);
     }
 };
 </script>

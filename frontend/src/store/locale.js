@@ -40,9 +40,12 @@ export const useLocaleStore = defineStore('locale', () => {
     };
 
     const getLanguageNativeMap = () => {
-        return Object.entries(languageMap).map(([lang, item]) => ({
+        return Object.entries(languageMap).map(([_lang, item]) => ({
             label: item.nativeName,
-            value: lang,
+            command: ({ item }) => {
+                lang.value = item.value;
+            },
+            value: _lang,
         }));
     };
 

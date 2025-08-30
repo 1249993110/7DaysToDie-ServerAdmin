@@ -2,33 +2,46 @@ import { defineStore } from 'pinia';
 import * as authApi from '~/api/auth';
 
 export const useUserInfoStore = defineStore('user-info', () => {
-    const username = ref(localStorage.getItem('username') || sessionStorage.getItem('username') || '');
-    const accessToken = ref(localStorage.getItem('access_token') || sessionStorage.getItem('access_token') || '');
-    const expiresAt = ref(localStorage.getItem('expires_at') || sessionStorage.getItem('expires_at') || '');
-    const refreshToken = ref(localStorage.getItem('refresh_token') || sessionStorage.getItem('refresh_token') || '');
+    const isRememberMe = useStorage('isRememberMe', true);
+    const useMyStorage = (key) => useStorage(key, '', isRememberMe.value ? localStorage : sessionStorage);
+    const username = computed({
+        get() {
+            return useMyStorage('username').value;
+        },
+        set(val) {
+            useMyStorage('username').value = val;
+        },
+    });
+    const accessToken = computed({
+        get() {
+            return useMyStorage('access_token').value;
+        },
+        set(val) {
+            useMyStorage('access_token').value = val;
+        },
+    });
+    const expiresAt = computed({
+        get() {
+            return useMyStorage('expires_at').value;
+        },
+        set(val) {
+            useMyStorage('expires_at').value = val;
+        },
+    });
+    const refreshToken = computed({
+        get() {
+            return useMyStorage('refresh_token').value;
+        },
+        set(val) {
+            useMyStorage('refresh_token').value = val;
+        },
+    });
 
     const route = useRoute();
     const router = useRouter();
     const { t } = useI18n();
 
-    const save = (isRememberMe) => {
-        const storage = isRememberMe ? localStorage : sessionStorage;
-
-        // Clean up another storage to ensure consistent state
-        const otherStorage = isRememberMe ? sessionStorage : localStorage;
-        otherStorage.removeItem('username');
-        otherStorage.removeItem('access_token');
-        otherStorage.removeItem('expires_at');
-        otherStorage.removeItem('refresh_token');
-
-        // Store the tokens in the selected storage
-        storage.setItem('username', username.value);
-        storage.setItem('access_token', accessToken.value);
-        storage.setItem('expires_at', expiresAt.value);
-        storage.setItem('refresh_token', refreshToken.value);
-    };
-
-    const signIn = async (_username, password, isRememberMe) => {
+    const signIn = async (_username, password) => {
         try {
             const data = await authApi.signIn(_username, password);
 
@@ -36,9 +49,8 @@ export const useUserInfoStore = defineStore('user-info', () => {
             accessToken.value = data.access_token;
             expiresAt.value = dayjs().add(data.expires_in, 'second').toISOString();
             refreshToken.value = data.refresh_token;
-            save(isRememberMe);
 
-            Toast.fire({
+            myToast({
                 title: t('views.login.successTitle'),
                 text: t('views.login.successMessage'),
                 icon: 'success',
@@ -48,7 +60,7 @@ export const useUserInfoStore = defineStore('user-info', () => {
             router.push(redirect);
         } catch (error) {
             console.error(error);
-            Toast.fire({
+            myToast({
                 title: t('views.login.failedTitle'),
                 text: t('views.login.failedMessage'),
                 icon: 'error',
@@ -97,14 +109,12 @@ export const useUserInfoStore = defineStore('user-info', () => {
         accessToken.value = accessToken;
         expiresAt.value = dayjs().add(expiresIn, 'second').toISOString();
         refreshToken.value = refreshToken;
-        save(isRememberMe);
     };
     const refresh = async () => {
         const data = await authApi.refreshToken(refreshToken.value);
         accessToken.value = data.access_token;
-        expiresAt.value = dayjs().add(data.expires_in, 'second').format();
+        expiresAt.value = dayjs().add(data.expires_in, 'second').toISOString();
         refreshToken.value = data.refresh_token;
-        save(isRememberMe);
     };
 
     const getAccessToken = async () => {
@@ -114,5 +124,5 @@ export const useUserInfoStore = defineStore('user-info', () => {
         return accessToken.value;
     };
 
-    return { username, signIn, signOut, isLoggedIn, signInByToken, getAccessToken };
+    return { username, isRememberMe, signIn, signOut, isLoggedIn, signInByToken, getAccessToken };
 });

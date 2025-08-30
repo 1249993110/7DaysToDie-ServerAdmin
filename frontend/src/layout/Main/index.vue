@@ -14,7 +14,7 @@ import { mainRoutes } from '~/router';
 const include = [];
 const filterKeepAlive = (routes) => {
     routes.forEach((item) => {
-        if (item.meta?.keepAlive !== false && item.name) {
+        if (item.meta?.isKeepAlive !== false && item.name) {
             include.push(item.name);
         }
         if (item?.children?.length) {

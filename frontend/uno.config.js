@@ -43,6 +43,10 @@ export default defineConfig({
 
             't-bg-overlay': 'bg-overlay dark:bg-overlay-dark backdrop-blur-md',
             't-border-card': 'border border-solid t-border-color-1',
+
+            't-text-primary': 'text-p-primary-color',
+            't-text-regular': 'text-p-text-color',
+            't-text-secondary': 'text-p-text-muted-color',
         },
     ],
     include: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],

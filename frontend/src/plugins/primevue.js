@@ -1,4 +1,5 @@
 import PrimeVue from 'primevue/config';
+import FocusTrap from 'primevue/focustrap';
 import StyleClass from 'primevue/styleclass';
 import Aura from '@primeuix/themes/aura';
 import Lara from '@primeuix/themes/lara';
@@ -24,6 +25,7 @@ export default (app) => {
         ripple: isRippleActive,
     });
     app.directive('styleclass', StyleClass);
+    app.directive('focustrap', FocusTrap);
 };
 
 const locales = {

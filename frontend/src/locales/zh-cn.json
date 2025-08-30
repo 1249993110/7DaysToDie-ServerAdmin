@@ -1,18 +1,120 @@
 {
-  "common": {
-    "appTitle": "天依七日杀服务器管理系统"
-  },
-  "views": {
-    "login": {
-      "password": "密码",
-      "username": "用户名",
-      "submit": "登 录",
-      "forgotPassword": "忘记密码?",
-      "rememberMe": "记住账号",
-      "failedTitle": "登录失败！",
-      "successTitle": "欢迎回来！",
-      "failedMessage": "用户名或密码不正确，请重试",
-      "successMessage": "登录成功。"
+    "common": {
+        "appTitle": "天依七日杀服务器管理系统",
+        "unknown": "未知"
+    },
+    "menus": {
+        "dashboard": "仪表盘",
+        "playerList": "玩家列表",
+        "gpsMap": "GPS地图",
+        "gameChat": "游戏聊天",
+        "serverConfig": "服务器配置",
+        "blackWhiteList": "黑白名单",
+        "permissions": "权限管理",
+        "modManagement": "模组管理",
+        "console": "控制台",
+        "appSettings": "应用设置",
+        "apiDocumentation": "API文档"
+    },
+    "plugins": {
+        "myConfirm": {
+            "title": "确认",
+            "text": "您确定要执行此操作吗？",
+            "confirmButtonText": "确定",
+            "cancelButtonText": "取消"
+        }
+    },
+    "views": {
+        "login": {
+            "password": "密码",
+            "username": "用户名",
+            "submit": "登 录",
+            "forgotPassword": "忘记密码?",
+            "rememberMe": "记住账号",
+            "failedTitle": "登录失败！",
+            "successTitle": "欢迎回来！",
+            "failedMessage": "用户名或密码不正确，请重试",
+            "successMessage": "登录成功。"
+        },
+        "dashboard": {
+            "headers": {
+                "overview": "概览",
+                "status": "状态",
+                "monitor": "监控",
+                "recentActivity": "最近活动",
+                "systemPlatformInfo": "系统平台信息",
+                "historyPlayers": "历史玩家数",
+                "entities": "实体数",
+                "fps": "FPS",
+                "heap": "堆内存",
+                "chunks": "区块数",
+                "chunkGameObjects": "CGO",
+                "items": "Items"
+            },
+            "overview": {
+                "serverName": "服务器名称",
+                "region": "服务器区域",
+                "language": "服务器语言",
+                "serverIp": "服务器 IP",
+                "uptime": "服务端运行时长",
+                "gameTime": "游戏时间",
+                "serverPort": "服务器端口",
+                "gameName": "游戏名称",
+                "gameMode": "游戏模式",
+                "serverVersion": "服务端版本",
+                "gameWorld": "游戏世界",
+                "gameDifficulty": "游戏难度",
+                "gameDifficultys": {
+                    "0": "拾荒者",
+                    "1": "冒险家",
+                    "2": "流浪者",
+                    "3": "战士",
+                    "4": "幸存者",
+                    "5": "疯狂"
+                },
+                "uptimeFormat": "{hours} 小时 {minutes} 分钟 {seconds} 秒 | {days} 天 {hours} 小时 {minutes} 分钟 {seconds} 秒",
+                "gameTimeFormat": "第 {days} 天 {hours} 小时 {minutes} 分钟"
+            },
+            "status": {
+                "freeSlots": "空闲插槽",
+                "players": "玩家数",
+                "onlinePlayers": "在线玩家数",
+                "maxOnlinePlayers": "最大在线玩家数",
+                "zombies": "僵尸数",
+                "activeZombies": "活跃僵尸数",
+                "maxZombies": "最大僵尸数",
+                "animals": "动物数",
+                "activeAnimals": "活跃动物数",
+                "maxAnimals": "最大动物数",
+                "memory": "内存",
+                "usedMemory": "已用内存",
+                "freeMemory": "空闲内存",
+                "totalMemory": "总内存",
+                "disk": "磁盘",
+                "usedDisk": "已用磁盘",
+                "freeDisk": "空闲磁盘",
+                "totalDisk": "总磁盘"
+            },
+            "monitor": {
+                "cpu": "CPU",
+                "cpuUsage": "CPU 使用率 (%)",
+                "time": "时间",
+                "network": "流量",
+                "trafficIn": "下行",
+                "trafficOut": "上行"
+            },
+            "systemInfo": {
+                "deviceName": "设备名称",
+                "deviceModel": "设备平台",
+                "deviceType": "设备类型",
+                "deviceUniqueIdentifier": "设备唯一标识符",
+                "operatingSystem": "操作系统",
+                "processorType": "处理器类型",
+                "processorCount": "处理器数量",
+                "processorFrequency": "处理器频率",
+                "systemMemorySize": "系统内存大小",
+                "userName": "用户名"
+            }
+        }
     }
-  }
 }
