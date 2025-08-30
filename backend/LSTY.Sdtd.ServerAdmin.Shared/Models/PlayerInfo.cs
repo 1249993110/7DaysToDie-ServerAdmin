@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace LSTY.Sdtd.ServerAdmin.Shared.Models
+﻿namespace LSTY.Sdtd.ServerAdmin.Shared.Models
 {
     /// <summary>
     /// Represents the base information of a player.

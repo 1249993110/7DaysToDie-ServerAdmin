@@ -7,9 +7,7 @@ using LSTY.Sdtd.ServerAdmin.WebApi;
 using MapRendering;
 using Microsoft.Owin.Hosting;
 using Platform.Local;
-using System.Diagnostics;
 using System.Reflection;
-using System.Runtime.InteropServices;
 
 namespace LSTY.Sdtd.ServerAdmin
 {
@@ -111,9 +109,17 @@ namespace LSTY.Sdtd.ServerAdmin
                 {
                     if (newSettings.WebUrl != oldSettings.WebUrl)
                     {
-                        webApp.Dispose();
-                        webApp = WebApp.Start<Startup>(newSettings.WebUrl);
-                        CustomLogger.Info($"Web application URL changed to: {newSettings.WebUrl}");
+                        try
+                        {
+                            webApp.Dispose();
+                            webApp = WebApp.Start<Startup>(newSettings.WebUrl);
+                            CustomLogger.Info($"Web application URL changed to: {newSettings.WebUrl}");
+                        }
+                        catch (Exception ex)
+                        {
+                            webApp = WebApp.Start<Startup>(oldSettings.WebUrl);
+                            CustomLogger.Error(ex, $"Failed to change web application URL to: {newSettings.WebUrl}, reverted to: {oldSettings.WebUrl}");
+                        }
                     }
                 };
                 CustomLogger.Info("Web application running on " + webUrl);

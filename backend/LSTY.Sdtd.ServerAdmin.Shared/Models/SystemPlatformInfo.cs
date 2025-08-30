@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-
-namespace LSTY.Sdtd.ServerAdmin.Shared.Models
+﻿namespace LSTY.Sdtd.ServerAdmin.Shared.Models
 {
     public class SystemPlatformInfo
     {

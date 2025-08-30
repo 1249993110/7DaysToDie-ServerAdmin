@@ -26,7 +26,7 @@ namespace LSTY.Sdtd.ServerAdmin.Helpers
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                if(GetSystemTimes(out var idleTime1, out var kernelTime1, out var userTime1) == false)
+                if (GetSystemTimes(out var idleTime1, out var kernelTime1, out var userTime1) == false)
                 {
                     return null;
                 }
@@ -221,7 +221,7 @@ namespace LSTY.Sdtd.ServerAdmin.Helpers
         {
             var hostName = Dns.GetHostName();
             var hostAddrs = Dns.GetHostAddresses(hostName).Where(i => i.AddressFamily == AddressFamily.InterNetwork).ToHashSet();
-            
+
             var allNetworkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
             var result = new List<NetworkInfo>();
             foreach (var item in allNetworkInterfaces)

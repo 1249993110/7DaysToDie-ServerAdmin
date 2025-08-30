@@ -14,8 +14,8 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
                 base.OnActionExecuting(actionContext);
                 return;
             }
-            
-            actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "The game is still initializing.");
+
+            actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "The game server is still initializing.");
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Web.Http;
 namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
 {
     /// <summary>
-    /// Devices
+    /// Provides an interface for querying device and system information.
     /// </summary>
     [Authorize]
     [RoutePrefix("api/Devices")]

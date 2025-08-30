@@ -5,9 +5,11 @@
     /// </summary>
     public class AdminEntry
     {
+        [Required]
         public required string PlayerId { get; set; }
 
-        public required int PermissionLevel { get; set; }
+        [DefaultValue(2000)]
+        public required int PermissionLevel { get; set; } = 2000;
 
         public required string DisplayName { get; set; }
     }

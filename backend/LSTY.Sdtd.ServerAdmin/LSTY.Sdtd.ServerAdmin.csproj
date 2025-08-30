@@ -8,6 +8,7 @@
 		<RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
 		<Platform>x64</Platform>
 		<OutputType>Library</OutputType>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		
 		<Authors>IceCoffee</Authors>
 		<Company>LuoShuiTianYi</Company>
@@ -69,6 +70,10 @@
 			<Private>false</Private>
 			<HintPath>7dtd-binaries\WebServer.dll</HintPath>
 		</Reference>
+		<Reference Include="UnityEngine.AnimationModule">
+			<Private>false</Private>
+			<HintPath>7dtd-binaries\UnityEngine.AnimationModule.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -111,6 +116,12 @@
 		</None>
 		<None Update="ModInfo.xml">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="restart-linux.sh">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="restart-windows.bat">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 		<None Include="$(SystemRoot)\Microsoft.NET\Framework64\v$(MSBuildRuntimeVersion)\System.Runtime.InteropServices.RuntimeInformation.dll">
 			<Visible>false</Visible>

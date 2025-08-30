@@ -1,7 +1,6 @@
 ﻿using LSTY.Sdtd.ServerAdmin.Config;
 using LSTY.Sdtd.ServerAdmin.Shared.Constants;
 using LSTY.Sdtd.ServerAdmin.WebApi.Authentication;
-using LSTY.Sdtd.ServerAdmin.WebApi.Controllers;
 using LSTY.Sdtd.ServerAdmin.WebApi.DataProtection;
 using LSTY.Sdtd.ServerAdmin.WebApi.Middlewares;
 using LSTY.Sdtd.ServerAdmin.WebApi.Providers;
@@ -118,8 +117,9 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
                     }));
                 settings.GeneratorSettings.OperationProcessors.Add(new OperationSecurityScopeProcessor("Basic Auth", "JWT Token"));
                 settings.GeneratorSettings.ApplySettings(new NewtonsoftJsonSchemaGeneratorSettings()
-                { 
-                    SerializerSettings = _jsonSerializerSettings, SchemaType = SchemaType.OpenApi3 
+                {
+                    SerializerSettings = _jsonSerializerSettings,
+                    SchemaType = SchemaType.OpenApi3
                 }, null);
                 settings.PostProcess = (document) =>
                 {
@@ -196,9 +196,9 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
                 OperationId = "OAuth_Token",
                 Consumes = new List<string>() { "application/x-www-form-urlencoded" },
                 Produces = new List<string>() { "application/json" },
-                Tags = new List<string>() { "Authentication" },
-                Summary = "User login with form data",
-                Description = "Get the access token used for webapp.",
+                Tags = new List<string>() { "OAuth 2.0 Token Endpoint" },
+                Summary = "Issues an access token for user authentication.",
+                Description = "This endpoint is a core part of the OAuth 2.0 authorization framework. It allows a client to exchange a user's credentials (username and password) or a refresh token for a valid access token, which can then be used to access protected resources.",
                 RequestBody = new OpenApiRequestBody()
                 {
                     Description = "User login with form data",
@@ -213,10 +213,31 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
                     Type = JsonObjectType.Object,
                     Properties =
                     {
-                        ["grant_type"] = new JsonSchemaProperty { Type = JsonObjectType.String, IsRequired = true, Default = "password" },
-                        ["username"] = new JsonSchemaProperty { Type = JsonObjectType.String, IsRequired = false },
-                        ["password"] = new JsonSchemaProperty { Type = JsonObjectType.String, IsRequired = false },
-                        ["refresh_token"] = new JsonSchemaProperty { Type = JsonObjectType.String, IsRequired = false }
+                        ["grant_type"] = new JsonSchemaProperty()
+                        {
+                            Type = JsonObjectType.String,
+                            IsRequired = true,
+                            Default = "password",
+                            Description = "The grant type being used (e.g., password for username/password login, or refresh_token for refreshing an existing token)."
+                        },
+                        ["username"] = new JsonSchemaProperty()
+                        {
+                            Type = JsonObjectType.String,
+                            IsRequired = false,
+                            Description = "The user's username. Required when grant_type is password."
+                        },
+                        ["password"] = new JsonSchemaProperty()
+                        {
+                            Type = JsonObjectType.String,
+                            IsRequired = false,
+                            Description = "The user's password. Required when grant_type is password."
+                        },
+                        ["refresh_token"] = new JsonSchemaProperty()
+                        {
+                            Type = JsonObjectType.String,
+                            IsRequired = false,
+                            Description = "The refresh token. Required when grant_type is refresh_token."
+                        }
                     }
                 }
             };
