@@ -45,7 +45,7 @@ namespace LSTY.Sdtd.ServerAdmin
         /// <summary>
         /// Gets a value indicating whether the game has started.
         /// </summary>
-        public static bool IsGameStartDone => GameManager.Instance.IsStartingGame == false;
+        public static bool IsGameStartDone { get; private set; }
 
         /// <summary>
         /// Initializes the mod.
@@ -88,6 +88,13 @@ namespace LSTY.Sdtd.ServerAdmin
         {
             try
             {
+                string[] files = Directory.GetFiles(Path.Combine(AppContext.BaseDirectory, "Mods"), "0Harmony.dll", SearchOption.AllDirectories);
+                if (files.Length == 0)
+                {
+                    CustomLogger.Warn("It is detected that TFP Mod (0_TFP_Harmony) is not installed, some functions may not be available.");
+                    return;
+                }
+
                 Harmony = new Harmony(ModInstance.Name);
                 Harmony.PatchAll(Assembly.GetExecutingAssembly());
 
@@ -152,6 +159,7 @@ namespace LSTY.Sdtd.ServerAdmin
                 WorldPatcher.Init(modEventHub.OnEntitySpawned);
                 ModEvents.GameStartDone.RegisterHandler(GetMapTileCache);
                 ModEvents.GameStartDone.RegisterHandler(WorldStaticDataHook.ReplaceXmls);
+                ModEvents.GameStartDone.RegisterHandler((ref ModEvents.SGameStartDoneData _) => { IsGameStartDone = true; });
 
                 CustomLogger.Info("Registered mod event handlers success.");
             }
@@ -168,7 +176,7 @@ namespace LSTY.Sdtd.ServerAdmin
                 string[] files = Directory.GetFiles(Path.Combine(AppContext.BaseDirectory, "Mods"), "MapRendering.dll", SearchOption.AllDirectories);
                 if (files.Length == 0)
                 {
-                    CustomLogger.Warn("It is detected that TFP Mod is not installed, some functions may not be available.");
+                    CustomLogger.Warn("It is detected that TFP Mod (TFP_MapRendering) is not installed, some functions may not be available.");
                 }
 
                 MapTileCache = (MapTileCache)MapRenderer.GetTileCache();

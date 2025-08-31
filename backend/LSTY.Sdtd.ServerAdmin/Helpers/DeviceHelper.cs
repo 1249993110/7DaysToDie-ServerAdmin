@@ -34,15 +34,29 @@ namespace LSTY.Sdtd.ServerAdmin.Helpers
                 return new CpuTimes()
                 {
                     IdleTime = idleTime1.ToULong(),
-                    KernelTime = kernelTime1.ToULong(),
+                    KernelTime = kernelTime1.ToULong() - idleTime1.ToULong(),
                     UserTime = userTime1.ToULong(),
                 };
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
                 // For Linux, you would typically read from /proc/stat
-                var lines = File.ReadAllLines("/proc/stat");
-                var cpuLine = lines.FirstOrDefault(line => line.StartsWith("cpu "));
+                //var lines = File.ReadAllLines("/proc/stat");
+                //var cpuLine = lines.FirstOrDefault(line => line.StartsWith("cpu "));
+
+                string? cpuLine = null;
+                using (var reader = new StreamReader("/proc/stat"))
+                {
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        if (line.StartsWith("cpu "))
+                        {
+                            cpuLine = line;
+                            break;
+                        }
+                    }
+                }
 
                 if (cpuLine == null)
                 {

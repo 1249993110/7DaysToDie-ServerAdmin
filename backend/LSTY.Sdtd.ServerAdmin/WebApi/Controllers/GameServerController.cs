@@ -119,7 +119,6 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        
         [Route("Stats")]
         public Stats GetStatistics()
         {
