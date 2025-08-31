@@ -52,11 +52,21 @@ export default defineConfig({
     include: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
     theme: {
         colors: {
-            'overlay': {
+            overlay: {
                 DEFAULT: 'hsla(0, 0%, 100%, 0.7)',
                 dark: 'rgba(0, 0, 0, 0.3)',
             },
         },
+    },
+    extendTheme: (theme) => {
+        return {
+            ...theme,
+            breakpoint: {
+                ...theme.breakpoint,
+                '3xl': '112rem',
+                '4xl': '128rem',
+            },
+        };
     },
     rules: [
         [

@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import isLeapYear from 'dayjs/plugin/isLeapYear'; // import plugin
 import duration from 'dayjs/plugin/duration'; // import plugin
+import relativeTime from 'dayjs/plugin/relativeTime'; // import plugin
 
 const locales = {
     de: () => import('dayjs/locale/de'),
@@ -21,6 +22,7 @@ const locales = {
 // use plugin
 dayjs.extend(isLeapYear);
 dayjs.extend(duration);
+dayjs.extend(relativeTime);
 
 const defaultFormat = 'YYYY-MM-DD HH:mm:ss';
 dayjs.extend((option, dayjsClass, dayjsFactory) => {

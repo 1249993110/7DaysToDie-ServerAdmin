@@ -46,6 +46,7 @@
                 "historyPlayers": "历史玩家数",
                 "entities": "实体数",
                 "fps": "FPS",
+                "residentSetSize": "RSS",
                 "heap": "堆内存",
                 "chunks": "区块数",
                 "chunkGameObjects": "CGO",
@@ -114,6 +115,11 @@
                 "processorFrequency": "处理器频率",
                 "systemMemorySize": "系统内存大小",
                 "userName": "用户名"
+            },
+            "recentActivity": {
+                "login": "登录成功",
+                "playerEnterGame": "玩家: {0} 进入游戏",
+                "playerLeaveGame": "玩家: {0} 离开游戏"
             }
         }
     }

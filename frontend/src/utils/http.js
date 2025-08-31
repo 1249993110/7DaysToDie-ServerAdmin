@@ -51,13 +51,22 @@ service.interceptors.response.use(
                 useRouter().push('/403');
                 break;
             case 404:
-                myToast.error('The requested resource does not found.');
+                myToast({
+                    title: 'The requested resource does not found.',
+                    icon: 'warn',
+                });
                 break;
             case 400:
-                myToast.error(data.message || data.error || 'Bad Request');
+                myToast({
+                    title: data.message || data.error || 'Bad Request',
+                    icon: 'error',
+                });
                 break;
             case 500:
-                myToast.error(data.message || data.error || 'Internal Server Error');
+                 myToast({
+                    title: data.message || data.error || 'Internal Server Error',
+                    icon: 'error',
+                });
                 break;
             default:
                 console.error(error);

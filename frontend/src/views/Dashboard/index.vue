@@ -13,42 +13,57 @@
                 </MyCard>
             </div>
             <div class="col-span-12 xl:col-span-4">
-                <MyCard :header="$t('views.dashboard.headers.recentActivity')">
-                    <div>
-                        <p class="m-0">Online</p>
-                    </div>
+                <MyCard :header="$t('views.dashboard.headers.recentActivity')" >
+                    <RecentActivity />
                 </MyCard>
+                <div class="grid grid-cols-6 gap-4 mt-4">
+                    <MyCard :header="$t('views.dashboard.headers.historyPlayers')" class="stats-content 3xl:whitespace-nowrap">
+                        <span>
+                            {{ gameServerStats.historyPlayers ?? $t('common.unknown') }}
+                        </span>
+                    </MyCard>
+                    <MyCard :header="$t('views.dashboard.headers.entities')" class="stats-content">
+                        <span>
+                            {{ gameServerStats.entities ?? $t('common.unknown') }}
+                        </span>
+                    </MyCard>
+                    <MyCard :header="$t('views.dashboard.headers.fps')" class="stats-content">
+                        <span>
+                            {{ gameServerStats.fps?.toFixed(1) ?? $t('common.unknown') }}
+                        </span>
+                    </MyCard>
+                    <MyCard :header="$t('views.dashboard.headers.residentSetSize')" class="stats-content">
+                        <span>{{ gameServerStats.residentSetSize?.toFixed() ?? $t('common.unknown') }} MB</span>
+                    </MyCard>
+                    <MyCard :header="$t('views.dashboard.headers.heap')" class="stats-content">
+                        <span>{{ gameServerStats.heap?.toFixed() ?? $t('common.unknown') }} MB</span>
+                    </MyCard>
+                    <MyCard :header="$t('views.dashboard.headers.chunks')" class="stats-content">
+                        <span>
+                            {{ gameServerStats.chunks ?? $t('common.unknown') }}
+                        </span>
+                    </MyCard>
+                </div>
                 <MyCard :header="$t('views.dashboard.headers.systemPlatformInfo')" class="mt-4">
-                    <div class="system-info">
-                        <span>{{ $t('views.dashboard.systemInfo.deviceName') }}</span>
-                        <span :title="systemPlatformInfo.deviceName">{{ systemPlatformInfo.deviceName }}</span>
-                        <span>{{ $t('views.dashboard.systemInfo.deviceModel') }}</span>
-                        <span :title="systemPlatformInfo.deviceModel">{{ systemPlatformInfo.deviceModel }}</span>
-                        <span>{{ $t('views.dashboard.systemInfo.deviceType') }}</span>
-                        <span :title="systemPlatformInfo.deviceType">{{ systemPlatformInfo.deviceType }}</span>
-                        <span>{{ $t('views.dashboard.systemInfo.deviceUniqueIdentifier') }}</span>
-                        <span :title="systemPlatformInfo.deviceUniqueIdentifier">{{ systemPlatformInfo.deviceUniqueIdentifier }}</span>
-                        <span>{{ $t('views.dashboard.systemInfo.operatingSystem') }}</span>
-                        <span :title="systemPlatformInfo.operatingSystem">{{ systemPlatformInfo.operatingSystem }}</span>
-                        <span>{{ $t('views.dashboard.systemInfo.processorType') }}</span>
-                        <span :title="systemPlatformInfo.processorType">{{ systemPlatformInfo.processorType }}</span>
-                        <span>{{ $t('views.dashboard.systemInfo.processorCount') }}</span>
-                        <span :title="systemPlatformInfo.processorCount">{{ systemPlatformInfo.processorCount }}</span>
-                        <span>{{ $t('views.dashboard.systemInfo.systemMemorySize') }}</span>
-                        <span :title="Math.round(systemPlatformInfo.systemMemorySize / 1024) + ' GB'">{{ Math.round(systemPlatformInfo.systemMemorySize / 1024) }} GB</span>
-                        <span>{{ $t('views.dashboard.systemInfo.userName') }}</span>
-                        <span :title="systemPlatformInfo.userName">{{ systemPlatformInfo.userName }}</span>
-                    </div>
+                    <SystemInfo :model="systemPlatformInfo" />
                 </MyCard>
             </div>
         </div>
     </div>
 </template>
 
+<script>
+export default {
+    name: 'Dashboard',
+};
+</script>
+
 <script setup>
 import Overview from './Overview/index.vue';
+import RecentActivity from './RecentActivity/index.vue';
 import Status from './Status/index.vue';
 import Monitor from './Monitor/index.vue';
+import SystemInfo from './SystemInfo/index.vue';
 import * as gameServerApi from '~/api/gameServer';
 import * as devicesApi from '~/api/devices';
 
@@ -61,9 +76,19 @@ devicesApi.getSystemPlatformInfo().then((data) => {
 });
 
 const { pause, resume, isActive } = useIntervalFn(
-    async () => {
-        gameServerStats.value = await gameServerApi.getStats();
-        systemMetricsSnapshot.value = await devicesApi.getSystemMetricsSnapshot();
+    () => {
+        gameServerApi
+            .getStats()
+            .then((data) => {
+                gameServerStats.value = data;
+            })
+            .catch((error) => {});
+        devicesApi
+            .getSystemMetricsSnapshot()
+            .then((data) => {
+                systemMetricsSnapshot.value = data;
+            })
+            .catch((error) => {});
     },
     3000,
     { immediateCallback: true }
@@ -74,12 +99,10 @@ onDeactivated(pause);
 </script>
 
 <style lang="scss" scoped>
-.system-info {
-    --uno: 'grid grid-cols-[auto_1fr] gap-4';
+.stats-content {
+    --uno: 'lg:col-span-2 xl:col-span-3 2xl:col-span-3 3xl:col-span-2';
     span {
-        &:nth-child(even) {
-            --uno: 'text-p-text-muted-color overflow-hidden whitespace-nowrap text-ellipsis';
-        }
+        --uno: 'text-p-primary-color ms-2';
     }
 }
 </style>

@@ -5,7 +5,7 @@ import usePrimeVue from './plugins/primevue';
 import i18n from './plugins/i18n';
 import router from './router';
 
-import 'virtual:uno.css'
+import 'virtual:uno.css';
 import './assets/styles/common.scss';
 
 const app = createApp(App);
@@ -15,7 +15,14 @@ usePinia(app);
 usePrimeVue(app);
 app.use(router);
 
-// Support async router
-router.isReady().then(() => {
-    app.mount('#app');
-});
+// Load locale and then mount the app
+useLocaleStore()
+    .loadLocale()
+    .then(() => {
+        app.mount('#app');
+    });
+
+// // Support async router
+// router.isReady().then(() => {
+//     app.mount('#app');
+// });

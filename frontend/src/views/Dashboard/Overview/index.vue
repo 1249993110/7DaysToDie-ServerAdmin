@@ -2,62 +2,62 @@
     <div class="grid grid-cols-12 gap-4">
         <div class="col-span-4 2xl:col-span-3">
             <Fieldset :legend="$t('views.dashboard.overview.serverName')">
-                <p class="content">{{ model.serverName }}</p>
+                <p class="content">{{ model.serverName || $t('common.unknown') }}</p>
             </Fieldset>
         </div>
         <div class="col-span-4 2xl:col-span-3">
             <Fieldset :legend="$t('views.dashboard.overview.serverIp')">
-                <p class="content">{{ model.serverIp || t('common.unknown') }}</p>
+                <p class="content">{{ model.serverIp || $t('common.unknown') }}</p>
             </Fieldset>
         </div>
         <div class="col-span-4 2xl:col-span-3">
             <Fieldset :legend="$t('views.dashboard.overview.serverPort')">
-                <p class="content">{{ model.serverPort }}</p>
+                <p class="content">{{ model.serverPort || $t('common.unknown') }}</p>
             </Fieldset>
         </div>
         <div class="col-span-4 2xl:col-span-3">
             <Fieldset :legend="$t('views.dashboard.overview.region')">
-                <p class="content">{{ model.region }}</p>
+                <p class="content">{{ model.region || $t('common.unknown') }}</p>
             </Fieldset>
         </div>
         <div class="col-span-4 2xl:col-span-3">
             <Fieldset :legend="$t('views.dashboard.overview.language')">
-                <p class="content">{{ model.language }}</p>
+                <p class="content">{{ model.language || $t('common.unknown') }}</p>
             </Fieldset>
         </div>
         <div class="col-span-4 2xl:col-span-3">
             <Fieldset :legend="$t('views.dashboard.overview.serverVersion')">
-                <p class="content">{{ model.serverVersion }}</p>
+                <p class="content">{{ model.serverVersion || $t('common.unknown') }}</p>
             </Fieldset>
         </div>
         <div class="col-span-4 2xl:col-span-3">
             <Fieldset :legend="$t('views.dashboard.overview.uptime')">
-                <p class="content">{{ formatUptime(model.uptime) }}</p>
+                <p class="content">{{ formatUptime(model.uptime) || $t('common.unknown') }}</p>
             </Fieldset>
         </div>
         <div class="col-span-4 2xl:col-span-3">
             <Fieldset :legend="$t('views.dashboard.overview.gameTime')">
-                <p class="content">{{ formatGameTime(model.gameTime) }}</p>
+                <p class="content">{{ formatGameTime(model.gameTime) || $t('common.unknown') }}</p>
             </Fieldset>
         </div>
         <div class="col-span-4 2xl:col-span-3">
             <Fieldset :legend="$t('views.dashboard.overview.gameName')">
-                <p class="content">{{ model.gameName }}</p>
+                <p class="content">{{ model.gameName || $t('common.unknown') }}</p>
             </Fieldset>
         </div>
         <div class="col-span-4 2xl:col-span-3">
             <Fieldset :legend="$t('views.dashboard.overview.gameMode')">
-                <p class="content">{{ model.gameMode }}</p>
+                <p class="content">{{ model.gameMode || $t('common.unknown') }}</p>
             </Fieldset>
         </div>
         <div class="col-span-4 2xl:col-span-3">
             <Fieldset :legend="$t('views.dashboard.overview.gameWorld')">
-                <p class="content">{{ model.gameWorld }}</p>
+                <p class="content">{{ model.gameWorld || $t('common.unknown') }}</p>
             </Fieldset>
         </div>
         <div class="col-span-4 2xl:col-span-3">
             <Fieldset :legend="$t('views.dashboard.overview.gameDifficulty')">
-                <p class="content">{{ formatGameDifficulty(model.gameDifficulty) }}</p>
+                <p class="content">{{ formatGameDifficulty(model.gameDifficulty) || $t('common.unknown') }}</p>
             </Fieldset>
         </div>
     </div>
@@ -107,6 +107,6 @@ const formatGameDifficulty = (gameDifficulty) => {
 
 <style lang="scss" scoped>
 .content {
-    --uno: 'ltr:ml-3 rtl:mr-3 text-p-primary-color';
+    --uno: 'ms-3 text-p-primary-color';
 }
 </style>

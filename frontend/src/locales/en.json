@@ -49,6 +49,7 @@
                 "historyPlayers": "History Players",
                 "entities": "Entities",
                 "fps": "FPS",
+                "residentSetSize": "RSS",
                 "heap": "Heap",
                 "chunks": "Chunks",
                 "chunkGameObjects": "CGO",
@@ -117,6 +118,11 @@
                 "processorFrequency": "Processor Frequency",
                 "systemMemorySize": "System Memory Size",
                 "userName": "User Name"
+            },
+            "recentActivity": {
+                "login": "Login Success",
+                "playerEnterGame": "Player: {0} Entered Game",
+                "playerLeaveGame": "Player: {0} Left Game"
             }
         }
     }

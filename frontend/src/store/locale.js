@@ -23,14 +23,6 @@ export const useLocaleStore = defineStore('locale', () => {
         'zh-cn': { englishName: 'Simplified Chinese', nativeName: '简体中文' },
     };
 
-    watch(
-        lang,
-        async (val) => {
-            await Promise.all([changeDayjsLang(val), changeValibotLang(val), changePrimevueLang(val, primevue)]);
-        },
-        { immediate: true }
-    );
-
     const getAppTitle = () => {
         return t('common.appTitle') + ' ' + import.meta.env.VITE_APP_VERSION;
     };
@@ -49,5 +41,12 @@ export const useLocaleStore = defineStore('locale', () => {
         }));
     };
 
-    return { lang: lang, getAppTitle, getLanguageEnglishName, getLanguageNativeMap };
+    const loadLocale = async() => {
+        await Promise.all([changeDayjsLang(lang.value), changeValibotLang(lang.value), changePrimevueLang(lang.value, primevue)]);
+        document.title = getAppTitle();
+    };
+
+    watch(lang, loadLocale);
+
+    return { lang: lang, getAppTitle, getLanguageEnglishName, getLanguageNativeMap, loadLocale };
 });
