@@ -8,21 +8,15 @@ import router from './router';
 import 'virtual:uno.css';
 import './assets/styles/common.scss';
 
+console.log('Application bootstrapping...');
+
 const app = createApp(App);
 
-app.use(i18n);
 usePinia(app);
-usePrimeVue(app);
+
+app.use(i18n);
 app.use(router);
 
-// Load locale and then mount the app
-useLocaleStore()
-    .loadLocale()
-    .then(() => {
-        app.mount('#app');
-    });
+usePrimeVue(app);
 
-// // Support async router
-// router.isReady().then(() => {
-//     app.mount('#app');
-// });
+app.mount('#app');

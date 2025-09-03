@@ -41,12 +41,12 @@ export const useLocaleStore = defineStore('locale', () => {
         }));
     };
 
-    const loadLocale = async() => {
+    const loadLocale = async () => {
         await Promise.all([changeDayjsLang(lang.value), changeValibotLang(lang.value), changePrimevueLang(lang.value, primevue)]);
         document.title = getAppTitle();
     };
 
-    watch(lang, loadLocale);
+    watch(lang, loadLocale, { immediate: true });
 
-    return { lang: lang, getAppTitle, getLanguageEnglishName, getLanguageNativeMap, loadLocale };
+    return { lang: lang, getAppTitle, getLanguageEnglishName, getLanguageNativeMap };
 });

@@ -1,39 +1,39 @@
-import { defineStore } from 'pinia';
 import * as authApi from '~/api/auth';
 
 export const useUserInfoStore = defineStore('user-info', () => {
-    const isRememberMe = useStorage('isRememberMe', true);
+    const keyPrefix = 'userInfo.';
+    const isRememberMe = useStorage(keyPrefix + 'isRememberMe', true);
     const useMyStorage = (key) => useStorage(key, '', isRememberMe.value ? localStorage : sessionStorage);
     const username = computed({
         get() {
-            return useMyStorage('username').value;
+            return useMyStorage(keyPrefix + 'username').value;
         },
         set(val) {
-            useMyStorage('username').value = val;
+            useMyStorage(keyPrefix + 'username').value = val;
         },
     });
     const accessToken = computed({
         get() {
-            return useMyStorage('access_token').value;
+            return useMyStorage(keyPrefix + 'access_token').value;
         },
         set(val) {
-            useMyStorage('access_token').value = val;
+            useMyStorage(keyPrefix + 'access_token').value = val;
         },
     });
     const expiresAt = computed({
         get() {
-            return useMyStorage('expires_at').value;
+            return useMyStorage(keyPrefix + 'expires_at').value;
         },
         set(val) {
-            useMyStorage('expires_at').value = val;
+            useMyStorage(keyPrefix + 'expires_at').value = val;
         },
     });
     const refreshToken = computed({
         get() {
-            return useMyStorage('refresh_token').value;
+            return useMyStorage(keyPrefix + 'refresh_token').value;
         },
         set(val) {
-            useMyStorage('refresh_token').value = val;
+            useMyStorage(keyPrefix + 'refresh_token').value = val;
         },
     });
 

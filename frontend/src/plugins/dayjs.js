@@ -33,7 +33,7 @@ dayjs.extend((option, dayjsClass, dayjsFactory) => {
 });
 
 export const changeLang = async (lang) => {
-    const loader = locales[lang] || locales.en;
+    const loader = locales[lang] ?? locales.en;
     const preset = await loader();
     dayjs.locale(preset);
 };

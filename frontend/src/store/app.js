@@ -34,5 +34,5 @@ export const useAppStore = defineStore('app', () => {
         { immediate: true }
     );
 
-    return { theme, isDark: isDark, primaryColor, surfaceColor, isRippleActive, isRTL, isMenuButtonVisible, isDrawerMenuVisible };
+    return { theme, isDark, primaryColor, surfaceColor, isRippleActive, isRTL, isMenuButtonVisible, isDrawerMenuVisible };
 });

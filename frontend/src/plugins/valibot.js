@@ -28,7 +28,7 @@ export const changeLang = async (lang) => {
             'zh-cn': 'zh-CN',
             'zh-tw': 'zh-TW',
         };
-        v.setGlobalConfig({ lang: langMap[lang] || lang });
+        v.setGlobalConfig({ lang: langMap[lang] ?? lang });
     } else {
         v.setGlobalConfig({ lang: 'en' });
     }

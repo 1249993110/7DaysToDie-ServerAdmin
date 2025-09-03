@@ -7,10 +7,10 @@ import Material from '@primeuix/themes/material';
 import Nora from '@primeuix/themes/nora';
 
 export const themePresets = {
-    'aura': Aura,
-    'material': Material,
-    'lara': Lara,
-    'nora': Nora,
+    aura: Aura,
+    material: Material,
+    lara: Lara,
+    nora: Nora,
 };
 
 export default (app) => {
@@ -45,7 +45,7 @@ const locales = {
 };
 
 export const changeLang = async (lang, primevue) => {
-    const loader = locales[lang] || locales.en;
+    const loader = locales[lang] ?? locales.en;
     const preset = await loader();
     primevue.config.locale = Object.values(preset)[0];
 };
