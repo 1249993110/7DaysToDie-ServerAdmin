@@ -10,6 +10,9 @@ const props = defineProps({
     cpuTimes: {
         type: Object,
     },
+    memoryInfo: {
+        type: Object,
+    },
 });
 
 const { t } = useI18n();
@@ -56,8 +59,13 @@ const getChartData = (newDate, newData) => {
                 label: t('views.dashboard.monitor.cpu'),
                 fill: false,
                 tension: 0.4,
+                borderColor: '#028FF1',
+            },
+            {
+                label: t('views.dashboard.monitor.ram'),
+                fill: false,
+                tension: 0.4,
                 borderColor: '#F97316',
-                backgroundColor: 'rgba(107, 114, 128, 0.2)',
             },
         ],
     };
@@ -140,7 +148,7 @@ const getChartOptions = () => {
                 },
                 title: {
                     display: true,
-                    text: t('views.dashboard.monitor.cpuUsage'),
+                    text: t('views.dashboard.monitor.usage'),
                 },
                 min: 0,
                 max: 100,
@@ -155,7 +163,7 @@ onMounted(() => {
 });
 
 watch(
-    () => [props.timestamp, props.cpuTimes],
+    () => [props.timestamp, props.cpuTimes, props.memoryInfo],
     (newVal, oldVal) => {
         if (!oldVal[0]) {
             return;
@@ -167,7 +175,7 @@ watch(
 
         const cpuUsage = calculateCpuUsage(oldCpuTimes, newCpuTimes);
 
-        chartData.value = getChartData(newDate, [cpuUsage]);
+        chartData.value = getChartData(newDate, [cpuUsage, newVal[2].usedPercentage]);
         chartOptions.value = getChartOptions();
     }
 );

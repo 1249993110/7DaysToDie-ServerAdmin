@@ -2,7 +2,7 @@
     <div class="config-panel hidden">
         <div class="config-section">
             <div>
-                <span class="config-label">Primary</span>
+                <span class="config-label">{{ $t('layout.header.palette.primary') }}</span>
                 <div class="config-colors">
                     <button
                         v-for="pc of primaryColorPalettes"
@@ -16,7 +16,7 @@
                 </div>
             </div>
             <div>
-                <span class="config-label">Surface</span>
+                <span class="config-label">{{ $t('layout.header.palette.surface') }}</span>
                 <div class="config-colors">
                     <button
                         v-for="s of surfaces"
@@ -35,7 +35,7 @@
                 </div>
             </div>
             <div class="config-settings">
-                <span class="config-label">Theme</span>
+                <span class="config-label">{{ $t('layout.header.palette.theme') }}</span>
                 <SelectButton
                     :pt="{ pcToggleButton: { root: { class: 'capitalize' } } }"
                     v-model="selectedPresetTheme"
@@ -49,13 +49,13 @@
             <div class="flex">
                 <div class="flex-1">
                     <div class="config-settings">
-                        <span class="config-label">Ripple</span>
+                        <span class="config-label">{{ $t('layout.header.palette.ripple') }}</span>
                         <ToggleSwitch v-model="isRippleActive" />
                     </div>
                 </div>
                 <div class="flex-1">
                     <div class="config-settings items-end">
-                        <span class="config-label">RTL</span>
+                        <span class="config-label">{{ $t('layout.header.palette.rtl') }}</span>
                         <ToggleSwitch v-model="isRTL" />
                     </div>
                 </div>

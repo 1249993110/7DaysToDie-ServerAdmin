@@ -17,7 +17,17 @@
         "apiDocumentation": "API Documentation"
     },
     "components": {},
-    "layout": {},
+    "layout": {
+      "header":{
+        "palette":{
+          "primary": "Primary",
+          "surface": "Surface",
+          "theme": "Theme",
+          "ripple": "Ripple",
+          "rtl": "RTL"
+        }
+      }
+    },
     "store": {},
     "plugins": {
         "myConfirm": {
@@ -101,7 +111,8 @@
             },
             "monitor": {
                 "cpu": "CPU",
-                "cpuUsage": "CPU Usage (%)",
+                "ram": "RAM",
+                "usage": "Usage (%)",
                 "time": "Time",
                 "network": "Network",
                 "trafficIn": "Traffic In",

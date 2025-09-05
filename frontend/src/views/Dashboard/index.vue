@@ -9,7 +9,7 @@
                     <Status :gameServerStats="gameServerStats" :systemMetricsSnapshot="systemMetricsSnapshot" />
                 </MyCard>
                 <MyCard :header="$t('views.dashboard.headers.monitor')" class="mt-4">
-                    <Monitor :timestamp="systemMetricsSnapshot.timestamp" :cpuTimes="systemMetricsSnapshot.cpuTimes" :networkInfos="systemMetricsSnapshot.networkInfos" />
+                    <Monitor :timestamp="systemMetricsSnapshot.timestamp" :cpuTimes="systemMetricsSnapshot.cpuTimes" :memoryInfo="systemMetricsSnapshot.memoryInfo" :networkInfos="systemMetricsSnapshot.networkInfos" />
                 </MyCard>
             </div>
             <div class="col-span-12 xl:col-span-4">
@@ -94,7 +94,11 @@ const { pause, resume, isActive } = useIntervalFn(
     { immediateCallback: true }
 );
 
-onActivated(resume);
+onActivated(() => {
+    if (!isActive.value) {
+        resume();
+    }
+});
 onDeactivated(pause);
 </script>
 

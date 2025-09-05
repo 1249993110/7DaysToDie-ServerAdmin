@@ -1,12 +1,12 @@
 <template>
     <div class="grid grid-cols-2 gap-4">
-        <CPU :timestamp="timestamp" :cpuTimes="cpuTimes" class="w-full h-60" />
+        <CPU_RAM :timestamp="timestamp" :cpuTimes="cpuTimes" :memoryInfo="memoryInfo" class="w-full h-60" />
         <Network :timestamp="timestamp" :networkInfos="networkInfos" class="w-full h-60" />
     </div>
 </template>
 
 <script setup>
-import CPU from './CPU.vue';
+import CPU_RAM from './CPU_RAM.vue';
 import Network from './Network.vue';
 
 const props = defineProps({
@@ -14,6 +14,9 @@ const props = defineProps({
         type: String,
     },
     cpuTimes: {
+        type: Object,
+    },
+    memoryInfo: {
         type: Object,
     },
     networkInfos: {

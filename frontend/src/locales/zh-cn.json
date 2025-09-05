@@ -16,6 +16,17 @@
         "appSettings": "应用设置",
         "apiDocumentation": "API文档"
     },
+    "layout": {
+        "header": {
+            "palette": {
+                "primary": "主色调",
+                "surface": "背景色",
+                "theme": "主题",
+                "ripple": "波纹",
+                "rtl": "RTL"
+            }
+        }
+    },
     "plugins": {
         "myConfirm": {
             "title": "确认",
@@ -98,7 +109,8 @@
             },
             "monitor": {
                 "cpu": "CPU",
-                "cpuUsage": "CPU 使用率 (%)",
+                "ram": "内存",
+                "usage": "使用率 (%)",
                 "time": "时间",
                 "network": "流量",
                 "trafficIn": "下行",
