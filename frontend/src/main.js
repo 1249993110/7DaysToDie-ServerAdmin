@@ -8,8 +8,6 @@ import router from './router';
 import 'virtual:uno.css';
 import './assets/styles/common.scss';
 
-console.log('Application bootstrapping...');
-
 const app = createApp(App);
 
 usePinia(app);

@@ -23,10 +23,36 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// </summary>
         /// <returns>List of results indicating success or failure of the command execution.</returns>
         [HttpPost]
-        [Route(nameof(ExecuteConsoleCommand))]
+        [Route("ExecuteConsoleCommand")]
         public Task<IEnumerable<string>> ExecuteConsoleCommand([FromBody] ConsoleCommand consoleCommand)
         {
             return Utils.ExecuteConsoleCommandAsync(consoleCommand.Command, consoleCommand.InMainThread);
+        }
+
+        /// <summary>
+        /// Get all allowed commands.
+        /// </summary>
+        [HttpGet]
+        [Route("AllowedCommands")]
+        public IEnumerable<AllowedCommand> GetAllowedCommands()
+        {
+            var consoleCommands = SdtdConsole.Instance.GetCommands();
+            var allowedCommands = new List<AllowedCommand>(consoleCommands.Count);
+            foreach (var consoleCommand in consoleCommands)
+            {
+                var commands = consoleCommand.GetCommands();
+                int commandPermissionLevel = GameManager.Instance.adminTools.Commands.GetCommandPermissionLevel(commands);
+
+                allowedCommands.Add(new AllowedCommand()
+                {
+                    Commands = commands,
+                    PermissionLevel = commandPermissionLevel,
+                    Description = consoleCommand.GetDescription(),
+                    Help = consoleCommand.GetHelp(),
+                });
+            }
+
+            return allowedCommands;
         }
         #endregion
 
@@ -94,7 +120,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         }
 
         /// <summary>
-        /// Remove admins
+        /// Delete admins
         /// </summary>
         /// <param name="playerIds">Array of player IDs to remove.</param>
         /// <returns>List of results indicating success or failure for each admin removal.</returns>

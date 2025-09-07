@@ -19,6 +19,7 @@ import Sidebar from './Sidebar/index.vue';
 import Main from './Main/index.vue';
 
 const { isMenuButtonVisible, isRTL, isDrawerMenuVisible } = storeToRefs(useAppStore());
+useGameEventStore();
 </script>
 
 <style lang="scss" scoped>

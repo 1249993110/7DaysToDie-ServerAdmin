@@ -11,11 +11,6 @@
         Welcome,
 
         /// <summary>
-        /// Command execution reply event.
-        /// </summary>
-        CommandExecutionReply,
-
-        /// <summary>
         /// Log callback event.
         /// </summary>
         LogCallback,

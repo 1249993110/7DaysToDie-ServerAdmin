@@ -97,7 +97,7 @@ const fullRoutes = [
             {
                 name: 'Console',
                 path: '/console',
-                component: () => import('../views/Dashboard/index.vue'),
+                component: () => import('../views/Console/index.vue'),
                 meta: {
                     title: () => t('menus.console'),
                     icon: markIcon(() => import('~icons/mdi/console')),

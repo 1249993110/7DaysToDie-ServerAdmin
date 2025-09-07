@@ -35,7 +35,7 @@ const props = defineProps({
     --uno: 'grid grid-cols-[auto_1fr] gap-4';
     span {
         &:nth-child(even) {
-            --uno: 'text-p-text-muted-color overflow-hidden whitespace-nowrap text-ellipsis';
+            --uno: 't-text-secondary overflow-hidden whitespace-nowrap text-ellipsis';
         }
     }
 }

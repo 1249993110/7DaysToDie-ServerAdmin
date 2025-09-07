@@ -18,7 +18,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Middlewares
 
         public override async Task Invoke(IOwinContext context)
         {
-            if (context.Request.Path == new PathString("/sse"))
+            if (context.Request.Path == new PathString("/api/sse"))
             {
                 if (context.Authentication.User == null || context.Authentication.User.Identity.IsAuthenticated == false)
                 {
@@ -83,7 +83,6 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Middlewares
         {
             return new WelcomeInfo()
             {
-                ConnectionMessages = new string[] { "*** Connected with 7DTD server.", "*** Dedicated server only build" },
                 Version = new VersionInfo
                 {
                     LongString = global::Constants.cVersionInformation.LongString,
@@ -93,11 +92,11 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Middlewares
                      ? "Any"
                      : GamePrefs.GetString(EnumGamePrefs.ServerIP),
                 ServerPort = GamePrefs.GetInt(EnumGamePrefs.ServerPort),
-                MaxPlayers = GamePrefs.GetInt(EnumGamePrefs.ServerMaxPlayerCount),
+                ServerMaxPlayerCount = GamePrefs.GetInt(EnumGamePrefs.ServerMaxPlayerCount),
                 GameMode = GamePrefs.GetString(EnumGamePrefs.GameMode),
-                World = GamePrefs.GetString(EnumGamePrefs.GameWorld),
+                GameWorld = GamePrefs.GetString(EnumGamePrefs.GameWorld),
                 GameName = GamePrefs.GetString(EnumGamePrefs.GameName),
-                Difficulty = GamePrefs.GetInt(EnumGamePrefs.GameDifficulty)
+                GameDifficulty = GamePrefs.GetInt(EnumGamePrefs.GameDifficulty)
             };
         }
 
@@ -109,15 +108,14 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Middlewares
 
         private class WelcomeInfo
         {
-            public required string[] ConnectionMessages { get; set; }
             public required VersionInfo Version { get; set; }
             public required string ServerIP { get; set; }
             public required int ServerPort { get; set; }
-            public required int MaxPlayers { get; set; }
+            public required int ServerMaxPlayerCount { get; set; }
             public required string GameMode { get; set; }
-            public required string World { get; set; }
+            public required string GameWorld { get; set; }
             public required string GameName { get; set; }
-            public required int Difficulty { get; set; }
+            public required int GameDifficulty { get; set; }
         }
     }
 }
