@@ -5,6 +5,7 @@ import Aura from '@primeuix/themes/aura';
 import Lara from '@primeuix/themes/lara';
 import Material from '@primeuix/themes/material';
 import Nora from '@primeuix/themes/nora';
+import { useAppStore } from '~/store/app';
 
 export const themePresets = {
     aura: Aura,

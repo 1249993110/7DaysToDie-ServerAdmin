@@ -3,6 +3,9 @@
 </template>
 
 <script setup>
+import { useAppStore } from '~/store/app';
+import { useLocaleStore } from '~/store/locale';
+
 const props = defineProps({
     timestamp: {
         type: String,

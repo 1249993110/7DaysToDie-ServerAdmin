@@ -68,6 +68,7 @@
 import { themePresets } from '~/plugins/primevue';
 import { usePrimeVue } from 'primevue/config';
 import { useTheme } from '~/composables/useTheme';
+import { useAppStore } from '~/store/app';
 
 const primeVue = usePrimeVue();
 

@@ -1,5 +1,6 @@
 import { themePresets } from '~/plugins/primevue';
 import { $t } from '@primeuix/themes';
+import { useAppStore } from '~/store/app';
 
 const surfaces = [
     {

@@ -2,6 +2,8 @@ import axios from 'axios';
 import nProgress from '~/plugins/nprogress';
 import qs from 'qs';
 import { authUrl } from '~/api/auth';
+import { myToast } from '~/plugins/sweetalert2';
+import { useUserInfoStore } from '~/store/userInfo';
 
 const service = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,

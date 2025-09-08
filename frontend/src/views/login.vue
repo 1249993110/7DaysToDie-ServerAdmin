@@ -68,6 +68,8 @@ export default {
 import { disposeAllStores } from '~/plugins/pinia';
 import { valibotResolver } from '@primevue/forms/resolvers/valibot';
 import v from '~/plugins/valibot';
+import { useLocaleStore } from '~/store/locale';
+import { useUserInfoStore } from '~/store/userInfo';
 
 disposeAllStores();
 

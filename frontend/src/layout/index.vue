@@ -17,6 +17,8 @@
 import Header from './Header/index.vue';
 import Sidebar from './Sidebar/index.vue';
 import Main from './Main/index.vue';
+import { useAppStore } from '~/store/app';
+import { useGameEventStore } from '~/store/gameEvent';
 
 const { isMenuButtonVisible, isRTL, isDrawerMenuVisible } = storeToRefs(useAppStore());
 useGameEventStore();

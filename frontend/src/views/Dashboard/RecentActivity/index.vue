@@ -11,6 +11,8 @@
 </template>
 
 <script setup>
+import { useRecentActivityStore } from '~/store/recentActivity';
+
 const { activities } = storeToRefs(useRecentActivityStore());
 </script>
 

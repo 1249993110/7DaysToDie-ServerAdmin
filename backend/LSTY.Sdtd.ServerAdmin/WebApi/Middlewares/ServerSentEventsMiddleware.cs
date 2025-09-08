@@ -35,7 +35,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Middlewares
                     FullMode = BoundedChannelFullMode.Wait
                 });
 
-                string jsonPayload = JsonConvert.SerializeObject(CreateWelcomeInfo(), _jsonSerializerSettings);
+                string jsonPayload = JsonConvert.SerializeObject(new { message = CreateWelcomeMessage() }, _jsonSerializerSettings);
                 await queue.Writer.WriteAsync((ModEventName.Welcome.ToString(), jsonPayload));
 
                 var eventForwarder = new EventForwarder(ModEventHub.Instance);
@@ -79,43 +79,25 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Middlewares
             }
         }
 
-        private static WelcomeInfo CreateWelcomeInfo()
+        private string CreateWelcomeMessage()
         {
-            return new WelcomeInfo()
-            {
-                Version = new VersionInfo
-                {
-                    LongString = global::Constants.cVersionInformation.LongString,
-                    CompatibilityVersion = global::Constants.cVersionInformation.LongStringNoBuild
-                },
-                ServerIP = string.IsNullOrEmpty(GamePrefs.GetString(EnumGamePrefs.ServerIP))
-                     ? "Any"
-                     : GamePrefs.GetString(EnumGamePrefs.ServerIP),
-                ServerPort = GamePrefs.GetInt(EnumGamePrefs.ServerPort),
-                ServerMaxPlayerCount = GamePrefs.GetInt(EnumGamePrefs.ServerMaxPlayerCount),
-                GameMode = GamePrefs.GetString(EnumGamePrefs.GameMode),
-                GameWorld = GamePrefs.GetString(EnumGamePrefs.GameWorld),
-                GameName = GamePrefs.GetString(EnumGamePrefs.GameName),
-                GameDifficulty = GamePrefs.GetInt(EnumGamePrefs.GameDifficulty)
-            };
-        }
+            var stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine("*** Connected with 7DTD server.");
+            stringBuilder.AppendLine("*** Server version: " + global::Constants.cVersionInformation.LongString + " Compatibility Version: " + global::Constants.cVersionInformation.LongStringNoBuild);
+            stringBuilder.AppendLine("*** Dedicated server only build");
+            stringBuilder.AppendLine(string.Empty);
+            stringBuilder.AppendLine("Server IP:   " + (string.IsNullOrEmpty(GamePrefs.GetString(EnumGamePrefs.ServerIP)) ? "Any" : GamePrefs.GetString(EnumGamePrefs.ServerIP)));
+            stringBuilder.AppendLine("Server port: " + GamePrefs.GetInt(EnumGamePrefs.ServerPort).ToString());
+            stringBuilder.AppendLine("Max players: " + GamePrefs.GetInt(EnumGamePrefs.ServerMaxPlayerCount).ToString());
+            stringBuilder.AppendLine("Game mode:   " + GamePrefs.GetString(EnumGamePrefs.GameMode));
+            stringBuilder.AppendLine("World:       " + GamePrefs.GetString(EnumGamePrefs.GameWorld));
+            stringBuilder.AppendLine("Game name:   " + GamePrefs.GetString(EnumGamePrefs.GameName));
+            stringBuilder.AppendLine("Difficulty:  " + GamePrefs.GetInt(EnumGamePrefs.GameDifficulty).ToString());
+            stringBuilder.AppendLine(string.Empty);
+            stringBuilder.AppendLine("Press 'help' to get a list of all commands.");
+            stringBuilder.AppendLine(string.Empty);
 
-        private class VersionInfo
-        {
-            public required string LongString { get; set; }
-            public required string CompatibilityVersion { get; set; }
-        }
-
-        private class WelcomeInfo
-        {
-            public required VersionInfo Version { get; set; }
-            public required string ServerIP { get; set; }
-            public required int ServerPort { get; set; }
-            public required int ServerMaxPlayerCount { get; set; }
-            public required string GameMode { get; set; }
-            public required string GameWorld { get; set; }
-            public required string GameName { get; set; }
-            public required int GameDifficulty { get; set; }
+            return stringBuilder.ToString();
         }
     }
 }

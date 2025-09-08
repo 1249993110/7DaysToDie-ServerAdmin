@@ -1,17 +1,13 @@
-export const useRecentActivityStore = defineStore('recent-activity', () => {
-    const max = 4;
+import emitter, { EVENT_TYPES } from '~/plugins/mitt';
+
+export const useRecentActivityStore = defineStore('recentActivity', () => {
+    const max = 8;
     const { t } = useI18n();
     const state = ref([
         {
-            icon: markIcon(() => import('~icons/ic/baseline-gamepad')),
-            text: () => t('views.dashboard.recentActivity.playerEnterGame', ['IceCoffee']),
-            time: dayjs(),
-            color: '#22c55e',
-        },
-        {
             icon: markIcon(() => import('~icons/ic/baseline-login')),
             text: () => t('views.dashboard.recentActivity.login'),
-            time: dayjs().add(-2, 'minute'),
+            time: dayjs(),
             color: '#22c55e',
         },
     ]);
@@ -35,6 +31,15 @@ export const useRecentActivityStore = defineStore('recent-activity', () => {
             state.value.pop();
         }
     };
+
+    emitter.on(EVENT_TYPES.GAME.PLAYER_SPAWNED_IN_WORLD, (data) => {
+        addActivity({
+            icon: markIcon(() => import('~icons/ic/baseline-gamepad')),
+            text: () => t('views.dashboard.recentActivity.playerEnterGame', [data.playerInfo.entityName]),
+            time: dayjs(),
+            color: '#22c55e',
+        });
+    });
 
     return {
         activities,

@@ -33,6 +33,7 @@
 
 <script setup>
 import { mainRoutes } from '~/router';
+import { useLocaleStore } from '~/store/locale';
 
 const resolveTitle = (title) => {
     return typeof title === 'function' ? title() : title;

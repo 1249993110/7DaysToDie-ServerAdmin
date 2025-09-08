@@ -1,7 +1,10 @@
 {
     "common": {
         "appTitle": "天依七日杀服务器管理系统",
-        "unknown": "未知"
+        "unknown": "未知",
+        "button": {
+            "send": "发送"
+        }
     },
     "menus": {
         "dashboard": "仪表盘",
@@ -132,6 +135,12 @@
                 "login": "登录成功",
                 "playerEnterGame": "玩家: {0} 进入游戏",
                 "playerLeaveGame": "玩家: {0} 离开游戏"
+            }
+        },
+        "console": {
+            "invalidCommand": {
+                "title": "无效命令",
+                "text": "请输入有效的命令。"
             }
         }
     }

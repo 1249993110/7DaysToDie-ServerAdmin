@@ -30,13 +30,13 @@ export default defineConfig(({ mode }) => {
                             // import { default as dayjs } from '~/plugins/dayjs.js'
                             ['default', 'dayjs'],
                         ],
-                        '~/plugins/sweetalert2.js': [
-                            ['myToast'], ['myConfirm'],
-                        ],
-                        '~/plugins/mitt.js': [
-                            ['default', 'emitter'],
-                            ['EVENT_TYPES'],
-                        ],
+                        // '~/plugins/sweetalert2.js': [
+                        //     ['myToast'], ['myConfirm'],
+                        // ],
+                        // '~/plugins/mitt.js': [
+                        //     ['default', 'emitter'],
+                        //     ['EVENT_TYPES'],
+                        // ],
                         '~/plugins/i18n.js': [
                             ['useI18n'],
                         ],
@@ -48,7 +48,7 @@ export default defineConfig(({ mode }) => {
                 // Set `false` to disable.
                 dts: true,
 
-                dirs: ['./src/utils/*', './src/store/*'],
+                dirs: ['./src/utils/*'],
                 resolvers: [],
                 ignore: ['h'],
             }),

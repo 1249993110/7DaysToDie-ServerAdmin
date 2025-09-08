@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory } from 'vue-router';
 import nProgress from '~/plugins/nprogress';
 import Layout from '~/layout/index.vue';
 import qs from 'qs';
+import { useUserInfoStore } from '~/store/userInfo';
 
 const { t } = useI18n();
 

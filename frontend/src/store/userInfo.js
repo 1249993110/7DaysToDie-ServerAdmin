@@ -1,6 +1,7 @@
 import * as authApi from '~/api/auth';
+import { myToast } from '~/plugins/sweetalert2';
 
-export const useUserInfoStore = defineStore('user-info', () => {
+export const useUserInfoStore = defineStore('userInfo', () => {
     const keyPrefix = 'userInfo.';
     const isRememberMe = useStorage(keyPrefix + 'isRememberMe', true);
     const useMyStorage = (key) => useStorage(key, '', isRememberMe.value ? localStorage : sessionStorage);

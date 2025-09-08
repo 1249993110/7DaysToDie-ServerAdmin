@@ -1,9 +1,10 @@
 import { EventSourcePlus } from 'event-source-plus';
+import emitter, { EVENT_TYPES } from '~/plugins/mitt';
+import { useUserInfoStore } from '~/store/userInfo';
 
-export const useGameEventStore = defineStore('game-event', () => {
+export const useGameEventStore = defineStore('gameEvent', () => {
     const logs = ref([]);
     const chatMessages = ref([]);
-
     const MAX = 2000;
 
     const addLog = (message, logType) => {
@@ -15,7 +16,7 @@ export const useGameEventStore = defineStore('game-event', () => {
     };
 
     const addChatMessage = (message, timestamp) => {
-        chatMessages.value.push({ message, timestamp });
+        chatMessages.value.push({ id: crypto.randomUUID(), message, timestamp });
 
         if (chatMessages.value.length > MAX) {
             nextTick(() => chatMessages.value.shift());
@@ -33,38 +34,19 @@ export const useGameEventStore = defineStore('game-event', () => {
     });
 
     const onWelcomeMessage = (data) => {
-        const serverInfoString = `
-*** Connected with 7DTD server.
-*** Server version: ${data.version.longString} Compatibility Version: ${data.version.compatibilityVersion}
-*** Dedicated server only build
-
-Server IP:   ${data.serverIP}
-Server port: ${data.serverPort}
-Max players: ${data.serverMaxPlayerCount}
-Game mode:   ${data.gameMode}
-World:       ${data.gameWorld}
-Game name:   ${data.gameName}
-Difficulty:  ${data.gameDifficulty}
-
-Press 'help' to get a list of all commands.
-`;
-        console.log(serverInfoString);
-        addLog(serverInfoString, 'Assert');
+        console.log(data.message);
+        addLog(data.message, 'Assert');
     };
 
     const controller = eventSource.listen({
         onMessage(message) {
             const data = JSON.parse(message.data);
-            switch (message.event) {
-                case 'Welcome':
-                    onWelcomeMessage(data);
-                case 'LogCallback':
-                    addLog(data.message, data.logType);
-                    break;
-            }
             emitter.emit('Game.' + message.event, data);
         },
     });
+
+    emitter.on(EVENT_TYPES.GAME.WELCOME, onWelcomeMessage);
+    emitter.on(EVENT_TYPES.GAME.LOG_CALLBACK, (data) => addLog(data.message, data.logType));
 
     const isLoggedIn = asyncComputed(() => userInfoStore.isLoggedIn());
     watch(isLoggedIn, (val) => {

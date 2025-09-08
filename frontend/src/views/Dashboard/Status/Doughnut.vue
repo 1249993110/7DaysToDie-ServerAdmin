@@ -6,6 +6,8 @@
 </template>
 
 <script setup>
+import { useAppStore } from '~/store/app';
+
 const props = defineProps({
     title: {
         type: String,

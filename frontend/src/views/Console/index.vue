@@ -42,7 +42,7 @@
                     </div>
                 </template>
             </AutoComplete>
-            <Button class="ms-2" type="button" :loading="isLoading" severity="secondary" label="Send" @click="sendCommand">
+            <Button class="ms-2" type="button" :loading="isLoading" severity="secondary" :label="$t('common.button.send')" @click="sendCommand">
                 <template #icon>
                     <icon-mdi:send />
                 </template>
@@ -60,13 +60,15 @@ export default {
 <script setup>
 import { executeConsoleCommand, getAllowedCommands } from '~/api/gameServer';
 import { useCommandHistory } from '~/composables/useCommandHistory';
+import { myToast } from '~/plugins/sweetalert2';
+import { useGameEventStore } from '~/store/gameEvent';
 
 const { t } = useI18n();
 const gameEventStore = useGameEventStore();
 const autoCompleteRef = ref();
 const consoleContentRef = ref();
-const allCommands = ref([]);
-const commandLookup = ref(new Set());
+let allCommands = [];
+let commandLookup = new Set();
 const filteredCommands = ref([]);
 const isLoading = ref(false);
 const { currentCommand, navigateUp, navigateDown, addCommandToHistory, onInputChange } = useCommandHistory();
@@ -79,7 +81,7 @@ const isCommandInvalid = computed(() => {
     }
 
     const commandPart = trimmedVal.split(' ')[0].toLowerCase();
-    return !commandLookup.value.has(commandPart);
+    return !commandLookup.has(commandPart);
 });
 
 const handleArrowUp = () => {
@@ -103,8 +105,8 @@ getAllowedCommands()
                 lookupSet.add(cmd.toLowerCase());
             });
         });
-        allCommands.value = processedCommands;
-        commandLookup.value = lookupSet;
+        allCommands = processedCommands;
+        commandLookup = lookupSet;
     })
     .catch((error) => {});
 
@@ -116,8 +118,8 @@ const sendCommand = async () => {
 
     if (isCommandInvalid.value) {
         myToast({
-            title: 'Invalid Command',
-            text: 'Please enter a valid command.',
+            title: t('views.console.invalidCommand.title'),
+            text: t('views.console.invalidCommand.text'),
             icon: 'error',
         });
         return;
@@ -179,10 +181,13 @@ const search = (event) => {
     }
 
     if (!query) {
-        filteredCommands.value = allCommands.value;
+        filteredCommands.value = [...allCommands];
+        
     } else {
         query = query.trim().toLowerCase();
-        filteredCommands.value = allCommands.value.filter((c) => c.cmd.toLowerCase().startsWith(query));
+        filteredCommands.value = allCommands.filter((c) => c.cmd.toLowerCase().startsWith(query));
     }
+
+
 };
 </script>

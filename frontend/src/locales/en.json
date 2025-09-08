@@ -1,7 +1,10 @@
 {
     "common": {
         "appTitle": "7 Days to Die Server Admin",
-        "unknown": "Unknown"
+        "unknown": "Unknown",
+        "button": {
+            "send": "Send"
+        }
     },
     "menus": {
         "dashboard": "Dashboard",
@@ -18,15 +21,15 @@
     },
     "components": {},
     "layout": {
-      "header":{
-        "palette":{
-          "primary": "Primary",
-          "surface": "Surface",
-          "theme": "Theme",
-          "ripple": "Ripple",
-          "rtl": "RTL"
+        "header": {
+            "palette": {
+                "primary": "Primary",
+                "surface": "Surface",
+                "theme": "Theme",
+                "ripple": "Ripple",
+                "rtl": "RTL"
+            }
         }
-      }
     },
     "store": {},
     "plugins": {
@@ -134,6 +137,12 @@
                 "login": "Login Success",
                 "playerEnterGame": "Player: {0} Entered Game",
                 "playerLeaveGame": "Player: {0} Left Game"
+            }
+        },
+        "console": {
+            "invalidCommand": {
+                "title": "Invalid Command",
+                "text": "Please enter a valid command."
             }
         }
     }

@@ -107,6 +107,10 @@
 
 <script setup>
 import Palette from './Palette.vue';
+import { myConfirm } from '~/plugins/sweetalert2';
+import { useAppStore } from '~/store/app';
+import { useLocaleStore } from '~/store/locale';
+import { useUserInfoStore } from '~/store/userInfo';
 
 const isDark = useDark();
 const userInfoStore = useUserInfoStore();
