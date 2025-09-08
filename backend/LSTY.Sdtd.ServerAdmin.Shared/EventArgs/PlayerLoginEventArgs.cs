@@ -4,7 +4,7 @@ namespace LSTY.Sdtd.ServerAdmin.Shared.EventArgs
 {
     public class PlayerLoginEventArgs : System.EventArgs
     {
-        public required PlayerInfo PlayerInfo { get; set; }
+        public required PlayerBasicInfo PlayerInfo { get; set; }
 
         public required string CompatibilityVersion { get; set; }
 

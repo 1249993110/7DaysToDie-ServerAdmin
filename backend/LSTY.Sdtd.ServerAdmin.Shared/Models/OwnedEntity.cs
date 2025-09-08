@@ -1,5 +1,8 @@
 ﻿namespace LSTY.Sdtd.ServerAdmin.Shared.Models
 {
+    /// <summary>
+    /// Owned Entity
+    /// </summary>
     public class OwnedEntity
     {
         public required int Id { get; set; }

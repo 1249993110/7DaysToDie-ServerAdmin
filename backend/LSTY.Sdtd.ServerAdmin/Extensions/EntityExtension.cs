@@ -4,9 +4,9 @@ namespace LSTY.Sdtd.ServerAdmin.Extensions
 {
     internal static class EntityExtension
     {
-        public static EntityInfo ToEntityInfo(this EntityAlive entityAlive)
+        public static EntityBasicInfo ToEntityBasicInfo(this EntityAlive entityAlive)
         {
-            return new EntityInfo()
+            return new EntityBasicInfo()
             {
                 EntityId = entityAlive.entityId,
                 EntityName = entityAlive.EntityName,

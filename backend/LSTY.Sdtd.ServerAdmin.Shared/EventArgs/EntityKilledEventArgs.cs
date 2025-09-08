@@ -10,12 +10,12 @@ namespace LSTY.Sdtd.ServerAdmin.Shared.EventArgs
         /// <summary>
         /// The dead entity
         /// </summary>
-        public required EntityInfo Victim { get; set; }
+        public required EntityBasicInfo Victim { get; set; }
 
         /// <summary>
         /// The killer entity
         /// </summary>
-        public EntityInfo? Killer { get; set; }
+        public EntityBasicInfo? Killer { get; set; }
 
         /// <summary>
         ///

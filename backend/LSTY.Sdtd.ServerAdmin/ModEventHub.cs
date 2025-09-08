@@ -89,14 +89,13 @@ namespace LSTY.Sdtd.ServerAdmin
         /// <param name="type">The log type.</param>
         public void OnLogCallback(string message, string trace, UnityEngine.LogType type)
         {
-            var logEntry = new LogCallbackEventArgs()
+            LogCallback?.Invoke(this, new LogCallbackEventArgs()
             {
                 Message = message,
                 StackTrace = trace,
                 LogLevel = (LogLevel)type,
                 Timestamp = DateTime.UtcNow,
-            };
-            LogCallback?.Invoke(this, logEntry);
+            });
         }
 
         /// <summary>
@@ -144,6 +143,11 @@ namespace LSTY.Sdtd.ServerAdmin
         /// <returns>True to pass the message on to the next mod or output to chat, false to prevent the message from being passed on or output to chat.</returns>
         public EModEventResult OnChatMessage(ref SChatMessageData sChatMessageData)
         {
+            if(ChatMessage == null)
+            {
+                return EModEventResult.Continue;
+            }
+
             var clientInfo = sChatMessageData.ClientInfo;
             string message = sChatMessageData.Message;
             int senderEntityId = sChatMessageData.SenderEntityId;
@@ -178,7 +182,7 @@ namespace LSTY.Sdtd.ServerAdmin
                 RecipientEntityIds = recipientEntityIds
             };
 
-            ChatMessage?.Invoke(this, chatMessage);
+            ChatMessage.Invoke(this, chatMessage);
 
             return EModEventResult.Continue;
         }
@@ -194,7 +198,7 @@ namespace LSTY.Sdtd.ServerAdmin
         {
             PlayerLogin?.Invoke(this, new PlayerLoginEventArgs()
             {
-                PlayerInfo = sPlayerLoginData.ClientInfo.ToPlayerInfo(),
+                PlayerInfo = sPlayerLoginData.ClientInfo.ToPlayerBasicInfo(),
                 CompatibilityVersion = sPlayerLoginData.CustomMessage,
                 CustomMessage = sPlayerLoginData.CustomMessage,
                 Timestamp = DateTime.UtcNow,
@@ -210,13 +214,13 @@ namespace LSTY.Sdtd.ServerAdmin
         /// <param name="killer">The entity that killed the entity.</param>
         public void OnEntityKilled(ref SEntityKilledData sEntityKilledData)
         {
-            var victim = sEntityKilledData.KilledEntitiy;
-            var killer = sEntityKilledData.KillingEntity;
-
             if (EntityKilled == null)
             {
                 return;
             }
+
+            var victim = sEntityKilledData.KilledEntitiy;
+            var killer = sEntityKilledData.KillingEntity;
 
             if (victim is EntityAlive diedEntity
                 && killer is EntityPlayer entityPlayer
@@ -224,8 +228,8 @@ namespace LSTY.Sdtd.ServerAdmin
             {
                 EntityKilled.Invoke(this, new EntityKilledEventArgs()
                 {
-                    Victim = diedEntity.ToEntityInfo(),
-                    Killer = entityPlayer.ToEntityInfo(),
+                    Victim = diedEntity.ToEntityBasicInfo(),
+                    Killer = entityPlayer.ToEntityBasicInfo(),
                     Timestamp = DateTime.UtcNow,
                 });
             }
@@ -235,7 +239,7 @@ namespace LSTY.Sdtd.ServerAdmin
         /// Runs when an entity is spawned.
         /// </summary>
         /// <param name="entity">The spawned entity.</param>
-        public void OnEntitySpawned(EntityInfo entity)
+        public void OnEntitySpawned(EntityBasicInfo entity)
         {
             EntitySpawned?.Invoke(this, new EntitySpawnedEventArgs()
             {
@@ -253,7 +257,7 @@ namespace LSTY.Sdtd.ServerAdmin
         {
             PlayerDisconnected?.Invoke(this, new PlayerDisconnectedEventArgs()
             {
-                PlayerInfo = sPlayerDisconnectedData.ClientInfo.ToPlayerInfo(),
+                PlayerInfo = sPlayerDisconnectedData.ClientInfo.ToPlayerBasicInfo(),
                 GameShuttingDown = sPlayerDisconnectedData.GameShuttingDown,
                 Timestamp = DateTime.UtcNow,
             });
@@ -270,7 +274,7 @@ namespace LSTY.Sdtd.ServerAdmin
         {
             PlayerSpawnedInWorld?.Invoke(this, new PlayerSpawnedInWorldEventArgs()
             {
-                PlayerInfo = sPlayerSpawnedInWorldData.ClientInfo.ToPlayerInfo(sPlayerSpawnedInWorldData.Position.ToPosition()),
+                PlayerInfo = sPlayerSpawnedInWorldData.ClientInfo.ToPlayerBasicInfo(sPlayerSpawnedInWorldData.Position.ToPosition()),
                 RespawnType = (Shared.Models.RespawnType)sPlayerSpawnedInWorldData.RespawnType,
                 Timestamp = DateTime.UtcNow,
             });
@@ -286,7 +290,7 @@ namespace LSTY.Sdtd.ServerAdmin
         {
             PlayerSpawning?.Invoke(this, new PlayerSpawningEventArgs()
             {
-                PlayerInfo = sPlayerSpawningData.ClientInfo.ToPlayerInfo(),
+                PlayerInfo = sPlayerSpawningData.ClientInfo.ToPlayerBasicInfo(),
                 ChunkViewDim = sPlayerSpawningData.ChunkViewDim,
                 PlayerProfile = sPlayerSpawningData.PlayerProfile.ToModel(),
                 Timestamp = DateTime.UtcNow,
@@ -301,11 +305,15 @@ namespace LSTY.Sdtd.ServerAdmin
         /// <param name="pdf">The player data file.</param>
         public void OnSavePlayerData(ref SSavePlayerDataData sSavePlayerDataData)
         {
-            SavePlayerData?.Invoke(this, new SavePlayerDataEventArgs()
+            if(GameManager.Instance.GetPersistentPlayerList().EntityToPlayerMap.TryGetValue(sSavePlayerDataData.ClientInfo.entityId, out var persistentPlayerData))
             {
-                PlayerDetails = sSavePlayerDataData.ClientInfo.ToPlayerDetails(),
-                Timestamp = DateTime.UtcNow,
-            });
+                var entityPlayer = GameManager.Instance.World.GetEntity(sSavePlayerDataData.ClientInfo.entityId) as EntityPlayer;
+                SavePlayerData?.Invoke(this, new SavePlayerDataEventArgs()
+                {
+                    PlayerDetails = persistentPlayerData.ToPlayerDetails(sSavePlayerDataData.ClientInfo, entityPlayer),
+                    Timestamp = DateTime.UtcNow,
+                });
+            }
         }
 
         /// <summary>

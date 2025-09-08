@@ -7,7 +7,7 @@ namespace LSTY.Sdtd.ServerAdmin.Shared.EventArgs
         /// <summary>
         /// 
         /// </summary>
-        public required EntityInfo SpawnedEntity { get; set; }
+        public required EntityBasicInfo SpawnedEntity { get; set; }
 
         /// <summary>
         ///

@@ -1,130 +1,205 @@
 ﻿namespace LSTY.Sdtd.ServerAdmin.Shared.Models
 {
-    public class PlayerDetails : PlayerInfo
+    /// <summary>
+    /// Player Details
+    /// </summary>
+    public class PlayerDetails : PlayerBasicInfo
     {
+        #region Online State
         /// <summary>
-        /// Gets the player's admin status.
+        /// Permission Level
         /// </summary>
-        public required bool IsAdmin { get; set; }
+        public required int PermissionLevel { get; set; }
 
         /// <summary>
-        /// Gets the last spawn position of the player.
+        /// Is Admin
         /// </summary>
-        public required Position LastSpawnPosition { get; set; }
+        public bool IsAdmin => PermissionLevel == 0;
 
         /// <summary>
-        /// Gets the last login time of the player.
+        /// Is Twitch Enabled
         /// </summary>
-        public required DateTime? LastLogin { get; set; }
+        public required bool? IsTwitchEnabled { get; set; }
 
         /// <summary>
-        /// Gets the number of kills by the player.
+        /// Is Twitch Safe
         /// </summary>
-        public required int PlayerKills { get; set; }
+        public required bool? IsTwitchSafe { get; set; }
 
         /// <summary>
-        /// Gets the number of zombie kills by the player.
+        /// Zombie Kills
         /// </summary>
         public required int ZombieKills { get; set; }
 
         /// <summary>
-        /// Gets the number of deaths by the player.
+        /// Player Kills
+        /// </summary>
+        public required int PlayerKills { get; set; }
+
+        /// <summary>
+        /// Deaths
         /// </summary>
         public required int Deaths { get; set; }
 
         /// <summary>
-        /// Gets the score of the player.
-        /// </summary>
-        public required int Score { get; set; }
-
-        /// <summary>
-        /// Gets the player stats.
-        /// </summary>
-        public required PlayerStats? Stats { get; set; }
-
-        /// <summary>
-        /// Gets or sets the level of the player.
+        /// Level
         /// </summary>
         public required int Level { get; set; }
 
         /// <summary>
-        /// Gets or sets the experience required to reach the next level.
+        /// Experience required to reach the next level.
         /// </summary>
         public required int ExpToNextLevel { get; set; }
 
         /// <summary>
-        /// Gets or sets the skill points available for the player.
+        /// Skill Points
         /// </summary>
         public required int SkillPoints { get; set; }
 
         /// <summary>
-        /// Gets a value indicating whether land protection is active for the player.
+        /// Game Stage
         /// </summary>
-        public required bool LandProtectionActive { get; set; }
+        public required int? GameStage { get; set; }
+        #endregion
+
+        #region History State
+        /// <summary>
+        /// Is Offline
+        /// </summary>
+        public bool IsOffline => EntityId == -1;
 
         /// <summary>
-        /// Gets the distance walked by the player.
+        /// Play Group
+        /// </summary>
+        public required string PlayGroup { get; set; }
+
+        /// <summary>
+        /// Last Login
+        /// </summary>
+        public required DateTime LastLogin { get; set; }
+
+        /// <summary>
+        /// ACL
+        /// </summary>
+        [JsonProperty("acl")]
+        public required IEnumerable<string>? ACL { get; set; }
+
+        /// <summary>
+        /// Land Claim Blocks
+        /// </summary>
+        public required IEnumerable<Position>? LandClaimBlocks { get; set; }
+
+        /// <summary>
+        /// Backpacks
+        /// </summary>
+        public required IEnumerable<Backpack>? Backpacks { get; set; }
+
+        /// <summary>
+        /// Bedroll
+        /// </summary>
+        public required Position? Bedroll { get; set; }
+
+        /// <summary>
+        /// QuestPositions
+        /// </summary>
+        public required IEnumerable<QuestpositionData>? QuestPositions { get; set; }
+
+        /// <summary>
+        /// Owned Vending Machine Positions
+        /// </summary>
+        public required IEnumerable<Position>? OwnedVendingMachinePositions { get; set; }
+        #endregion
+
+        #region Other State
+        /// <summary>
+        /// Last Spawn Position
+        /// </summary>
+        public required Position LastSpawnPosition { get; set; }
+
+        /// <summary>
+        /// Score
+        /// </summary>
+        public required int Score { get; set; }
+
+        /// <summary>
+        /// Player Stats
+        /// </summary>
+        public required PlayerStats? Stats { get; set; }
+
+        /// <summary>
+        /// Is Land Protection Active
+        /// </summary>
+        public required bool IsLandProtectionActive { get; set; }
+
+        /// <summary>
+        /// Distance Walked
         /// </summary>
         public required float DistanceWalked { get; set; }
 
         /// <summary>
-        /// Gets the total number of items crafted by the player.
+        /// Total Items Crafted
         /// </summary>
         public required uint TotalItemsCrafted { get; set; }
 
         /// <summary>
-        /// Gets the longest life of the player.
+        /// Longest Life
         /// </summary>
         public required float LongestLife { get; set; }
 
         /// <summary>
-        /// Gets the current life of the player.
+        /// Current Life
         /// </summary>
         public required float CurrentLife { get; set; }
 
         /// <summary>
-        /// Gets the total time played by the player in minutes.
+        /// Total Time Played
         /// </summary>
         public required float TotalTimePlayed { get; set; }
 
         /// <summary>
-        /// Gets the rented VM position of the player.
+        /// Rented VM Position
         /// </summary>
         public required Position RentedVMPosition { get; set; }
 
         /// <summary>
-        /// Gets the rental end time of the player.
+        /// Rental End Time
         /// </summary>
         public required ulong RentalEndTime { get; set; }
 
         /// <summary>
-        /// Gets the rental end day of the player.
+        /// Rental End Day
         /// </summary>
         public required int RentalEndDay { get; set; }
 
         /// <summary>
-        /// Gets the spawn points of the player.
+        /// Spawn Points
         /// </summary>
         public required IEnumerable<Position> SpawnPoints { get; set; }
 
         /// <summary>
-        /// Gets the list of already crafted items by the player.
+        /// Already Crafted List
         /// </summary>
         public required IEnumerable<string> AlreadyCraftedList { get; set; }
 
         /// <summary>
-        /// Gets the list of unlocked recipes by the player.
+        /// Unlocked Recipe List
         /// </summary>
         public required IEnumerable<string> UnlockedRecipeList { get; set; }
 
         /// <summary>
-        /// Gets the list of favorite recipes by the player.
+        /// Favorite Recipe List
         /// </summary>
         public required IEnumerable<string> FavoriteRecipeList { get; set; }
 
         /// <summary>
-        /// Gets the list of owned entities by the player.
+        /// Owned Entities
         /// </summary>
         public required IEnumerable<OwnedEntity> OwnedEntities { get; set; }
+
+        /// <summary>
+        /// Player Profile
+        /// </summary>
+        public required PlayerProfile? PlayerProfile { get; set; }
+        #endregion
     }
 }

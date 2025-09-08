@@ -7,9 +7,9 @@ namespace LSTY.Sdtd.ServerAdmin.HarmonyPatchers
     [HarmonyPatch(typeof(World))]
     internal static class WorldPatcher
     {
-        private static Action<EntityInfo>? _entitySpawnedCallback;
+        private static Action<EntityBasicInfo>? _entitySpawnedCallback;
 
-        public static void Init(Action<EntityInfo> entitySpawnedCallback)
+        public static void Init(Action<EntityBasicInfo> entitySpawnedCallback)
         {
             _entitySpawnedCallback = entitySpawnedCallback;
         }
@@ -20,7 +20,7 @@ namespace LSTY.Sdtd.ServerAdmin.HarmonyPatchers
         {
             if (_entity is EntityAlive entityAlive)
             {
-                _entitySpawnedCallback?.Invoke(entityAlive.ToEntityInfo());
+                _entitySpawnedCallback?.Invoke(entityAlive.ToEntityBasicInfo());
             }
         }
     }
