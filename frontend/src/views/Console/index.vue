@@ -27,6 +27,7 @@
                 :virtualScrollerOptions="{ itemSize: 38 }"
                 :invalid="isCommandInvalid"
                 :showEmptyMessage="false"
+                :delay="200"
             >
                 <template #option="{ option }">
                     <div
@@ -58,8 +59,9 @@ export default {
 </script>
 
 <script setup>
-import { executeConsoleCommand, getAllowedCommands } from '~/api/gameServer';
+import * as gameServerApi from '~/api/gameServer';
 import { useCommandHistory } from '~/composables/useCommandHistory';
+import emitter, { EVENT_TYPES } from '~/plugins/mitt';
 import { myToast } from '~/plugins/sweetalert2';
 import { useGameEventStore } from '~/store/gameEvent';
 
@@ -67,8 +69,8 @@ const { t } = useI18n();
 const gameEventStore = useGameEventStore();
 const autoCompleteRef = ref();
 const consoleContentRef = ref();
-let allCommands = [];
-let commandLookup = new Set();
+const allCommands = ref([]);
+const commandLookup = ref(new Set());
 const filteredCommands = ref([]);
 const isLoading = ref(false);
 const { currentCommand, navigateUp, navigateDown, addCommandToHistory, onInputChange } = useCommandHistory();
@@ -81,7 +83,7 @@ const isCommandInvalid = computed(() => {
     }
 
     const commandPart = trimmedVal.split(' ')[0].toLowerCase();
-    return !commandLookup.has(commandPart);
+    return !commandLookup.value.has(commandPart);
 });
 
 const handleArrowUp = () => {
@@ -95,20 +97,22 @@ const handleArrowDown = () => {
     }
 };
 
-getAllowedCommands()
-    .then((data) => {
-        const processedCommands = [];
-        const lookupSet = new Set();
-        data.forEach((group) => {
-            group.commands.forEach((cmd) => {
-                processedCommands.push({ cmd, desc: group.description, help: group.help });
-                lookupSet.add(cmd.toLowerCase());
-            });
+const getAllowedCommands = async () => {
+    const data = await gameServerApi.getAllowedCommands();
+    const processedCommands = [];
+    const lookupSet = new Set();
+    data.forEach((group) => {
+        group.commands.forEach((cmd) => {
+            processedCommands.push({ cmd, desc: group.description, help: group.help });
+            lookupSet.add(cmd.toLowerCase());
         });
-        allCommands = processedCommands;
-        commandLookup = lookupSet;
-    })
-    .catch((error) => {});
+    });
+    allCommands.value = processedCommands;
+    commandLookup.value = lookupSet;
+};
+getAllowedCommands();
+
+emitter.on(EVENT_TYPES.GAME.GAME_START_DONE, getAllowedCommands);
 
 let lastOverlayVisible = false;
 const sendCommand = async () => {
@@ -127,7 +131,7 @@ const sendCommand = async () => {
 
     isLoading.value = true;
     try {
-        const data = await executeConsoleCommand(commandText.value, true);
+        const data = await gameServerApi.executeConsoleCommand(commandText.value, true);
 
         addCommandToHistory(commandText.value);
         onInputChange('');
@@ -181,13 +185,10 @@ const search = (event) => {
     }
 
     if (!query) {
-        filteredCommands.value = [...allCommands];
-        
+        filteredCommands.value = [...allCommands.value];
     } else {
         query = query.trim().toLowerCase();
-        filteredCommands.value = allCommands.filter((c) => c.cmd.toLowerCase().startsWith(query));
+        filteredCommands.value = allCommands.value.filter((c) => c.cmd.toLowerCase().startsWith(query));
     }
-
-
 };
 </script>

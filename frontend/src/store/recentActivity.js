@@ -41,6 +41,15 @@ export const useRecentActivityStore = defineStore('recentActivity', () => {
         });
     });
 
+    emitter.on(EVENT_TYPES.GAME.PLAYER_DISCONNECTED, (data) => {
+        addActivity({
+            icon: markIcon(() => import('~icons/ic/baseline-gamepad')),
+            text: () => t('views.dashboard.recentActivity.playerLeaveGame', [data.playerInfo.entityName]),
+            time: dayjs(),
+            color: '#c52238ff',
+        });
+    });
+    
     return {
         activities,
         addActivity,

@@ -19,7 +19,7 @@ service.interceptors.request.use(
     async (config) => {
         nProgress.start();
 
-        if (config.url != authUrl) {
+        if (config.url !== authUrl) {
             const token = await useUserInfoStore().getAccessToken();
             config.headers.Authorization = `Bearer ${token}`;
         }
