@@ -83,6 +83,7 @@ export default defineConfig(({ mode }) => {
                 '/api': {
                     target: env.VITE_DEV_API_PROXY_TARGET,
                     changeOrigin: true,
+                    // timeout: 0,
                     // followRedirects: true
                 },
                 '/swagger': {

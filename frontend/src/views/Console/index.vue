@@ -13,7 +13,8 @@
             <AutoComplete
                 class="flex-1"
                 ref="autoCompleteRef"
-                v-model="selectedCommand"
+                :modelValue="currentCommand"
+                @update:modelValue="onInputChange"
                 optionLabel="cmd"
                 :suggestions="filteredCommands"
                 @complete="search"
@@ -28,7 +29,14 @@
                 :showEmptyMessage="false"
             >
                 <template #option="{ option }">
-                    <div class="flex items-center w-full" v-tooltip.top="{ value: option.help, autoHide: false, pt: { root: { style: { maxWidth: 'none' } } } }">
+                    <div
+                        class="flex items-center w-full"
+                        v-tooltip.top="{
+                            value: option.help,
+                            // autoHide: false,
+                            pt: { root: { style: { maxWidth: '80vw' } } },
+                        }"
+                    >
                         <div class="me-20">{{ option.cmd }}</div>
                         <div class="ms-auto overflow-hidden text-ellipsis whitespace-nowrap t-text-secondary text-sm">{{ option.desc }}</div>
                     </div>
@@ -51,45 +59,52 @@ export default {
 
 <script setup>
 import { executeConsoleCommand, getAllowedCommands } from '~/api/gameServer';
+import { useCommandHistory } from '~/composables/useCommandHistory';
 
 const { t } = useI18n();
 const gameEventStore = useGameEventStore();
 const autoCompleteRef = ref();
 const consoleContentRef = ref();
-let allowedCommands = [];
+const allCommands = ref([]);
+const commandLookup = ref(new Set());
 const filteredCommands = ref([]);
 const isLoading = ref(false);
-const selectedCommand = ref();
-const commandText = computed(() => (typeof selectedCommand.value === 'object' ? selectedCommand.value.cmd : selectedCommand.value));
+const { currentCommand, navigateUp, navigateDown, addCommandToHistory, onInputChange } = useCommandHistory();
+
+const commandText = computed(() => (typeof currentCommand.value === 'object' ? currentCommand.value.cmd : currentCommand.value));
 const isCommandInvalid = computed(() => {
-    const trimmedVal = commandText.value ? commandText.value.trim().toLowerCase() : '';
-    return !trimmedVal || !allowedCommands.some((group) => group.commands.some((cmd) => trimmedVal === cmd.toLowerCase() || trimmedVal.startsWith(cmd.toLowerCase() + ' ')));
+    const trimmedVal = commandText.value.trim();
+    if (!trimmedVal) {
+        return true;
+    }
+
+    const commandPart = trimmedVal.split(' ')[0].toLowerCase();
+    return !commandLookup.value.has(commandPart);
 });
 
-const commandHistory = [];
-let historyIndex = -1;
 const handleArrowUp = () => {
-    if (autoCompleteRef.value.overlayVisible) {
-        return;
-    }
-    if (commandHistory.length > 0 && historyIndex < commandHistory.length - 1) {
-        historyIndex++;
-        selectedCommand.value = commandHistory[commandHistory.length - 1 - historyIndex];
+    if (!autoCompleteRef.value.overlayVisible) {
+        navigateUp();
     }
 };
 const handleArrowDown = () => {
-    if (autoCompleteRef.value.overlayVisible) {
-        return;
-    }
-    if (commandHistory.length > 0 && historyIndex >= 0) {
-        historyIndex--;
-        selectedCommand.value = historyIndex === -1 ? '' : commandHistory[commandHistory.length - 1 - historyIndex];
+    if (!autoCompleteRef.value.overlayVisible) {
+        navigateDown();
     }
 };
 
 getAllowedCommands()
     .then((data) => {
-        allowedCommands = data;
+        const processedCommands = [];
+        const lookupSet = new Set();
+        data.forEach((group) => {
+            group.commands.forEach((cmd) => {
+                processedCommands.push({ cmd, desc: group.description, help: group.help });
+                lookupSet.add(cmd.toLowerCase());
+            });
+        });
+        allCommands.value = processedCommands;
+        commandLookup.value = lookupSet;
     })
     .catch((error) => {});
 
@@ -112,12 +127,8 @@ const sendCommand = async () => {
     try {
         const data = await executeConsoleCommand(commandText.value, true);
 
-        if (commandHistory.length === 0 || commandHistory[commandHistory.length - 1] !== commandText.value) {
-            commandHistory.push(commandText.value);
-        }
-        historyIndex = -1;
-
-        selectedCommand.value = '';
+        addCommandToHistory(commandText.value);
+        onInputChange('');
 
         data.forEach((message) => {
             gameEventStore.addLog(message, 'Assert');
@@ -127,20 +138,14 @@ const sendCommand = async () => {
     }
 };
 
-const getColor = (logType) => {
-    switch (logType) {
-        case 'Error':
-        case 'Exception':
-            return 'red';
-        case 'Assert':
-            return '#BBBFC4';
-        case 'Warning':
-            return 'yellow';
-        case 'Log':
-        default:
-            return '#00C814';
-    }
+const logColorMap = {
+    Error: 'red',
+    Exception: 'red',
+    Assert: '#BBBFC4',
+    Warning: 'yellow',
+    Log: '#00C814',
 };
+const getColor = (logType) => logColorMap[logType] || '#00C814';
 
 const { pause, resume } = watch(
     () => gameEventStore.logs.length,
@@ -167,34 +172,17 @@ onDeactivated(() => {
 });
 
 const search = (event) => {
-    let input = event.query;
-    if (input.indexOf(' ') !== -1) {
+    let query = event.query;
+    if (query.indexOf(' ') !== -1) {
         filteredCommands.value = [];
         return;
     }
 
-    const result = [];
-    if (!input) {
-        allowedCommands.forEach((group) => {
-            group.commands.forEach((cmd) => {
-                result.push({ cmd, desc: group.description, help: group.help });
-            });
-        });
+    if (!query) {
+        filteredCommands.value = allCommands.value;
     } else {
-        input = input.trim().toLowerCase();
-        allowedCommands
-            .flatMap((group) => group.commands)
-            .filter((cmd) => cmd.toLowerCase().startsWith(input))
-            .forEach((cmd) => {
-                const group = allowedCommands.find((g) => g.commands.includes(cmd));
-                if (input === cmd) {
-                    result.unshift({ cmd, desc: group.description, help: group.help });
-                } else {
-                    result.push({ cmd, desc: group.description, help: group.help });
-                }
-            });
+        query = query.trim().toLowerCase();
+        filteredCommands.value = allCommands.value.filter((c) => c.cmd.toLowerCase().startsWith(query));
     }
-
-    filteredCommands.value = result;
 };
 </script>
