@@ -1,5 +1,4 @@
 ﻿using LSTY.Sdtd.ServerAdmin.Config;
-using Microsoft.Owin;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 

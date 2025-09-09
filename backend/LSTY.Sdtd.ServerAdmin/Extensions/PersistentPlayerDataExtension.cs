@@ -1,5 +1,4 @@
 ﻿using LSTY.Sdtd.ServerAdmin.Shared.Models;
-using System.Reflection.Emit;
 using static PersistentPlayerData;
 
 namespace LSTY.Sdtd.ServerAdmin.Extensions
@@ -20,12 +19,12 @@ namespace LSTY.Sdtd.ServerAdmin.Extensions
                 PermissionLevel = GameManager.Instance.adminTools.Users.GetUserPermissionLevel(persistentPlayerData.PrimaryId),
                 PlayGroup = persistentPlayerData.PlayGroup.ToString(),
                 LastLogin = persistentPlayerData.LastLogin,
-                ACL = persistentPlayerData.ACL.Select(i => i.CombinedString),
-                LandClaimBlocks = persistentPlayerData.LPBlocks.Select(i => i.ToPosition()),
-                Backpacks = persistentPlayerData.backpacksByID.Select(i => i.ToBackpack()),
-                Bedroll = persistentPlayerData.BedrollPos.ToPosition(),
-                QuestPositions = persistentPlayerData.QuestPositions.Select(i => i.ToQuestpositionData()),
-                OwnedVendingMachinePositions = persistentPlayerData.OwnedVendingMachinePositions.Select(i => i.ToPosition()),
+                ACL = persistentPlayerData.ACL?.Select(i => i.CombinedString),
+                LandClaimBlocks = persistentPlayerData.LPBlocks?.Select(i => i.ToPosition()),
+                Backpacks = persistentPlayerData.backpacksByID?.Select(i => i.ToBackpack()),
+                Bedroll = persistentPlayerData.BedrollPos.y == int.MaxValue ? null : persistentPlayerData.BedrollPos.ToPosition(),
+                QuestPositions = persistentPlayerData.QuestPositions?.Select(i => i.ToQuestpositionData()),
+                OwnedVendingMachinePositions = persistentPlayerData.OwnedVendingMachinePositions?.Select(i => i.ToPosition()),
             };
         }
 
@@ -54,12 +53,12 @@ namespace LSTY.Sdtd.ServerAdmin.Extensions
                 PermissionLevel = GameManager.Instance.adminTools.Users.GetUserPermissionLevel(persistentPlayerData.PrimaryId),
                 PlayGroup = persistentPlayerData.PlayGroup.ToString(),
                 LastLogin = persistentPlayerData.LastLogin,
-                ACL = persistentPlayerData.ACL.Select(i => i.CombinedString),
-                LandClaimBlocks = persistentPlayerData.LPBlocks.Select(i => i.ToPosition()),
-                Backpacks = persistentPlayerData.backpacksByID.Select(i => i.ToBackpack()),
-                Bedroll = persistentPlayerData.BedrollPos.ToPosition(),
-                QuestPositions = persistentPlayerData.QuestPositions.Select(i => i.ToQuestpositionData()),
-                OwnedVendingMachinePositions = persistentPlayerData.OwnedVendingMachinePositions.Select(i => i.ToPosition()),
+                ACL = persistentPlayerData.ACL?.Select(i => i.CombinedString),
+                LandClaimBlocks = persistentPlayerData.LPBlocks?.Select(i => i.ToPosition()),
+                Backpacks = persistentPlayerData.backpacksByID?.Select(i => i.ToBackpack()),
+                Bedroll = persistentPlayerData.BedrollPos.y == int.MaxValue ? null : persistentPlayerData.BedrollPos.ToPosition(),
+                QuestPositions = persistentPlayerData.QuestPositions?.Select(i => i.ToQuestpositionData()),
+                OwnedVendingMachinePositions = persistentPlayerData.OwnedVendingMachinePositions?.Select(i => i.ToPosition()),
 
                 IsTwitchEnabled = null,
                 IsTwitchSafe = null,
@@ -91,7 +90,7 @@ namespace LSTY.Sdtd.ServerAdmin.Extensions
                 PlayerProfile = null,
             };
 
-            if(entityPlayer == null)
+            if (entityPlayer == null)
             {
                 var stream = playerDataFile.progressionData;
                 if (stream.Length > 0L)
@@ -126,7 +125,7 @@ namespace LSTY.Sdtd.ServerAdmin.Extensions
                 {
                     Health = stats.Health.Value,
                     Stamina = stats.Stamina.Value,
-                    //CoreTemp = stats.CoreTemp.Value,
+                    // CoreTemp = stats.CoreTemp.Value,
                     Food = stats.Food.Value,
                     Water = stats.Water.Value
                 };

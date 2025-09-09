@@ -48,12 +48,12 @@ namespace LSTY.Sdtd.ServerAdmin.Commands
                     int x, y, z;
                     if (args.Count == 0)
                     {
-                        if(GameManager.Instance.World.Players.dict.TryGetValue(senderInfo.GetEntityId(), out var player) == false)
+                        if (GameManager.Instance.World.Players.dict.TryGetValue(senderInfo.GetEntityId(), out var player) == false)
                         {
                             Log("ERR: Unable to get your position.");
                             return;
                         }
-                      
+
                         var playerBlockPosition = player.GetBlockPosition();
                         x = playerBlockPosition.x;
                         y = playerBlockPosition.y - 1;

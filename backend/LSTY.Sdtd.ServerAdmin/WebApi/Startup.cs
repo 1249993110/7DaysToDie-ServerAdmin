@@ -2,6 +2,7 @@
 using LSTY.Sdtd.ServerAdmin.Shared.Constants;
 using LSTY.Sdtd.ServerAdmin.WebApi.Authentication;
 using LSTY.Sdtd.ServerAdmin.WebApi.DataProtection;
+using LSTY.Sdtd.ServerAdmin.WebApi.JsonConverters;
 using LSTY.Sdtd.ServerAdmin.WebApi.Middlewares;
 using LSTY.Sdtd.ServerAdmin.WebApi.Providers;
 using Microsoft.Owin;
@@ -40,11 +41,14 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
             ContractResolver = new CamelCasePropertyNamesContractResolver(),
             MissingMemberHandling = MissingMemberHandling.Ignore,
             TypeNameHandling = TypeNameHandling.None,
-            DateFormatString = "yyyy-MM-ddTHH:mm:ss.fffZ",
             Converters = new List<JsonConverter>()
             {
-                new Newtonsoft.Json.Converters.StringEnumConverter()
+                new Newtonsoft.Json.Converters.StringEnumConverter(),
+                new UtcDateTimeConverter(),
+                new UtcDateTimeNullableConverter()
             },
+            // DateFormatString = "yyyy-MM-ddTHH:mm:ss.fffZ",
+            // DateFormatHandling = DateFormatHandling.IsoDateFormat
         };
 
         /// <summary>
@@ -166,23 +170,6 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
             app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions());
 
             app.Use<ServerSentEventsMiddleware>(_jsonSerializerSettings);
-
-            //app.Use(async (context, next) =>
-            //{
-            //    if (ModMain.IsGameStartDone == false)
-            //    {
-            //        var error = new { Message = "The game is still initializing." };
-            //        context.Response.ContentType = "application/json";
-            //        context.Response.StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
-
-            //        string json = JsonConvert.SerializeObject(error, _jsonSerializerSettings);
-            //        await context.Response.WriteAsync(json);
-            //    }
-            //    else
-            //    {
-            //        await next();
-            //    }
-            //});
 
             // Adds the Web API runtime (middleware) to the OWIN pipeline, responsible for handling HTTP requests and routing them to the correct Web API controllers and action methods
             app.UseWebApi(config);

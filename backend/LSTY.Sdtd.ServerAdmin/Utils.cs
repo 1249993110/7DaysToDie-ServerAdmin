@@ -94,5 +94,23 @@ namespace LSTY.Sdtd.ServerAdmin
             blockValue = BlockValue.Air;
             return false;
         }
+
+        public static string GetLocalization(string key, Language language, bool caseInsensitive = false)
+        {
+            try
+            {
+                var dict = caseInsensitive ? Localization.mDictionaryCaseInsensitive : Localization.mDictionary;
+                if (dict.TryGetValue(key, out string[] values))
+                {
+                    return values[(int)language] ?? string.Empty;
+                }
+
+                return string.Empty;
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
     }
 }

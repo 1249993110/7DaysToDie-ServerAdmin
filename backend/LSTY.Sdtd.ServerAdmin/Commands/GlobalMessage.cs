@@ -1,6 +1,4 @@
-﻿using LSTY.Sdtd.ServerAdmin.Config;
-
-namespace LSTY.Sdtd.ServerAdmin.Commands
+﻿namespace LSTY.Sdtd.ServerAdmin.Commands
 {
     /// <summary>
     /// Sends a message to all connected clients.

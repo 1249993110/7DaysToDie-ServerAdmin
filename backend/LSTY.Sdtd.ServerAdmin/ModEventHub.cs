@@ -143,7 +143,7 @@ namespace LSTY.Sdtd.ServerAdmin
         /// <returns>True to pass the message on to the next mod or output to chat, false to prevent the message from being passed on or output to chat.</returns>
         public EModEventResult OnChatMessage(ref SChatMessageData sChatMessageData)
         {
-            if(ChatMessage == null)
+            if (ChatMessage == null)
             {
                 return EModEventResult.Continue;
             }
@@ -305,7 +305,7 @@ namespace LSTY.Sdtd.ServerAdmin
         /// <param name="pdf">The player data file.</param>
         public void OnSavePlayerData(ref SSavePlayerDataData sSavePlayerDataData)
         {
-            if(GameManager.Instance.GetPersistentPlayerList().EntityToPlayerMap.TryGetValue(sSavePlayerDataData.ClientInfo.entityId, out var persistentPlayerData))
+            if (GameManager.Instance.GetPersistentPlayerList().EntityToPlayerMap.TryGetValue(sSavePlayerDataData.ClientInfo.entityId, out var persistentPlayerData))
             {
                 var entityPlayer = GameManager.Instance.World.GetEntity(sSavePlayerDataData.ClientInfo.entityId) as EntityPlayer;
                 SavePlayerData?.Invoke(this, new SavePlayerDataEventArgs()

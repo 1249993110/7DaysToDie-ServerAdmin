@@ -1,7 +1,11 @@
-﻿using LSTY.Sdtd.ServerAdmin.Config;
+﻿using HarmonyLib;
+using LSTY.Sdtd.ServerAdmin.Config;
+using LSTY.Sdtd.ServerAdmin.Extensions;
 using LSTY.Sdtd.ServerAdmin.Shared.Models;
 using Newtonsoft.Json;
+using NSwag.Annotations;
 using System.ComponentModel.DataAnnotations;
+using System.Net;
 using System.Web.Http;
 using System.Xml;
 using UnityEngine;
@@ -84,7 +88,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
 
         #region Admins
         /// <summary>
-        /// Create an admin
+        /// Create an admin.
         /// </summary>
         /// <param name="admin">Admin entry details.</param>
         /// <returns>List of results indicating success or failure for the admin creation.</returns>
@@ -98,7 +102,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         }
 
         /// <summary>
-        /// Get admins
+        /// Get admins.
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -120,7 +124,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         }
 
         /// <summary>
-        /// Delete admins
+        /// Delete admins.
         /// </summary>
         /// <param name="playerIds">Array of player IDs to remove.</param>
         /// <returns>List of results indicating success or failure for each admin removal.</returns>
@@ -141,7 +145,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
 
         #region Statistics
         /// <summary>
-        /// Get game server stats
+        /// Get game server stats.
         /// </summary>
         /// <returns></returns>
         [HttpGet]
@@ -268,6 +272,321 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
 
             xmlDocument.Save(path);
             return Ok();
+        }
+        #endregion
+
+        #region Players
+        /// <summary>
+        /// Get paged online players.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("OnlinePlayers")]
+        public PagedDto<OnlinePlayer> GetOnlinePlayers([FromUri] PagingQueryDto<OnlinePlayerQueryOrder> queryDto)
+        {
+            int pageSize = queryDto.PageSize;
+            string? keyword = queryDto.Keyword;
+            var clientInfoMap = ConnectionManager.Instance.Clients.entityIdMap;
+            IEnumerable<EntityPlayer> entityPlayers = GameManager.Instance.World.Players.list;
+            int total = 0;
+
+            if (queryDto.Order == null && string.IsNullOrEmpty(keyword))
+            {
+                total = GameManager.Instance.World.Players.list.Count;
+                if (pageSize > 0)
+                {
+                    entityPlayers = entityPlayers.Skip((queryDto.PageNumber - 1) * pageSize).Take(pageSize);
+                }
+
+                var items = new List<OnlinePlayer>();
+                foreach (var entityPlayer in entityPlayers)
+                {
+                    var clientInfo = clientInfoMap[entityPlayer.entityId];
+                    items.Add(entityPlayer.ToOnlinePlayer(clientInfo));
+                }
+
+                return new PagedDto<OnlinePlayer>()
+                {
+                    Items = items,
+                    Total = total,
+                };
+            }
+            else
+            {
+                IEnumerable<OnlinePlayer> items = new List<OnlinePlayer>();
+                bool isHasKeyword = string.IsNullOrEmpty(keyword) == false;
+                foreach (var entityPlayer in entityPlayers)
+                {
+                    var clientInfo = clientInfoMap[entityPlayer.entityId];
+                    if (isHasKeyword
+                        && clientInfo.entityId.ToString() != keyword
+                        && clientInfo.CrossplatformId.CombinedString.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) == -1
+                        && clientInfo.PlatformId.CombinedString.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) == -1
+                        && clientInfo.playerName.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) == -1)
+                    {
+                        continue;
+                    }
+
+                    ((List<OnlinePlayer>)items).Add(entityPlayer.ToOnlinePlayer(clientInfo));
+                }
+
+                total = ((List<OnlinePlayer>)items).Count;
+
+                if (queryDto.Order.HasValue)
+                {
+                    switch (queryDto.Order.Value)
+                    {
+                        case OnlinePlayerQueryOrder.EntityId:
+                            items = queryDto.Desc ? items.OrderByDescending(k => k.EntityId) : items.OrderBy(k => k.EntityId);
+                            break;
+                        case OnlinePlayerQueryOrder.PlayerName:
+                            items = queryDto.Desc ? items.OrderByDescending(k => k.PlayerName) : items.OrderBy(k => k.PlayerName);
+                            break;
+                        case OnlinePlayerQueryOrder.Ping:
+                            items = queryDto.Desc ? items.OrderByDescending(k => k.Ping) : items.OrderBy(k => k.Ping);
+                            break;
+                        case OnlinePlayerQueryOrder.PermissionLevel:
+                            items = queryDto.Desc ? items.OrderByDescending(k => k.PermissionLevel) : items.OrderBy(k => k.PermissionLevel);
+                            break;
+                        case OnlinePlayerQueryOrder.ZombieKills:
+                            items = queryDto.Desc ? items.OrderByDescending(k => k.ZombieKills) : items.OrderBy(k => k.ZombieKills);
+                            break;
+                        case OnlinePlayerQueryOrder.PlayerKills:
+                            items = queryDto.Desc ? items.OrderByDescending(k => k.PlayerKills) : items.OrderBy(k => k.PlayerKills);
+                            break;
+                        case OnlinePlayerQueryOrder.Deaths:
+                            items = queryDto.Desc ? items.OrderByDescending(k => k.Deaths) : items.OrderBy(k => k.Deaths);
+                            break;
+                        case OnlinePlayerQueryOrder.Level:
+                            items = queryDto.Desc ? items.OrderByDescending(k => k.Level) : items.OrderBy(k => k.Level);
+                            break;
+                        case OnlinePlayerQueryOrder.ExpToNextLevel:
+                            items = queryDto.Desc ? items.OrderByDescending(k => k.ExpToNextLevel) : items.OrderBy(k => k.ExpToNextLevel);
+                            break;
+                        case OnlinePlayerQueryOrder.SkillPoints:
+                            items = queryDto.Desc ? items.OrderByDescending(k => k.SkillPoints) : items.OrderBy(k => k.SkillPoints);
+                            break;
+                        case OnlinePlayerQueryOrder.GameStage:
+                            items = queryDto.Desc ? items.OrderByDescending(k => k.GameStage) : items.OrderBy(k => k.GameStage);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                if (pageSize > 0)
+                {
+                    items = items.Skip((queryDto.PageNumber - 1) * pageSize).Take(pageSize);
+                }
+
+                return new PagedDto<OnlinePlayer>()
+                {
+                    Items = items,
+                    Total = total,
+                };
+            }
+        }
+
+        /// <summary>
+        /// Get paged history players.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("HistoryPlayers")]
+        public PagedDto<HistoryPlayer> GetHistoryPlayers([FromUri] PagingQueryDto<HistoryPlayerQueryOrder> queryDto)
+        {
+            int pageSize = queryDto.PageSize;
+            string? keyword = queryDto.Keyword;
+            int total = 0;
+            IEnumerable<PersistentPlayerData> persistentPlayers = GameManager.Instance.GetPersistentPlayerList().Players.Values;
+
+            if (queryDto.Order == null && string.IsNullOrEmpty(keyword))
+            {
+                total = GameManager.Instance.GetPersistentPlayerList().Players.Count;
+
+                if (pageSize > 0)
+                {
+                    persistentPlayers = persistentPlayers.Skip((queryDto.PageNumber - 1) * pageSize).Take(pageSize);
+                }
+
+                var items = new List<HistoryPlayer>();
+                foreach (var persistentPlayer in persistentPlayers)
+                {
+                    var clientInfo = ConnectionManager.Instance.Clients.ForEntityId(persistentPlayer.EntityId);
+                    items.Add(persistentPlayer.ToHistoryPlayer(clientInfo));
+                }
+
+                return new PagedDto<HistoryPlayer>()
+                {
+                    Items = items,
+                    Total = total,
+                };
+            }
+            else
+            {
+                IEnumerable<HistoryPlayer> items = new List<HistoryPlayer>();
+                bool isHasKeyword = string.IsNullOrEmpty(keyword) == false;
+                foreach (var persistentPlayer in persistentPlayers)
+                {
+                    if (isHasKeyword
+                        && persistentPlayer.EntityId.ToString() != keyword
+                        && persistentPlayer.PrimaryId.CombinedString.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) == -1
+                        && persistentPlayer.NativeId.CombinedString.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) == -1
+                        && persistentPlayer.PlayerName.DisplayName.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) == -1)
+                    {
+                        continue;
+                    }
+
+                    var clientInfo = ConnectionManager.Instance.Clients.ForEntityId(persistentPlayer.EntityId);
+                    ((List<HistoryPlayer>)items).Add(persistentPlayer.ToHistoryPlayer(clientInfo));
+                }
+
+                total = ((List<HistoryPlayer>)items).Count;
+
+                if (queryDto.Order.HasValue)
+                {
+                    switch (queryDto.Order.Value)
+                    {
+                        case HistoryPlayerQueryOrder.EntityId:
+                            items = queryDto.Desc ? items.OrderByDescending(k => k.EntityId) : items.OrderBy(k => k.EntityId);
+                            break;
+                        case HistoryPlayerQueryOrder.PlayerName:
+                            items = queryDto.Desc ? items.OrderByDescending(k => k.PlayerName) : items.OrderBy(k => k.PlayerName);
+                            break;
+                        case HistoryPlayerQueryOrder.PermissionLevel:
+                            items = queryDto.Desc ? items.OrderByDescending(k => k.PermissionLevel) : items.OrderBy(k => k.PermissionLevel);
+                            break;
+                        case HistoryPlayerQueryOrder.PlayGroup:
+                            items = queryDto.Desc ? items.OrderByDescending(k => k.PlayGroup) : items.OrderBy(k => k.PlayGroup);
+                            break;
+                        case HistoryPlayerQueryOrder.IsOffline:
+                            items = queryDto.Desc ? items.OrderByDescending(k => k.IsOffline) : items.OrderBy(k => k.IsOffline);
+                            break;
+                        case HistoryPlayerQueryOrder.LastLogin:
+                            items = queryDto.Desc ? items.OrderByDescending(k => k.LastLogin) : items.OrderBy(k => k.LastLogin);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                if (pageSize > 0)
+                {
+                    items = items.Skip((queryDto.PageNumber - 1) * pageSize).Take(pageSize);
+                }
+
+                return new PagedDto<HistoryPlayer>()
+                {
+                    Items = items,
+                    Total = total,
+                };
+            }
+        }
+
+        /// <summary>
+        /// Get player details by player id.
+        /// </summary>
+        /// <param name="playerId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("PlayerDetails/{playerId}")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(Shared.Models.PlayerDetails))]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(object))]
+        public IHttpActionResult GetPlayerDetails(string playerId)
+        {
+            var userId = PlatformUserIdentifierAbs.FromCombinedString(playerId);
+            if (userId == null)
+            {
+                return NotFound();
+            }
+
+            var persistentPlayerMap = GameManager.Instance.GetPersistentPlayerList().Players;
+            if (persistentPlayerMap.TryGetValue(userId, out var persistentPlayerData) == false)
+            {
+                return NotFound();
+            }
+
+            var clientInfo = ConnectionManager.Instance.Clients.ForEntityId(persistentPlayerData.EntityId);
+            var entityPlayer = GameManager.Instance.World.Players.dict.GetValueSafe(persistentPlayerData.EntityId);
+            return Ok(persistentPlayerData.ToPlayerDetails(clientInfo, entityPlayer));
+        }
+
+        /// <summary>
+        /// Get player inventory by player id.
+        /// </summary>
+        /// <param name="playerId"></param>
+        /// <param name="language"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("PlayerInventory/{playerId}")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(Shared.Models.Inventory))]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(object))]
+        public IHttpActionResult GetPlayerInventory(string playerId, [FromUri] Language language)
+        {
+            var userId = PlatformUserIdentifierAbs.FromCombinedString(playerId);
+            if (userId == null)
+            {
+                return NotFound();
+            }
+
+            var clientInfo = ConnectionManager.Instance.Clients.ForUserId(userId);
+            if (clientInfo != null)
+            {
+                return Ok(clientInfo.latestPlayerData.GetInventory(language));
+            }
+
+            var playerDataFile = new PlayerDataFile();
+            playerDataFile.Load(GameIO.GetPlayerDataDir(), userId.CombinedString);
+            if (playerDataFile.bLoaded)
+            {
+                return Ok(playerDataFile.GetInventory(language));
+            }
+
+            return NotFound();
+        }
+
+        /// <summary>
+        /// Get player skills by player id.
+        /// </summary>
+        /// <param name="playerId"></param>
+        /// <param name="language"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("PlayerSkills/{playerId}")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(IEnumerable<PlayerSkill>))]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(object))]
+        public IHttpActionResult GetPlayerSkills(string playerId, [FromUri] Language language)
+        {
+            var userId = PlatformUserIdentifierAbs.FromCombinedString(playerId);
+            if (userId == null)
+            {
+                return NotFound();
+            }
+
+            var clientInfo = ConnectionManager.Instance.Clients.ForUserId(userId);
+            if (clientInfo != null && GameManager.Instance.World.Players.dict.TryGetValue(clientInfo.entityId, out var entityPlayer))
+            {
+                var progression = entityPlayer.Progression;
+                return Ok(progression.ToPlayerSkills(language));
+            }
+            else
+            {
+                var playerDataFile = new PlayerDataFile();
+                playerDataFile.Load(GameIO.GetPlayerDataDir(), userId.CombinedString);
+                if (playerDataFile.bLoaded == false || playerDataFile.progressionData.Length <= 0L)
+                {
+                    return NotFound();
+                }
+
+                using PooledBinaryReader pooledBinaryReader = MemoryPools.poolBinaryReader.AllocSync(false);
+                pooledBinaryReader.SetBaseStream(playerDataFile.progressionData);
+
+                entityPlayer = new EntityPlayer();
+                entityPlayer.Progression = new Progression(entityPlayer);
+
+                var progression = Progression.Read(pooledBinaryReader, entityPlayer);
+                return Ok(progression.ToPlayerSkills(language));
+            }
         }
         #endregion
     }

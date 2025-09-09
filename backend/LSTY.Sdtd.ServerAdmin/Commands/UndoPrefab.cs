@@ -195,7 +195,7 @@ namespace LSTY.Sdtd.ServerAdmin.Commands
                 OffsetPosition = offsetPosition;
                 PrefabInstanceId = prefabInstanceId;
                 PrefabName = prefabName;
-                CreatedAt = DateTime.Now;
+                CreatedAt = DateTime.UtcNow;
 
                 // Clear sleeper volumes
                 prefab.SleeperVolumes.Clear();
