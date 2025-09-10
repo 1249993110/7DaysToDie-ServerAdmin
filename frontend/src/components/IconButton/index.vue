@@ -1,9 +1,8 @@
 <template>
     <Button
         class="mr-2 !size-7 !p-0 !t-border-color-1"
-        variant="outlined"
-        severity="contrast"
         text
+        severity="contrast"
         :as="aTag ? 'a' : undefined"
         :target="aTag ? '_blank' : undefined"
         :rel="aTag ? 'noopener' : undefined"

@@ -28,7 +28,7 @@ const fullRoutes = [
             {
                 name: 'PlayerList',
                 path: '/player-list',
-                component: () => import('../views/Dashboard/index.vue'),
+                component: () => import('../views/PlayerList/index.vue'),
                 meta: {
                     title: () => t('menus.playerList'),
                     icon: markIcon(() => import('~icons/mdi/account-group')),

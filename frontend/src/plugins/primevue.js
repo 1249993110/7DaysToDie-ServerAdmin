@@ -24,6 +24,16 @@ export default (app) => {
             },
         },
         ripple: isRippleActive,
+        pt:{
+            datatable: {
+                mask: {
+                    class: 'p-table-mask',
+                },
+                loadingIcon: {
+                    class: 'p-table-loading',
+                },
+            }
+        }
     });
     app.directive('styleclass', StyleClass);
     app.directive('focustrap', FocusTrap);

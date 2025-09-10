@@ -1,10 +1,7 @@
 {
     "common": {
         "appTitle": "7 Days to Die Server Admin",
-        "unknown": "Unknown",
-        "button": {
-            "send": "Send"
-        }
+        "unknown": "Unknown"
     },
     "menus": {
         "dashboard": "Dashboard",
@@ -19,7 +16,16 @@
         "appSettings": "App Settings",
         "apiDocumentation": "API Documentation"
     },
-    "components": {},
+    "components": {
+        "myTable": {
+            "total": "Total {0}",
+            "keywordSearch": "Keyword Search",
+            "view": "View",
+            "batch": "Batch",
+            "refresh": "Refresh",
+            "noData": "No Data"
+        }
+    },
     "layout": {
         "header": {
             "palette": {
@@ -143,7 +149,8 @@
             "invalidCommand": {
                 "title": "Invalid Command",
                 "text": "Please enter a valid command."
-            }
+            },
+            "send": "Send"
         }
     }
 }

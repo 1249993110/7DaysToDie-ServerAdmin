@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-col" :class="{ 'h-screen': isDrawerMenuVisible, 'overflow-hidden': isDrawerMenuVisible }">
-        <Header class="padding z-1" />
+        <Header class="padding z-10" />
         <div class="flex-grow flex padding pt-20 pb-10">
             <Sidebar v-if="!isMenuButtonVisible" />
             <Drawer v-model:visible="isDrawerMenuVisible" header=" " :position="isRTL ? 'right' : 'left'">

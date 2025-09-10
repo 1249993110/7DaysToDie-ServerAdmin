@@ -43,7 +43,7 @@
                     </div>
                 </template>
             </AutoComplete>
-            <Button class="ms-2" type="button" :loading="isLoading" severity="secondary" :label="$t('common.button.send')" @click="sendCommand">
+            <Button class="ms-2" type="button" :loading="isLoading" severity="secondary" :label="$t('views.console.send')" @click="sendCommand">
                 <template #icon>
                     <icon-mdi:send />
                 </template>
