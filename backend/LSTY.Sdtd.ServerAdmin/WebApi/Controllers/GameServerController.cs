@@ -4,6 +4,7 @@ using LSTY.Sdtd.ServerAdmin.Extensions;
 using LSTY.Sdtd.ServerAdmin.Shared.Models;
 using Newtonsoft.Json;
 using NSwag.Annotations;
+using SkiaSharp;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Web.Http;
@@ -28,7 +29,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <returns>List of results indicating success or failure of the command execution.</returns>
         [HttpPost]
         [Route("ExecuteConsoleCommand")]
-        public Task<IEnumerable<string>> ExecuteConsoleCommand([FromBody] ConsoleCommand consoleCommand)
+        public Task<IEnumerable<string>> ExecuteConsoleCommand([FromBody, Required] ConsoleCommand consoleCommand)
         {
             return Utils.ExecuteConsoleCommandAsync(consoleCommand.Command, consoleCommand.InMainThread);
         }
@@ -254,7 +255,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <returns></returns>
         [HttpPut]
         [Route("Config")]
-        public IHttpActionResult UpdateConfig([FromBody] Dictionary<string, string> model)
+        public IHttpActionResult UpdateConfig([FromBody, Required] Dictionary<string, string> model)
         {
             string path = Path.Combine(AppContext.BaseDirectory, AppConfig.Settings.ServerConfigFile);
             var xmlDocument = new XmlDocument();
@@ -282,8 +283,9 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("OnlinePlayers")]
-        public PagedDto<OnlinePlayer> GetOnlinePlayers([FromUri] PagingQueryDto<OnlinePlayerQueryOrder> queryDto)
+        public PagedDto<OnlinePlayer> GetOnlinePlayers([FromUri] PagingQueryDto<OnlinePlayerQueryOrder>? queryDto)
         {
+            queryDto ??= new PagingQueryDto<OnlinePlayerQueryOrder>();
             int pageSize = queryDto.PageSize;
             string? keyword = queryDto.Keyword;
             var clientInfoMap = ConnectionManager.Instance.Clients.entityIdMap;
@@ -388,13 +390,43 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         }
 
         /// <summary>
+        /// Get online player by player id.
+        /// </summary>
+        /// <param name="playerId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("OnlinePlayers/{playerId}")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(Shared.Models.OnlinePlayer))]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(object))]
+        public IHttpActionResult GetOnlinePlayerById(string playerId)
+        {
+            var userId = PlatformUserIdentifierAbs.FromCombinedString(playerId);
+            if (userId == null)
+            {
+                return NotFound();
+            }
+            var clientInfo = ConnectionManager.Instance.Clients.ForUserId(userId);
+            if (clientInfo == null)
+            {
+                return NotFound();
+            }
+            var entityPlayer = GameManager.Instance.World.Players.dict.GetValueSafe(clientInfo.entityId);
+            if (entityPlayer == null)
+            {
+                return NotFound();
+            }
+            return Ok(entityPlayer.ToOnlinePlayer(clientInfo));
+        }
+
+        /// <summary>
         /// Get paged history players.
         /// </summary>
         /// <returns></returns>
         [HttpGet]
         [Route("HistoryPlayers")]
-        public PagedDto<HistoryPlayer> GetHistoryPlayers([FromUri] PagingQueryDto<HistoryPlayerQueryOrder> queryDto)
+        public PagedDto<HistoryPlayer> GetHistoryPlayers([FromUri] PagingQueryDto<HistoryPlayerQueryOrder>? queryDto)
         {
+            queryDto ??= new PagingQueryDto<HistoryPlayerQueryOrder>();
             int pageSize = queryDto.PageSize;
             string? keyword = queryDto.Keyword;
             int total = 0;
@@ -484,6 +516,31 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         }
 
         /// <summary>
+        /// Get history player by player id.
+        /// </summary>
+        /// <param name="playerId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("HistoryPlayers/{playerId}")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(Shared.Models.HistoryPlayer))]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(object))]
+        public IHttpActionResult GetHistoryPlayerById(string playerId)
+        {
+            var userId = PlatformUserIdentifierAbs.FromCombinedString(playerId);
+            if (userId == null)
+            {
+                return NotFound();
+            }
+            var persistentPlayerMap = GameManager.Instance.GetPersistentPlayerList().Players;
+            if (persistentPlayerMap.TryGetValue(userId, out var persistentPlayerData) == false)
+            {
+                return NotFound();
+            }
+            var clientInfo = ConnectionManager.Instance.Clients.ForEntityId(persistentPlayerData.EntityId);
+            return Ok(persistentPlayerData.ToHistoryPlayer(clientInfo));
+        }
+
+        /// <summary>
         /// Get player details by player id.
         /// </summary>
         /// <param name="playerId"></param>
@@ -521,7 +578,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         [Route("PlayerInventory/{playerId}")]
         [SwaggerResponse(HttpStatusCode.OK, typeof(Shared.Models.Inventory))]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(object))]
-        public IHttpActionResult GetPlayerInventory(string playerId, [FromUri] Language language)
+        public IHttpActionResult GetPlayerInventory(string playerId, [FromUri] Language language = Language.English)
         {
             var userId = PlatformUserIdentifierAbs.FromCombinedString(playerId);
             if (userId == null)
@@ -555,7 +612,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         [Route("PlayerSkills/{playerId}")]
         [SwaggerResponse(HttpStatusCode.OK, typeof(IEnumerable<PlayerSkill>))]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(object))]
-        public IHttpActionResult GetPlayerSkills(string playerId, [FromUri] Language language)
+        public IHttpActionResult GetPlayerSkills(string playerId, [FromUri] Language language = Language.English)
         {
             var userId = PlatformUserIdentifierAbs.FromCombinedString(playerId);
             if (userId == null)
@@ -587,6 +644,211 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                 var progression = Progression.Read(pooledBinaryReader, entityPlayer);
                 return Ok(progression.ToPlayerSkills(language));
             }
+        }
+        #endregion
+
+        #region Icons
+        /// <summary>
+        /// Get Item Icon
+        /// </summary>
+        /// <remarks>
+        /// e.g. airConditioner__00FF00.png Color is optional
+        /// </remarks>
+        /// <param name="name">Can be either an icon name or an item name. If it's an icon name, the suffix must be .png. Color is optional. See example for format.</param>
+        /// <returns></returns>
+        [HttpGet]
+        [ResponseCache(Duration = 7200)]
+        [Route("ItemIcons/{name}")]
+        public IHttpActionResult GetItemIcon(string name)
+        {
+            if (name.EndsWith(".png", StringComparison.OrdinalIgnoreCase) == false)
+            {
+                var itemClass = ItemClass.GetItemClass(name);
+                if (itemClass == null)
+                {
+                    return BadRequest("Invalid item name.");
+                }
+
+                string iconFileName = itemClass.GetIconName() + ".png";
+                var iconColor = itemClass.GetIconTint();
+
+                string? iconPath = FindIconPath(iconFileName, false);
+                if (iconPath == null)
+                {
+                    return NotFound();
+                }
+
+                if (iconColor == UnityEngine.Color.white)
+                {
+                    return new FileContentResult(iconPath, "image/png");
+                }
+
+                return GetIconWithColor(iconPath, iconColor);
+            }
+            else
+            {
+                int len = name.Length;
+                if (len > 12 && name[len - 11] == '_' && name[len - 12] == '_')
+                {
+                    string iconColor = name.Substring(len - 10, 6);
+                    string iconFileName = string.Concat(name.Substring(0, len - 12), ".png");
+
+                    int r, g, b;
+                    try
+                    {
+                        r = Convert.ToInt32(iconColor.Substring(0, 2), 16);
+                        g = Convert.ToInt32(iconColor.Substring(2, 2), 16);
+                        b = Convert.ToInt32(iconColor.Substring(4, 2), 16);
+                    }
+                    catch
+                    {
+                        return BadRequest("Invalid icon color.");
+                    }
+
+                    string? iconPath = FindIconPath(iconFileName, false);
+                    return iconPath == null ? NotFound() : GetIconWithColor(iconPath, r, g, b);
+                }
+                else
+                {
+                    string? iconPath = FindIconPath(name, false);
+                    return iconPath == null ? NotFound() : new FileContentResult(iconPath, "image/png");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get UI Icon
+        /// </summary>
+        /// <remarks>
+        /// e.g. Button__00FF00.png Color is optional
+        /// </remarks>
+        /// <param name="name">Can be either an icon name or an item name. If it's an icon name, the suffix must be .png. Color is optional. See example for format.</param>
+        /// <returns></returns>
+        [HttpGet]
+        [ResponseCache(Duration = 7200)]
+        [Route("UiIcons/{name}")]
+        public IHttpActionResult GetUiIcon(string name)
+        {
+            if (name.EndsWith(".png", StringComparison.OrdinalIgnoreCase) == false)
+            {
+                return BadRequest();
+            }
+            else
+            {
+                int len = name.Length;
+                if (len > 12 && name[len - 11] == '_' && name[len - 12] == '_')
+                {
+                    string iconColor = name.Substring(len - 10, 6);
+                    string iconFileName = string.Concat(name.Substring(0, len - 12), ".png");
+
+                    int r, g, b;
+                    try
+                    {
+                        r = Convert.ToInt32(iconColor.Substring(0, 2), 16);
+                        g = Convert.ToInt32(iconColor.Substring(2, 2), 16);
+                        b = Convert.ToInt32(iconColor.Substring(4, 2), 16);
+                    }
+                    catch
+                    {
+                        return BadRequest("Invalid icon color.");
+                    }
+
+                    string? iconPath = FindIconPath(name, true);
+                    return iconPath == null ? NotFound() : GetIconWithColor(iconPath, r, g, b);
+                }
+                else
+                {
+                    string? iconPath = FindIconPath(name, true);
+                    return iconPath == null ? NotFound() : new FileContentResult(iconPath, "image/png");
+                }
+            }
+        }
+
+        private IHttpActionResult GetIconWithColor(string iconPath, int r, int g, int b)
+        {
+            byte[] data = System.IO.File.ReadAllBytes(iconPath);
+            using var skBitmap = SKBitmap.Decode(data);
+            int width = skBitmap.Width;
+            int height = skBitmap.Height;
+
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    var skColor = skBitmap.GetPixel(i, j);
+
+                    skBitmap.SetPixel(i, j, new SKColor(
+                        (byte)(skColor.Red * r / 255),
+                        (byte)(skColor.Green * g / 255),
+                        (byte)(skColor.Blue * b / 255),
+                        skColor.Alpha));
+                }
+            }
+
+            var stream = new MemoryStream(data.Length / 2);
+            skBitmap.Encode(stream, SKEncodedImageFormat.Png, 100);
+            stream.Position = 0L;
+            return new FileStreamResult(stream, "image/png");
+        }
+
+        private IHttpActionResult GetIconWithColor(string iconPath, UnityEngine.Color color)
+        {
+            byte[] data = System.IO.File.ReadAllBytes(iconPath);
+            using var skBitmap = SKBitmap.Decode(data);
+            int width = skBitmap.Width;
+            int height = skBitmap.Height;
+
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    var skColor = skBitmap.GetPixel(i, j);
+
+                    if (skColor.Alpha == 0)
+                    {
+                        continue;
+                    }
+
+                    skBitmap.SetPixel(i, j, new SKColor(
+                        (byte)(skColor.Red * color.r),
+                        (byte)(skColor.Green * color.g),
+                        (byte)(skColor.Blue * color.b),
+                        skColor.Alpha));
+                }
+            }
+
+            var stream = new MemoryStream(data.Length / 2);
+            skBitmap.Encode(stream, SKEncodedImageFormat.Png, 100);
+            stream.Position = 0L;
+            return new FileStreamResult(stream, "image/png");
+        }
+
+        private static string? FindIconPath(string iconFileName, bool isUiIcon)
+        {
+            string defaultPath = isUiIcon ? Path.Combine(ModMain.ModInstance.Path, "Assets/Sprites", iconFileName) : "Data/ItemIcons/" + iconFileName;
+            if (File.Exists(defaultPath))
+            {
+                return defaultPath;
+            }
+
+            string subPath = isUiIcon ? "UIAtlases/UIAtlas" : "UIAtlases/ItemIconAtlas";
+            foreach (Mod mod in ModManager.GetLoadedMods())
+            {
+                var di = new DirectoryInfo(Path.Combine(mod.Path, subPath));
+                if (di.Exists == false)
+                {
+                    continue;
+                }
+
+                var files = di.GetFiles(iconFileName, SearchOption.AllDirectories);
+
+                if (files.Length > 0)
+                {
+                    return files[0].FullName;
+                }
+            }
+
+            return null;
         }
         #endregion
     }

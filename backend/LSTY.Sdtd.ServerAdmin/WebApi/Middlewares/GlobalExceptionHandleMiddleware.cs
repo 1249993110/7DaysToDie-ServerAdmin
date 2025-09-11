@@ -62,11 +62,13 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Middlewares
                 }, _jsonSerializerSettings);
                 await response.WriteAsync(json);
 
+#if DEBUG
                 CustomLogger.Error(
                     ex,
                     "The exception is caught in the global exception handling middleware, traceId: {0}, path: {1}",
                     traceId,
                     context.Request.Path);
+#endif
             }
         }
     }

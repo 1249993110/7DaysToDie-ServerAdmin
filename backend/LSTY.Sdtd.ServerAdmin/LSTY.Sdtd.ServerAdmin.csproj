@@ -35,6 +35,7 @@
 
 	<ItemGroup>
 	  <Folder Include="7dtd-binaries\" />
+	  <Folder Include="Assets\Sprites\" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -125,6 +126,12 @@
 		</None>
 		<None Include="$(SystemRoot)\Microsoft.NET\Framework64\v$(MSBuildRuntimeVersion)\System.Runtime.InteropServices.RuntimeInformation.dll">
 			<Visible>false</Visible>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Assets\**">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Licenses\*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>

@@ -25,6 +25,18 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
             _contentType = contentType;
         }
 
+        public FileContentResult(string filePath, string contentType)
+        {
+            if (filePath == null)
+                throw new ArgumentNullException(nameof(filePath));
+
+            if (contentType == null)
+                throw new ArgumentNullException(nameof(contentType));
+
+            _fileContents = System.IO.File.ReadAllBytes(filePath);
+            _contentType = contentType;
+        }
+
         /// <inheritdoc/>
         public Task<HttpResponseMessage> ExecuteAsync(CancellationToken cancellationToken)
         {

@@ -11,6 +11,11 @@
         public required int PermissionLevel { get; set; }
 
         /// <summary>
+        /// Is Admin
+        /// </summary>
+        public bool IsAdmin => PermissionLevel == 0;
+
+        /// <summary>
         /// Is Offline
         /// </summary>
         public bool IsOffline => EntityId == -1;
