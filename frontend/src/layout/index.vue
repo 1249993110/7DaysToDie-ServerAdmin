@@ -2,11 +2,13 @@
     <div class="flex flex-col" :class="{ 'h-screen': isDrawerMenuVisible, 'overflow-hidden': isDrawerMenuVisible }">
         <Header class="padding z-10" />
         <div class="flex-grow flex padding pt-20 pb-10">
-            <Sidebar v-if="!isMenuButtonVisible" />
-            <Drawer v-model:visible="isDrawerMenuVisible" header=" " :position="isRTL ? 'right' : 'left'">
-                <Sidebar v-if="isMenuButtonVisible" />
-            </Drawer>
-            <div class="flex-grow">
+            <div ref="sidebarRef">
+                <Sidebar v-if="!isMenuButtonVisible" />
+                <Drawer v-else v-model:visible="isDrawerMenuVisible" header=" " :position="isRTL ? 'right' : 'left'">
+                    <Sidebar />
+                </Drawer>
+            </div>
+            <div class="flex-grow" :style="{ maxWidth: isMenuButtonVisible ? '100%' : `calc(100% - ${sidebarWidth}px)` }">
                 <Main />
             </div>
         </div>
@@ -22,6 +24,9 @@ import { useGameEventStore } from '~/store/gameEvent';
 
 const { isMenuButtonVisible, isRTL, isDrawerMenuVisible } = storeToRefs(useAppStore());
 useGameEventStore();
+
+const sidebarRef = ref();
+const { width: sidebarWidth } = useElementSize(sidebarRef);
 </script>
 
 <style lang="scss" scoped>

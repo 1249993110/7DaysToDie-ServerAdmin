@@ -1,7 +1,11 @@
 {
     "common": {
         "appTitle": "7 Days to Die Server Admin",
-        "unknown": "Unknown"
+        "unknown": "Unknown",
+        "yes": "Yes",
+        "no": "No",
+        "online": "Online",
+        "offline": "Offline"
     },
     "menus": {
         "dashboard": "Dashboard",
@@ -23,7 +27,8 @@
             "view": "View",
             "batch": "Batch",
             "refresh": "Refresh",
-            "noData": "No Data"
+            "noData": "No Data",
+            "exportCSV": "Export CSV"
         }
     },
     "layout": {
@@ -143,6 +148,25 @@
                 "login": "Login Success",
                 "playerEnterGame": "Player: {0} Entered Game",
                 "playerLeaveGame": "Player: {0} Left Game"
+            }
+        },
+        "playerList":{
+            "onlinePlayers": "Online Players",
+            "historyPlayers": "History Players",
+            "header": {
+                "playerName": "Player Name",
+                "status": "Status",
+                "entityId": "Entity ID",
+                "playerId": "Player ID",
+                "platformId": "Platform ID",
+                "playGroup": "Play Group",
+                "position": "Position",
+                "lastLogin": "Last Login",
+                "bedroll": "Bedroll",
+                "permissionLevel": "Permission Level"
+            },
+            "title":{
+                "admin": "Admin"
             }
         },
         "console": {

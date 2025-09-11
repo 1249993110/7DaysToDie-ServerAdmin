@@ -1,7 +1,11 @@
 {
     "common": {
         "appTitle": "天依七日杀服务器管理系统",
-        "unknown": "未知"
+        "unknown": "未知",
+        "yes": "是",
+        "no": "否",
+        "online": "在线",
+        "offline": "离线"
     },
     "menus": {
         "dashboard": "仪表盘",
@@ -23,7 +27,8 @@
             "view": "查看",
             "batch": "批量",
             "refresh": "刷新",
-            "noData": "暂无数据"
+            "noData": "暂无数据",
+            "exportCSV": "导出 CSV"
         }
     },
     "layout": {
@@ -142,6 +147,25 @@
                 "login": "登录成功",
                 "playerEnterGame": "玩家: {0} 进入游戏",
                 "playerLeaveGame": "玩家: {0} 离开游戏"
+            }
+        },
+        "playerList": {
+            "onlinePlayers": "在线玩家",
+            "historyPlayers": "历史玩家",
+            "header": {
+                "playerName": "玩家名称",
+                "status": "状态",
+                "entityId": "实体 ID",
+                "playerId": "玩家 ID",
+                "platformId": "平台 ID",
+                "playGroup": "游戏组",
+                "position": "位置",
+                "lastLogin": "最后登录",
+                "bedroll": "床铺",
+                "permissionLevel": "权限级别"
+            },
+            "title": {
+                "admin": "管理员"
             }
         },
         "console": {

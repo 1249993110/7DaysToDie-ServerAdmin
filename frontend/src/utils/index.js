@@ -19,3 +19,8 @@ export const bytesToMB = (bytes, decimalPlaces = 0) => {
     // Use the toFixed() method to control the number of decimal places
     return Number(megabytes.toFixed(decimalPlaces));
 };
+
+export const formatPosition = (position) => {
+    if (!position) return '';
+    return `${position.x}, ${position.y}, ${position.z}`;
+};

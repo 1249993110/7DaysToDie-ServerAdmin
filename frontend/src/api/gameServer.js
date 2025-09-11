@@ -12,3 +12,29 @@ export const executeConsoleCommand = (command, inMainThread = true) => {
 export const getAllowedCommands = () => {
     return http.get('/GameServer/AllowedCommands');
 };
+
+export const getServerConfig = () => {
+    return http.get('/GameServer/Config');
+}
+
+export const updateServerConfig = (config) => {
+    return http.post('/GameServer/Config', config);
+}
+
+//#region Players
+export const getOnlinePlayers = (params) => {
+    return http.get('/GameServer/OnlinePlayers', { params });
+};
+
+export const getOnlinePlayer = (playerId) => {
+    return http.get(`/GameServer/OnlinePlayers/${playerId}`);
+}
+
+export const getHistoryPlayers = (params) => {
+    return http.get('/GameServer/HistoryPlayers', { params });
+}
+
+export const getHistoryPlayer = (playerId) => {
+    return http.get(`/GameServer/HistoryPlayers/${playerId}`);
+}
+//#endregion
