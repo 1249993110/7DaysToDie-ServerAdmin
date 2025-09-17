@@ -9,6 +9,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Web.Http;
 using System.Xml;
+using System.Xml.Linq;
 using UnityEngine;
 
 namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
@@ -652,115 +653,68 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// Get Item Icon
         /// </summary>
         /// <remarks>
-        /// e.g. airConditioner__00FF00.png Color is optional
+        /// e.g. airConditioner.png or airConditioner__00FF00.png    Color is optional
         /// </remarks>
         /// <param name="name">Can be either an icon name or an item name. If it's an icon name, the suffix must be .png. Color is optional. See example for format.</param>
         /// <returns></returns>
         [HttpGet]
         [ResponseCache(Duration = 7200)]
         [Route("ItemIcons/{name}")]
+        [AllowAnonymous]
         public IHttpActionResult GetItemIcon(string name)
         {
-            if (name.EndsWith(".png", StringComparison.OrdinalIgnoreCase) == false)
-            {
-                var itemClass = ItemClass.GetItemClass(name);
-                if (itemClass == null)
-                {
-                    return BadRequest("Invalid item name.");
-                }
-
-                string iconFileName = itemClass.GetIconName() + ".png";
-                var iconColor = itemClass.GetIconTint();
-
-                string? iconPath = FindIconPath(iconFileName, false);
-                if (iconPath == null)
-                {
-                    return NotFound();
-                }
-
-                if (iconColor == UnityEngine.Color.white)
-                {
-                    return new FileContentResult(iconPath, "image/png");
-                }
-
-                return GetIconWithColor(iconPath, iconColor);
-            }
-            else
-            {
-                int len = name.Length;
-                if (len > 12 && name[len - 11] == '_' && name[len - 12] == '_')
-                {
-                    string iconColor = name.Substring(len - 10, 6);
-                    string iconFileName = string.Concat(name.Substring(0, len - 12), ".png");
-
-                    int r, g, b;
-                    try
-                    {
-                        r = Convert.ToInt32(iconColor.Substring(0, 2), 16);
-                        g = Convert.ToInt32(iconColor.Substring(2, 2), 16);
-                        b = Convert.ToInt32(iconColor.Substring(4, 2), 16);
-                    }
-                    catch
-                    {
-                        return BadRequest("Invalid icon color.");
-                    }
-
-                    string? iconPath = FindIconPath(iconFileName, false);
-                    return iconPath == null ? NotFound() : GetIconWithColor(iconPath, r, g, b);
-                }
-                else
-                {
-                    string? iconPath = FindIconPath(name, false);
-                    return iconPath == null ? NotFound() : new FileContentResult(iconPath, "image/png");
-                }
-            }
+            return InternalGetIcon(name, false);
         }
 
         /// <summary>
         /// Get UI Icon
         /// </summary>
         /// <remarks>
-        /// e.g. Button__00FF00.png Color is optional
+        /// e.g. Button.png or Button__00FF00.png    Color is optional
         /// </remarks>
         /// <param name="name">Can be either an icon name or an item name. If it's an icon name, the suffix must be .png. Color is optional. See example for format.</param>
         /// <returns></returns>
         [HttpGet]
         [ResponseCache(Duration = 7200)]
         [Route("UiIcons/{name}")]
+        [AllowAnonymous]
         public IHttpActionResult GetUiIcon(string name)
+        {
+            return InternalGetIcon(name, true);
+        }
+
+        private IHttpActionResult InternalGetIcon(string name, bool isUiIcon)
         {
             if (name.EndsWith(".png", StringComparison.OrdinalIgnoreCase) == false)
             {
-                return BadRequest();
+                return BadRequest("Invalid icon name.");
+            }
+
+            int len = name.Length;
+            if (len > 12 && name[len - 11] == '_' && name[len - 12] == '_')
+            {
+                string iconColor = name.Substring(len - 10, 6);
+                name = name.Substring(0, len - 12) + ".png";
+
+                int r, g, b;
+                try
+                {
+                    r = Convert.ToInt32(iconColor.Substring(0, 2), 16);
+                    g = Convert.ToInt32(iconColor.Substring(2, 2), 16);
+                    b = Convert.ToInt32(iconColor.Substring(4, 2), 16);
+                }
+                catch
+                {
+                    return BadRequest("Invalid icon color.");
+                }
+
+                string? iconPath = FindIconPath(name, isUiIcon);
+                return iconPath == null ? NotFound() : GetIconWithColor(iconPath, r, g, b);
             }
             else
             {
-                int len = name.Length;
-                if (len > 12 && name[len - 11] == '_' && name[len - 12] == '_')
-                {
-                    string iconColor = name.Substring(len - 10, 6);
-                    string iconFileName = string.Concat(name.Substring(0, len - 12), ".png");
-
-                    int r, g, b;
-                    try
-                    {
-                        r = Convert.ToInt32(iconColor.Substring(0, 2), 16);
-                        g = Convert.ToInt32(iconColor.Substring(2, 2), 16);
-                        b = Convert.ToInt32(iconColor.Substring(4, 2), 16);
-                    }
-                    catch
-                    {
-                        return BadRequest("Invalid icon color.");
-                    }
-
-                    string? iconPath = FindIconPath(name, true);
-                    return iconPath == null ? NotFound() : GetIconWithColor(iconPath, r, g, b);
-                }
-                else
-                {
-                    string? iconPath = FindIconPath(name, true);
-                    return iconPath == null ? NotFound() : new FileContentResult(iconPath, "image/png");
-                }
+                string? iconPath = FindIconPath(name, isUiIcon);
+                return iconPath == null ? NotFound() : new FileContentResult(iconPath, "image/png");
             }
         }
 
@@ -781,38 +735,6 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                         (byte)(skColor.Red * r / 255),
                         (byte)(skColor.Green * g / 255),
                         (byte)(skColor.Blue * b / 255),
-                        skColor.Alpha));
-                }
-            }
-
-            var stream = new MemoryStream(data.Length / 2);
-            skBitmap.Encode(stream, SKEncodedImageFormat.Png, 100);
-            stream.Position = 0L;
-            return new FileStreamResult(stream, "image/png");
-        }
-
-        private IHttpActionResult GetIconWithColor(string iconPath, UnityEngine.Color color)
-        {
-            byte[] data = System.IO.File.ReadAllBytes(iconPath);
-            using var skBitmap = SKBitmap.Decode(data);
-            int width = skBitmap.Width;
-            int height = skBitmap.Height;
-
-            for (int i = 0; i < width; i++)
-            {
-                for (int j = 0; j < height; j++)
-                {
-                    var skColor = skBitmap.GetPixel(i, j);
-
-                    if (skColor.Alpha == 0)
-                    {
-                        continue;
-                    }
-
-                    skBitmap.SetPixel(i, j, new SKColor(
-                        (byte)(skColor.Red * color.r),
-                        (byte)(skColor.Green * color.g),
-                        (byte)(skColor.Blue * color.b),
                         skColor.Alpha));
                 }
             }

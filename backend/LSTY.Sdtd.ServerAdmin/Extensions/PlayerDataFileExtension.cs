@@ -136,21 +136,20 @@ namespace LSTY.Sdtd.ServerAdmin.Extensions
 
                 string name = itemClass.GetItemName();
 
-                int quality = 0;
+                int? quality = null;
                 string? qualityColor = null;
                 if (itemValue.HasQuality)
                 {
                     quality = itemValue.Quality;
-                    qualityColor = QualityInfo.GetQualityColorHex(quality);
-                }
-                else
-                {
-                    quality = -1;
+                    qualityColor = QualityInfo.GetQualityColorHex(itemValue.Quality);
                 }
 
+                UnityEngine.Color iconTint = itemClass.GetIconTint();
                 InvItem item = new InvItem()
                 {
                     ItemName = name,
+                    IconName = itemClass.GetIconName(),
+                    IconColor = iconTint == UnityEngine.Color.white ? null : iconTint.ToHex(),
                     LocalizationName = Utils.GetLocalization(name, language),
                     Count = count,
                     MaxStackAllowed = itemClass.Stacknumber.Value,
@@ -159,6 +158,7 @@ namespace LSTY.Sdtd.ServerAdmin.Extensions
                     UseTimes = itemValue.UseTimes,
                     MaxUseTimes = itemValue.MaxUseTimes,
                     IsMod = itemValue.IsMod,
+                    IsBlock = itemClass.IsBlock(),
                     Parts = null
                 };
 

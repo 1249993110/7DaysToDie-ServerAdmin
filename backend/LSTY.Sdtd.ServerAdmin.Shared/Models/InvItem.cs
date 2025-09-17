@@ -11,6 +11,16 @@
         public required string ItemName { get; set; }
 
         /// <summary>
+        /// Icon Name
+        /// </summary>
+        public required string IconName { get; set; }
+
+        /// <summary>
+        /// Icon Color
+        /// </summary>
+        public required string? IconColor { get; set; }
+
+        /// <summary>
         /// Localization Name
         /// </summary>
         public required string LocalizationName { get; set; }
@@ -28,7 +38,7 @@
         /// <summary>
         /// Quality
         /// </summary>
-        public required int Quality { get; set; }
+        public required int? Quality { get; set; }
 
         /// <summary>
         /// Quality color
@@ -49,6 +59,11 @@
         /// Is this a module?
         /// </summary>
         public required bool IsMod { get; set; }
+
+        /// <summary>
+        /// Is this a block?
+        /// </summary>
+        public required bool IsBlock { get; set; }
 
         /// <summary>
         /// Parts
