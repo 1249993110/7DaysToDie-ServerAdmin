@@ -29,6 +29,28 @@
             "refresh": "Refresh",
             "noData": "No Data",
             "exportCSV": "Export CSV"
+        },
+        "inventoryDialog": {
+            "title": "View Inventory",
+            "grid": "Grid",
+            "list": "List",
+            "bag": "Bag",
+            "belt": "Belt",
+            "equipment": "Equipment",
+            "itemName": "Item Name",
+            "icon": "Icon",
+            "iconName": "Icon Name",
+            "iconColor": "Icon Color",
+            "localizationName": "Localization Name",
+            "count": "Count",
+            "maxStackAllowed": "Max Stack Allowed",
+            "quality": "Quality",
+            "qualityColor": "Quality Color",
+            "useTimes": "Use Times",
+            "maxUseTimes": "Max Use Times",
+            "isMod": "Is Mod",
+            "isBlock": "Is Block",
+            "mod": "Mod"
         }
     },
     "layout": {
@@ -150,7 +172,7 @@
                 "playerLeaveGame": "Player: {0} Left Game"
             }
         },
-        "playerList":{
+        "playerList": {
             "onlinePlayers": "Online Players",
             "historyPlayers": "History Players",
             "header": {
@@ -165,7 +187,7 @@
                 "bedroll": "Bedroll",
                 "permissionLevel": "Permission Level"
             },
-            "title":{
+            "title": {
                 "admin": "Admin"
             }
         },

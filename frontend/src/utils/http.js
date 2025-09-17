@@ -55,7 +55,7 @@ service.interceptors.response.use(
             case 404:
                 myToast({
                     title: 'The requested resource does not found.',
-                    icon: 'warn',
+                    icon: 'warning',
                 });
                 break;
             case 400:

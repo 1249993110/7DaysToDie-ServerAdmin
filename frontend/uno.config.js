@@ -48,7 +48,6 @@ export default defineConfig({
             't-text-regular': 'text-p-text-color',
             't-text-secondary': 'text-p-text-muted-color',
 
-            // 'max-card-height': 'max-h-[calc(100vh-130px)]'
         },
     ],
     include: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],

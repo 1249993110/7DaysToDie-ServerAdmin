@@ -29,6 +29,28 @@
             "refresh": "刷新",
             "noData": "暂无数据",
             "exportCSV": "导出 CSV"
+        },
+         "inventoryDialog": {
+            "title": "查看背包",
+            "grid": "网格",
+            "list": "列表",
+            "bag": "背包",
+            "belt": "腰带",
+            "equipment": "装备",
+            "itemName": "物品名称",
+            "icon": "图标",
+            "iconName": "图标名称",
+            "iconColor": "图标颜色",
+            "localizationName": "本地化名称",
+            "count": "数量",
+            "maxStackAllowed": "最大堆叠数量",
+            "quality": "品质",
+            "qualityColor": "品质颜色",
+            "useTimes": "使用次数",
+            "maxUseTimes": "最大使用次数",
+            "isMod": "是否为模组",
+            "isBlock": "是否为方块",
+            "mod": "模组"
         }
     },
     "layout": {

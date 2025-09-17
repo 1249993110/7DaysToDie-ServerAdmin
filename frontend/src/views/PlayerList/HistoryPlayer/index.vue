@@ -14,7 +14,7 @@
             <template #playerName-body="{ data }">
                 <span class="flex items-center">
                     {{ data.playerName }}
-                    <img v-if="data.isAdmin" :src="serverFavoriteImgUrl" class="size-5" :title="$t('views.playerList.title.admin')" />
+                    <img v-if="data.isAdmin" :src="serverFavoriteImgUrl" width="20" :title="$t('views.playerList.title.admin')" />
                 </span>
             </template>
             <template #lastLogin-body="{ data }"> {{ dayjs(data.lastLogin).format() }} </template>
@@ -26,6 +26,7 @@
                 </Tag>
             </template>
         </MyTable>
+        <InventoryDialog ref="inventoryDialogRef" />
     </div>
 </template>
 
@@ -36,6 +37,7 @@ import serverFavoriteImgUrl from '~/assets/images/server_favorite.png';
 import { formatPosition } from '~/utils';
 
 const tableRef = ref();
+const isInventoryDialogVisible = ref(false);
 const { t } = useI18n();
 const columns = computed(() => [
     { field: 'playerName', header: t('views.playerList.header.playerName'), sortable: true, frozen: true, class: 'min-w-40' },
@@ -44,9 +46,9 @@ const columns = computed(() => [
     { field: 'playGroup', header: t('views.playerList.header.playGroup'), sortable: true, class: 'min-w-35' },
     { field: 'lastLogin', header: t('views.playerList.header.lastLogin'), sortable: true, class: 'min-w-45' },
     { field: 'position', header: t('views.playerList.header.position'), class: 'min-w-40' },
-    { field: 'permissionLevel', header: t('views.playerList.header.permissionLevel'), sortable: true, class: 'min-w-45' },
     { field: 'playerId', header: t('views.playerList.header.playerId') },
     { field: 'platformId', header: t('views.playerList.header.platformId') },
+    { field: 'permissionLevel', header: t('views.playerList.header.permissionLevel'), sortable: true, class: 'min-w-45' },
     { field: 'bedroll', header: t('views.playerList.header.bedroll'), class: 'min-w-40' },
 ]);
 
@@ -57,13 +59,15 @@ const fetchData = async (params) => {
 };
 
 const batchMenuItems = ref([]);
+const inventoryDialogRef = ref();
 
 const currentRowData = computed(() => tableRef.value?.currentRow);
 const contextMenuItems = ref([
     {
-        label: 'View Details',
+        label: 'View Inventory',
         command: () => {
-            console.log('View Details', currentRowData.value);
+            console.log('View Inventory', currentRowData.value);
+            inventoryDialogRef.value.show(currentRowData.value.playerId, currentRowData.value.playerName);
         },
     },
     {

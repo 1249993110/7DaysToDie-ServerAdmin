@@ -107,6 +107,6 @@ const formatGameDifficulty = (gameDifficulty) => {
 
 <style lang="scss" scoped>
 .content {
-    --uno: 'ms-3 text-p-primary-color';
+    --uno: 'ms-3 text-p-primary-color 3xl:whitespace-nowrap';
 }
 </style>

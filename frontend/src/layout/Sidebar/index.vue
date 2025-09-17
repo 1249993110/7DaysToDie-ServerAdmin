@@ -1,6 +1,6 @@
 <template>
     <div
-        class="flex flex-col flex-none w-[250px] h-[calc(100vh-8rem)] pe-1 ltr:left-0 rtl:right-0 ltr:mr-4 rtl:ml-4 ltr:lg:mr-8 rtl:lg:ml-8 ltr:2xl:mr-12 rtl:2xl:ml-12 overflow-auto p-0 sticky top-20 transition-all duration-400 ease-in-out select-none"
+        class="flex flex-col flex-none w-[250px] h-[calc(100vh-8rem)] overflow-auto p-0 sticky top-20 transition-all duration-400 ease-in-out select-none"
     >
         <PanelMenu :model="items" class="w-full" multiple>
             <template #item="{ item }">
