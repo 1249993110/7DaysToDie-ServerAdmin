@@ -11,8 +11,8 @@
                     <GameIconEx :size="48" :fontSize="20" v-bind="data" />
                 </template>
             </Column>
-            <Column field="localizationName" :header="$t('components.inventoryDialog.localizationName')"></Column>
-            <Column field="itemName" :header="$t('components.inventoryDialog.iconName')"></Column>
+            <Column field="localizationName" :header="$t('components.inventoryDialog.localizationName')" sortable></Column>
+            <Column field="itemName" :header="$t('components.inventoryDialog.itemName')" sortable></Column>
             <Column :header="$t('components.inventoryDialog.mod')">
                 <template #body="{ data }">
                     <GameIconEx v-for="(item, index) in data?.parts?.filter((i) => i)" :key="index" :size="60" v-bind="item" />

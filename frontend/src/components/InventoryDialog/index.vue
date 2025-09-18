@@ -16,7 +16,6 @@
             <template #list>
                 <List :bag="inventory.bag" :belt="inventory.belt" :equipment="inventory.equipment" />
             </template>
-
             <template #grid>
                 <Grid :bag="inventory.bag" :belt="inventory.belt" :equipment="inventory.equipment" />
             </template>

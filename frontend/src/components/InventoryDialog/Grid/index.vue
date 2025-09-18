@@ -2,7 +2,7 @@
     <div class="flex gap-2">
         <div :style="{ width: `${8 * iconSize + 50}px` }">
             <div>{{ $t('components.inventoryDialog.bag') }}</div>
-            <div class="flex flex-wrap gap-1 overflow-y-auto" :style="{ height: `${5 * iconSize + 20}px` }">
+            <div class="flex flex-wrap gap-1 overflow-y-auto content-start" :style="{ height: `${5 * iconSize + 20}px` }">
                 <GameIconEx v-for="(item, index) in bag" :key="index" :size="iconSize" v-bind="item" backgroundColor="#4d4d4d" />
             </div>
         </div>

@@ -37,7 +37,6 @@ import serverFavoriteImgUrl from '~/assets/images/server_favorite.png';
 import { formatPosition } from '~/utils';
 
 const tableRef = ref();
-const isInventoryDialogVisible = ref(false);
 const { t } = useI18n();
 const columns = computed(() => [
     { field: 'playerName', header: t('views.playerList.header.playerName'), sortable: true, frozen: true, class: 'min-w-40' },
