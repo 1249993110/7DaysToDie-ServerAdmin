@@ -1,9 +1,13 @@
 <template>
-    <Image :src="src" preview />
+    <Image :src="src" :preview="preview" :width="size" />
 </template>
 
 <script setup>
 const props = defineProps({
+    size: {
+        type: Number,
+        default: 160,
+    },
     iconName: {
         type: String,
         default: '',
@@ -14,6 +18,10 @@ const props = defineProps({
     isUiIcon: {
         type: Boolean,
         default: false,
+    },
+    preview: {
+        type: Boolean,
+        default: true,
     },
 });
 

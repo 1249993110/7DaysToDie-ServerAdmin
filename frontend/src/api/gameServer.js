@@ -15,11 +15,11 @@ export const getAllowedCommands = () => {
 
 export const getServerConfig = () => {
     return http.get('/GameServer/Config');
-}
+};
 
 export const updateServerConfig = (config) => {
     return http.post('/GameServer/Config', config);
-}
+};
 
 //#region Players
 export const getOnlinePlayers = (params) => {
@@ -28,17 +28,21 @@ export const getOnlinePlayers = (params) => {
 
 export const getOnlinePlayer = (playerId) => {
     return http.get(`/GameServer/OnlinePlayers/${playerId}`);
-}
+};
 
 export const getHistoryPlayers = (params) => {
     return http.get('/GameServer/HistoryPlayers', { params });
-}
+};
 
 export const getHistoryPlayer = (playerId) => {
     return http.get(`/GameServer/HistoryPlayers/${playerId}`);
-}
+};
 
 export const getPlayerInventory = (playerId) => {
     return http.get(`/GameServer/PlayerInventory/${playerId}`);
-}
+};
+
+export const getPlayerSkills = (playerId, lang) => {
+    return http.get(`/GameServer/PlayerSkills/${playerId}`, { params: { language: lang } });
+};
 //#endregion

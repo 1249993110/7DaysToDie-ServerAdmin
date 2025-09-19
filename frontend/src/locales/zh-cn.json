@@ -30,8 +30,8 @@
             "noData": "暂无数据",
             "exportCSV": "导出 CSV"
         },
-         "inventoryDialog": {
-            "title": "查看背包",
+        "inventoryDialog": {
+            "header": "查看背包",
             "grid": "网格",
             "list": "列表",
             "bag": "背包",
@@ -51,6 +51,19 @@
             "isMod": "是否为模组",
             "isBlock": "是否为方块",
             "mod": "模组"
+        },
+        "playerSkillsDialog": {
+            "header": "查看技能",
+            "fold": "折叠",
+            "expand": "展开",
+            "name": "技能名称",
+            "icon": "图标",
+            "localizationName": "本地化名称",
+            "level": "等级",
+            "maxLevel": "最大等级",
+            "costForNextLevel": "升级消耗",
+            "type": "类型",
+            "localizationDesc": "说明"
         }
     },
     "layout": {

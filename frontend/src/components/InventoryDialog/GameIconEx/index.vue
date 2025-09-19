@@ -1,6 +1,6 @@
 <template>
     <div class="game-icon-ex" @contextmenu.prevent="handleContextMenu" v-tooltip="tooltipContent" :style="{ backgroundColor: backgroundColor }">
-        <GameIcon :iconName="iconName" :iconColor="iconColor" class="size-full"></GameIcon>
+        <GameIcon :iconName="iconName" :iconColor="iconColor" :size="size" />
         <template v-if="quality">
             <span :style="qualityColor"></span>
             <span class="quality-number">

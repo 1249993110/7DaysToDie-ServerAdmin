@@ -31,7 +31,7 @@
             "exportCSV": "Export CSV"
         },
         "inventoryDialog": {
-            "title": "View Inventory",
+            "header": "View Inventory",
             "grid": "Grid",
             "list": "List",
             "bag": "Bag",
@@ -51,6 +51,19 @@
             "isMod": "Is Mod",
             "isBlock": "Is Block",
             "mod": "Mod"
+        },
+        "playerSkillsDialog": {
+            "header": "View Skills",
+            "fold": "Fold",
+            "expand": "Expand",
+            "name": "Name",
+            "icon": "Icon",
+            "localizationName": "Localization Name",
+            "level": "Level",
+            "maxLevel": "Max Level",
+            "costForNextLevel": "Cost For Next Level",
+            "type": "Type",
+            "localizationDesc": "Description"
         }
     },
     "layout": {

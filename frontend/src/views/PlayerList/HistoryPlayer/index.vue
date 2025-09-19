@@ -27,6 +27,7 @@
             </template>
         </MyTable>
         <InventoryDialog ref="inventoryDialogRef" />
+        <PlayerSkillsDialog ref="playerSkillsDialogRef" />
     </div>
 </template>
 
@@ -59,6 +60,7 @@ const fetchData = async (params) => {
 
 const batchMenuItems = ref([]);
 const inventoryDialogRef = ref();
+const playerSkillsDialogRef = ref();
 
 const currentRowData = computed(() => tableRef.value?.currentRow);
 const contextMenuItems = ref([
@@ -70,9 +72,9 @@ const contextMenuItems = ref([
         },
     },
     {
-        label: 'Ban Player',
+        label: 'View Skills',
         command: () => {
-            console.log('Ban Player', currentRowData.value);
+            playerSkillsDialogRef.value.show(currentRowData.value.playerId, currentRowData.value.playerName);
         },
     },
 ]);

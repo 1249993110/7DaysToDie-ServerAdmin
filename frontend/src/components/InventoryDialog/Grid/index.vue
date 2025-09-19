@@ -1,12 +1,12 @@
 <template>
     <div class="flex gap-2">
-        <div :style="{ width: `${8 * iconSize + 50}px` }">
+        <div :style="{ minWidth: `${4 * iconSize + 50}px` }">
             <div>{{ $t('components.inventoryDialog.bag') }}</div>
             <div class="flex flex-wrap gap-1 overflow-y-auto content-start" :style="{ height: `${5 * iconSize + 20}px` }">
                 <GameIconEx v-for="(item, index) in bag" :key="index" :size="iconSize" v-bind="item" backgroundColor="#4d4d4d" />
             </div>
         </div>
-        <div :style="{ width: `${2 * iconSize + 8}px` }">
+        <div :style="{ minWidth: `${2 * iconSize + 8}px` }">
             <div>{{ $t('components.inventoryDialog.equipment') }}</div>
             <div class="flex flex-wrap gap-1 overflow-y-auto h-full">
                 <GameIconEx v-for="(item, index) in equipment?.filter((i) => i)" :key="index" :size="iconSize" v-bind="item" backgroundColor="#4d4d4d" />

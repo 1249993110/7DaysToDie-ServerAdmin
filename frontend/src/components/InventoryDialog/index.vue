@@ -1,6 +1,9 @@
 <template>
-    <Dialog v-model:visible="visible" modal :header="$t('components.inventoryDialog.title')" @hide="inventory = {}">
-        <DataView :value="[{}]" :layout="layout" :loading="loading">
+    <Dialog class="w-[64vw]" v-model:visible="visible" maximizable modal :header="$t('components.inventoryDialog.header')" @hide="modelValue = {}">
+        <div v-if="loading" class="f-center h-[50vh]">
+            <ProgressSpinner />
+        </div>
+        <DataView v-else :value="[{}]" :layout="layout">
             <template #header>
                 <div class="flex justify-between items-center gap-4">
                     <span>{{ title }}</span>
@@ -12,12 +15,11 @@
                     </SelectButton>
                 </div>
             </template>
-
             <template #list>
-                <List :bag="inventory.bag" :belt="inventory.belt" :equipment="inventory.equipment" />
+                <List :bag="modelValue.bag" :belt="modelValue.belt" :equipment="modelValue.equipment" />
             </template>
             <template #grid>
-                <Grid :bag="inventory.bag" :belt="inventory.belt" :equipment="inventory.equipment" />
+                <Grid :bag="modelValue.bag" :belt="modelValue.belt" :equipment="modelValue.equipment" />
             </template>
         </DataView>
     </Dialog>
@@ -28,13 +30,12 @@ import Grid from './Grid/index.vue';
 import List from './List/index.vue';
 import { getPlayerInventory } from '~/api/gameServer';
 
-const inventory = ref({});
+const modelValue = ref({});
 const layout = ref('grid');
 const options = ref(['list', 'grid']);
 
 const visible = ref(false);
 const loading = ref(false);
-
 const title = ref('');
 
 const show = async (playerId, playerName) => {
@@ -42,7 +43,7 @@ const show = async (playerId, playerName) => {
     loading.value = true;
     visible.value = true;
     try {
-        inventory.value = await getPlayerInventory(playerId);
+        modelValue.value = await getPlayerInventory(playerId);
     } finally {
         loading.value = false;
     }
