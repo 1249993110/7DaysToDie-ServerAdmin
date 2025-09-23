@@ -48,7 +48,7 @@
         /// <summary>
         /// Gets or sets the icon of the skill.
         /// </summary>
-        public string? Icon { get; set; }
+        public string? IconName { get; set; }
 
         /// <summary>
         /// Gets or sets the type of the skill.

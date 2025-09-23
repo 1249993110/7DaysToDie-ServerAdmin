@@ -27,7 +27,7 @@ namespace LSTY.Sdtd.ServerAdmin.Extensions
                     MinLevel = item.MinLevel,
                     MaxLevel = item.MaxLevel,
                     CostForNextLevel = progressionValue.costForNextLevel,
-                    Icon = item.Icon,
+                    IconName = item.Icon,
                     Type = item.Type.ToString(),
                     Children = GetChildren(progression, item, language),
                 };
@@ -55,7 +55,7 @@ namespace LSTY.Sdtd.ServerAdmin.Extensions
                         MinLevel = child.MinLevel,
                         MaxLevel = child.MaxLevel,
                         CostForNextLevel = childProgressionValue.costForNextLevel,
-                        Icon = child.Icon,
+                        IconName = child.Icon,
                         Type = child.Type.ToString(),
                         Children = GetChildren(progression, child, language),
                     };
