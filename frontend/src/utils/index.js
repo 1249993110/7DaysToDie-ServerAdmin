@@ -24,3 +24,25 @@ export const formatPosition = (position) => {
     if (!position) return '';
     return `${position.x}, ${position.y}, ${position.z}`;
 };
+
+export const formatMinute = (totalMinute) => {
+    const { t } = useI18n();
+    if (totalMinute < 1) {
+        return `${t('common.lessThan')} 1 ${t('common.minute')}`;
+    }
+
+    const day = parseInt(totalMinute / 60 / 24);
+    const hour = parseInt((totalMinute / 60) % 24);
+    const minute = parseInt(totalMinute % 60);
+    let result = '';
+    if (day > 0) {
+        result = day + ` ${t('common.day', day)} `;
+    }
+    if (hour > 0) {
+        result += hour + ` ${t('common.hour', hour)} `;
+    }
+    if (minute > 0) {
+        result += minute + ` ${t('common.minute', minute)} `;
+    }
+    return result;
+};

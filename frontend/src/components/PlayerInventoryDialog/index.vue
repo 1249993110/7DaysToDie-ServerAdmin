@@ -1,5 +1,5 @@
 <template>
-    <Dialog class="w-[64vw]" v-model:visible="visible" maximizable modal :header="$t('components.inventoryDialog.header')" @hide="modelValue = {}">
+    <Dialog class="w-[64vw]" v-model:visible="visible" maximizable modal :header="$t('components.playerInventoryDialog.header')" @hide="modelValue = {}">
         <div v-if="loading" class="f-center h-[50vh]">
             <ProgressSpinner />
         </div>

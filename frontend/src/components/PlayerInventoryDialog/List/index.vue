@@ -2,9 +2,9 @@
     <div class="size-full">
         <Tabs value="0">
             <TabList>
-                <Tab value="0">{{ $t('components.inventoryDialog.bag') }}</Tab>
-                <Tab value="1">{{ $t('components.inventoryDialog.belt') }}</Tab>
-                <Tab value="2">{{ $t('components.inventoryDialog.equipment') }} </Tab>
+                <Tab value="0">{{ $t('components.playerInventoryDialog.bag') }}</Tab>
+                <Tab value="1">{{ $t('components.playerInventoryDialog.belt') }}</Tab>
+                <Tab value="2">{{ $t('components.playerInventoryDialog.equipment') }} </Tab>
             </TabList>
             <TabPanels>
                 <TabPanel value="0">

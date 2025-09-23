@@ -5,7 +5,14 @@
         "yes": "Yes",
         "no": "No",
         "online": "Online",
-        "offline": "Offline"
+        "offline": "Offline",
+        "day": "Day | Day | Days",
+        "hour": "Hour | Hour | Hours",
+        "minute": "Minute | Minute | Minutes",
+        "second": "Second | Second | Seconds",
+        "lessThan": "Less Than",
+        "moreThan": "More Than",
+        "equal": "Equal"
     },
     "menus": {
         "dashboard": "Dashboard",
@@ -30,8 +37,8 @@
             "noData": "No Data",
             "exportCSV": "Export CSV"
         },
-        "inventoryDialog": {
-            "header": "View Inventory",
+        "playerInventoryDialog": {
+            "header": "Player Inventory",
             "grid": "Grid",
             "list": "List",
             "bag": "Bag",
@@ -53,7 +60,7 @@
             "mod": "Mod"
         },
         "playerSkillsDialog": {
-            "header": "View Skills",
+            "header": "Player Skills",
             "fold": "Fold",
             "expand": "Expand",
             "name": "Name",
@@ -64,6 +71,46 @@
             "costForNextLevel": "Cost For Next Level",
             "type": "Type",
             "localizationDesc": "Description"
+        },
+        "playerDetailsDialog": {
+            "header": "Player Details",
+            "playerName": "Player Name",
+            "entityId": "Entity ID",
+            "playerId": "Player ID",
+            "platformId": "Platform ID",
+            "playGroup": "Play Group",
+            "isAdmin": "Is Admin",
+            "isOnline": "Is Online",
+            "ip": "IP Address",
+            "ping": "Ping",
+            "position": "Position",
+            "lastSpawnPosition": "Last Spawn Position",
+            "gameStage": "Game Stage",
+            "lastLogin": "Last Login",
+            "playerKills": "Player Kills",
+            "zombieKills": "Zombie Kills",
+            "deaths": "Deaths",
+            "score": "Score",
+            "health": "Health",
+            "stamina": "Stamina",
+            "food": "Food",
+            "water": "Water",
+            "level": "Level",
+            "expToNextLevel": "Exp To Next Level",
+            "skillPoints": "Skill Points",
+            "isLandProtectionActive": "Is Land Protection Active",
+            "distanceWalked": "Distance Walked",
+            "totalItemsCrafted": "Total Items Crafted",
+            "totalTimePlayed": "Total Time Played",
+            "currentLife": "Current Life",
+            "longestLife": "Longest Life",
+            "alreadyCraftedList": "Already Crafted List",
+            "unlockedRecipeList": "Unlocked Recipe List",
+            "rentedVMPosition": "Rented VM Position",
+            "rentalEndDayTime": "Rental End Day Time",
+            "bedroll": "Bedroll",
+            "active": "Active",
+            "inactive": "Inactive"
         }
     },
     "layout": {
@@ -188,21 +235,20 @@
         "playerList": {
             "onlinePlayers": "Online Players",
             "historyPlayers": "History Players",
-            "header": {
-                "playerName": "Player Name",
-                "status": "Status",
-                "entityId": "Entity ID",
-                "playerId": "Player ID",
-                "platformId": "Platform ID",
-                "playGroup": "Play Group",
-                "position": "Position",
-                "lastLogin": "Last Login",
-                "bedroll": "Bedroll",
-                "permissionLevel": "Permission Level"
-            },
-            "title": {
-                "admin": "Admin"
-            }
+            "playerName": "Player Name",
+            "status": "Status",
+            "entityId": "Entity ID",
+            "playerId": "Player ID",
+            "platformId": "Platform ID",
+            "playGroup": "Play Group",
+            "position": "Position",
+            "lastLogin": "Last Login",
+            "bedroll": "Bedroll",
+            "permissionLevel": "Permission Level",
+            "admin": "Admin",
+            "viewInventory": "View Inventory",
+            "viewSkills": "View Skills",
+            "viewDetails": "View Details"
         },
         "console": {
             "invalidCommand": {

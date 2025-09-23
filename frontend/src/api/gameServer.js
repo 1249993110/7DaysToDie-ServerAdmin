@@ -45,4 +45,8 @@ export const getPlayerInventory = (playerId) => {
 export const getPlayerSkills = (playerId, lang) => {
     return http.get(`/GameServer/PlayerSkills/${playerId}`, { params: { language: lang } });
 };
+
+export const getPlayerDetails = (playerId) => {
+    return http.get(`/GameServer/PlayerDetails/${playerId}`);
+}
 //#endregion

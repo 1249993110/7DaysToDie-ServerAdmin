@@ -13,12 +13,12 @@
             </Column>
             <Column :header="$t('components.playerSkillsDialog.localizationName')">
                 <template #body="{ node: data }">
-                    <span :class="{ 'font-bold': isSkillOrBookGroup(data) }">{{ data.localizationName }}</span>
+                    <span :class="{ 'font-semibold': isSkillOrBookGroup(data) }">{{ data.localizationName }}</span>
                 </template>
             </Column>
             <Column :header="$t('components.playerSkillsDialog.name')">
                 <template #body="{ node: data }">
-                    <span :class="{ 'font-bold': isSkillOrBookGroup(data) }">{{ data.name }}</span>
+                    <span :class="{ 'font-semibold': isSkillOrBookGroup(data) }">{{ data.name }}</span>
                 </template>
             </Column>
             <Column field="level" :header="$t('components.playerSkillsDialog.level')">

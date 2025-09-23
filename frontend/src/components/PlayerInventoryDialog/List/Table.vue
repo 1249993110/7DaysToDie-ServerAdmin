@@ -6,14 +6,14 @@
                     {{ $t('components.myTable.noData') }}
                 </div>
             </template>
-            <Column :header="$t('components.inventoryDialog.icon')">
+            <Column :header="$t('components.playerInventoryDialog.icon')">
                 <template #body="{ data }">
                     <GameIconEx :size="48" :fontSize="20" v-bind="data" />
                 </template>
             </Column>
-            <Column field="localizationName" :header="$t('components.inventoryDialog.localizationName')" sortable></Column>
-            <Column field="itemName" :header="$t('components.inventoryDialog.itemName')" sortable></Column>
-            <Column :header="$t('components.inventoryDialog.mod')">
+            <Column field="localizationName" :header="$t('components.playerInventoryDialog.localizationName')" sortable></Column>
+            <Column field="itemName" :header="$t('components.playerInventoryDialog.itemName')" sortable></Column>
+            <Column :header="$t('components.playerInventoryDialog.mod')">
                 <template #body="{ data }">
                     <GameIconEx v-for="(item, index) in data?.parts?.filter((i) => i)" :key="index" :size="60" v-bind="item" />
                 </template>

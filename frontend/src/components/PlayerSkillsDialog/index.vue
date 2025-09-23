@@ -21,7 +21,7 @@
                         <Tab v-for="(item, index) in modelValue" :key="index" :value="index">
                             <div class="flex items-center gap-1">
                                 <GameIcon v-if="item.iconName" isUiIcon :iconName="item.iconName" :size="24" :preview="false" />
-                                <span>{{ (item.localizationName || item.name) + ` (${$t('components.playerSkillsDialog.level')}:${item.level})` }}</span>
+                                <span>{{ (item.localizationName || item.name) + ` (${$t('components.playerSkillsDialog.level')} ${item.level})` }}</span>
                             </div>
                         </Tab>
                     </TabList>
@@ -41,12 +41,13 @@ import { getPlayerSkills } from '~/api/gameServer';
 import { useLocaleStore } from '~/store/locale';
 import Table from './Table.vue';
 
-const localeStore = useLocaleStore();
-const options = ref(['fold', 'expand']);
 const modelValue = ref([]);
 const visible = ref(false);
 const loading = ref(false);
 const title = ref('');
+
+const localeStore = useLocaleStore();
+const options = ref(['fold', 'expand']);
 const layout = ref('expand');
 
 const show = async (playerId, playerName) => {

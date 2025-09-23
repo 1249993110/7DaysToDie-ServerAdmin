@@ -90,17 +90,17 @@ const fontSizePx = computed(() => {
 const { t } = useI18n();
 const tooltipContent = computed(() => {
     return {
-        value: `${t('components.inventoryDialog.itemName')}: ${props.itemName}
-        ${t('components.inventoryDialog.iconName')}: ${props.iconName}
-        ${t('components.inventoryDialog.iconColor')}: ${props.iconColor ?? 'FFFFFF'}
-        ${t('components.inventoryDialog.localizationName')}: ${props.localizationName}
-        ${t('components.inventoryDialog.count')}: ${props.count}
-        ${t('components.inventoryDialog.maxStackAllowed')}: ${props.maxStackAllowed}
-        ${t('components.inventoryDialog.quality')}: ${props.quality ?? 0}
-        ${t('components.inventoryDialog.useTimes')}: ${props.useTimes}
-        ${t('components.inventoryDialog.maxUseTimes')}: ${props.maxUseTimes}
-        ${t('components.inventoryDialog.isMod')}: ${props.isMod ? t('common.yes') : t('common.no')}
-        ${t('components.inventoryDialog.isBlock')}: ${props.isBlock ? t('common.yes') : t('common.no')}`,
+        value: `${t('components.playerInventoryDialog.itemName')}: ${props.itemName}
+        ${t('components.playerInventoryDialog.iconName')}: ${props.iconName}
+        ${t('components.playerInventoryDialog.iconColor')}: ${props.iconColor ?? 'FFFFFF'}
+        ${t('components.playerInventoryDialog.localizationName')}: ${props.localizationName}
+        ${t('components.playerInventoryDialog.count')}: ${props.count}
+        ${t('components.playerInventoryDialog.maxStackAllowed')}: ${props.maxStackAllowed}
+        ${t('components.playerInventoryDialog.quality')}: ${props.quality ?? 0}
+        ${t('components.playerInventoryDialog.useTimes')}: ${props.useTimes}
+        ${t('components.playerInventoryDialog.maxUseTimes')}: ${props.maxUseTimes}
+        ${t('components.playerInventoryDialog.isMod')}: ${props.isMod ? t('common.yes') : t('common.no')}
+        ${t('components.playerInventoryDialog.isBlock')}: ${props.isBlock ? t('common.yes') : t('common.no')}`,
         escape: false,
         pt: { root: { style: { maxWidth: '80vw' } } },
         autoHide: false,

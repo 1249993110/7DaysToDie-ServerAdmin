@@ -14,7 +14,7 @@
             <template #playerName-body="{ data }">
                 <span class="flex items-center">
                     {{ data.playerName }}
-                    <img v-if="data.isAdmin" :src="serverFavoriteImgUrl" width="20" :title="$t('views.playerList.title.admin')" />
+                    <img v-if="data.isAdmin" :src="serverFavoriteImgUrl" width="20" :title="$t('views.playerList.admin')" />
                 </span>
             </template>
             <template #lastLogin-body="{ data }"> {{ dayjs(data.lastLogin).format() }} </template>
@@ -26,8 +26,9 @@
                 </Tag>
             </template>
         </MyTable>
-        <InventoryDialog ref="inventoryDialogRef" />
+        <PlayerInventoryDialog ref="playerInventoryDialogRef" />
         <PlayerSkillsDialog ref="playerSkillsDialogRef" />
+        <PlayerDetailsDialog ref="playerDetailsDialogRef" />
     </div>
 </template>
 
@@ -40,16 +41,16 @@ import { formatPosition } from '~/utils';
 const tableRef = ref();
 const { t } = useI18n();
 const columns = computed(() => [
-    { field: 'playerName', header: t('views.playerList.header.playerName'), sortable: true, frozen: true, class: 'min-w-40' },
-    { field: 'isOffline', header: t('views.playerList.header.status'), sortable: true, class: 'min-w-30' },
-    // { field: 'entityId', header: t('views.playerList.header.entityId'), sortable: true, class: 'min-w-30' },
-    { field: 'playGroup', header: t('views.playerList.header.playGroup'), sortable: true, class: 'min-w-35' },
-    { field: 'lastLogin', header: t('views.playerList.header.lastLogin'), sortable: true, class: 'min-w-45' },
-    { field: 'position', header: t('views.playerList.header.position'), class: 'min-w-40' },
-    { field: 'playerId', header: t('views.playerList.header.playerId') },
-    { field: 'platformId', header: t('views.playerList.header.platformId') },
-    { field: 'permissionLevel', header: t('views.playerList.header.permissionLevel'), sortable: true, class: 'min-w-45' },
-    { field: 'bedroll', header: t('views.playerList.header.bedroll'), class: 'min-w-40' },
+    { field: 'playerName', header: t('views.playerList.playerName'), sortable: true, frozen: true, class: 'min-w-40' },
+    { field: 'isOffline', header: t('views.playerList.status'), sortable: true, class: 'min-w-30' },
+    // { field: 'entityId', header: t('views.playerList.entityId'), sortable: true, class: 'min-w-30' },
+    { field: 'playGroup', header: t('views.playerList.playGroup'), sortable: true, class: 'min-w-35' },
+    { field: 'lastLogin', header: t('views.playerList.lastLogin'), sortable: true, class: 'min-w-45' },
+    { field: 'position', header: t('views.playerList.position'), class: 'min-w-40' },
+    { field: 'playerId', header: t('views.playerList.playerId') },
+    { field: 'platformId', header: t('views.playerList.platformId') },
+    { field: 'permissionLevel', header: t('views.playerList.permissionLevel'), sortable: true, class: 'min-w-45' },
+    { field: 'bedroll', header: t('views.playerList.bedroll'), class: 'min-w-40' },
 ]);
 
 const selectedRows = ref([]);
@@ -59,22 +60,28 @@ const fetchData = async (params) => {
 };
 
 const batchMenuItems = ref([]);
-const inventoryDialogRef = ref();
+const playerInventoryDialogRef = ref();
 const playerSkillsDialogRef = ref();
+const playerDetailsDialogRef = ref();
 
 const currentRowData = computed(() => tableRef.value?.currentRow);
-const contextMenuItems = ref([
+const contextMenuItems = computed(() => [
     {
-        label: 'View Inventory',
+        label: t('views.playerList.viewInventory'),
         command: () => {
-            console.log('View Inventory', currentRowData.value);
-            inventoryDialogRef.value.show(currentRowData.value.playerId, currentRowData.value.playerName);
+            playerInventoryDialogRef.value.show(currentRowData.value.playerId, currentRowData.value.playerName);
         },
     },
     {
-        label: 'View Skills',
+        label: t('views.playerList.viewSkills'),
         command: () => {
             playerSkillsDialogRef.value.show(currentRowData.value.playerId, currentRowData.value.playerName);
+        },
+    },
+    {
+        label: t('views.playerList.viewDetails'),
+        command: () => {
+            playerDetailsDialogRef.value.show(currentRowData.value.playerId, currentRowData.value.playerName);
         },
     },
 ]);
