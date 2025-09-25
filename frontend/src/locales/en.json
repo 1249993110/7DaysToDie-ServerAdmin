@@ -281,6 +281,13 @@
             "removeLandClaimConfirm": "Are you sure you want to remove the land claim?",
             "dragendTelePlayerConfirm": "Are you sure you want to teleport player: {0} to the target location {1}?"
         },
+        "gameChat":{
+            "typeMessage": "Type a message",
+            "send": "Send"
+        },
+        "serverConfig": {
+            
+        },
         "console": {
             "invalidCommand": {
                 "title": "Invalid Command",

@@ -129,6 +129,10 @@ const props = defineProps({
     contextMenuItems: {
         type: Array,
     },
+    autoRefreshInterval: {
+        type: Number,
+        default: 0,
+    },
 });
 
 const isShowContextMenu = computed(() => {
@@ -145,8 +149,8 @@ watch(
 );
 const onToggleColumns = (val) => {
     const fields = val.map((col) => col.field);
-    selectedColumns.value = props.columns.filter(col => fields.includes(col.field));
-}
+    selectedColumns.value = props.columns.filter((col) => fields.includes(col.field));
+};
 
 const selectedRows = defineModel('selectedRows', {
     type: Array,
@@ -182,7 +186,8 @@ const loadLazyData = async () => {
         loading.value = false;
     }
 };
-loadLazyData();
+
+useIntervalFn(loadLazyData, () => props.autoRefreshInterval * 1000, { immediate: true, immediateCallback: true });
 
 const onPage = async (event) => {
     first.value = event.first;

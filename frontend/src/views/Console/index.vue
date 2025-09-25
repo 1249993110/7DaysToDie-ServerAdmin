@@ -2,9 +2,9 @@
     <div class="h-full flex flex-col">
         <Card class="flex-1">
             <template #content>
-                <div ref="consoleContentRef" class="h-[calc(100vh-210px)] overflow-y-auto">
-                    <p v-for="logEntry in gameEventStore.logs" :key="logEntry.id" :style="{ color: getColor(logEntry.logType) }" class="font-mono whitespace-pre-wrap">
-                        {{ logEntry.message }}
+                <div ref="contentRef" class="h-[calc(100vh-210px)] overflow-y-auto">
+                    <p v-for="item in gameEventStore.logs" :key="item.id" :style="{ color: getColor(item.logType) }" class="font-mono whitespace-pre-wrap">
+                        {{ item.message }}
                     </p>
                 </div>
             </template>
@@ -68,7 +68,7 @@ import { useGameEventStore } from '~/store/gameEvent';
 const { t } = useI18n();
 const gameEventStore = useGameEventStore();
 const autoCompleteRef = ref();
-const consoleContentRef = ref();
+const contentRef = ref();
 const allCommands = ref([]);
 const commandLookup = ref(new Set());
 const filteredCommands = ref([]);
@@ -156,7 +156,7 @@ const getColor = (logType) => logColorMap[logType] || '#00C814';
 const { pause, resume } = watch(
     () => gameEventStore.logs.length,
     () => {
-        const element = consoleContentRef.value;
+        const element = contentRef.value;
         if (element) {
             const isScrolledToBottom = element.scrollTop + element.clientHeight >= element.scrollHeight - 1;
             if (isScrolledToBottom) {
@@ -169,7 +169,7 @@ const { pause, resume } = watch(
 );
 
 onActivated(() => {
-    consoleContentRef.value.scrollTop = consoleContentRef.value.scrollHeight;
+    contentRef.value.scrollTop = contentRef.value.scrollHeight;
     resume();
 });
 

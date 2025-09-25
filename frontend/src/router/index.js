@@ -48,7 +48,7 @@ const fullRoutes = [
             {
                 name: 'GameChat',
                 path: '/game-chat',
-                component: () => import('../views/Dashboard/index.vue'),
+                component: () => import('../views/GameChat/index.vue'),
                 meta: {
                     title: () => t('menus.gameChat'),
                     icon: markIcon(() => import('~icons/mdi/chat')),

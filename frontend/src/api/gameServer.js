@@ -9,6 +9,15 @@ export const executeConsoleCommand = (command, inMainThread = true) => {
     });
 };
 
+//#region Send Message
+export const sendGlobalMessage = (message, senderName = null) => {
+    return http.post('/GameServer/SendGlobalMessage', { message, senderName });
+}
+export const sendPrivateMessage = (targetPlayerIdOrName, message, senderName = null) => {
+    return http.post('/GameServer/SendPrivateMessage', { targetPlayerIdOrName, message, senderName });
+}
+//#endregion
+
 export const getAllowedCommands = () => {
     return http.get('/GameServer/AllowedCommands');
 };

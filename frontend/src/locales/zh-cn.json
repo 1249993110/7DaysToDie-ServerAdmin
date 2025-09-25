@@ -280,6 +280,10 @@
             "removeLandClaimConfirm": "您确定要移除领地石吗?",
             "dragendTelePlayerConfirm": "确定将玩家: {0} 传送到目标地点 {1} 吗?"
         },
+        "gameChat": {
+            "typeMessage": "输入消息",
+            "send": "发送"
+        },
         "console": {
             "invalidCommand": {
                 "title": "无效命令",

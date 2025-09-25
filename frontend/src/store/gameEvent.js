@@ -15,8 +15,8 @@ export const useGameEventStore = defineStore('gameEvent', () => {
         }
     };
 
-    const addChatMessage = (message, timestamp) => {
-        chatMessages.value.push({ id: crypto.randomUUID(), message, timestamp });
+    const addChatMessage = (message, timestamp, senderName) => {
+        chatMessages.value.push({ id: crypto.randomUUID(), message, timestamp, senderName });
 
         if (chatMessages.value.length > MAX) {
             nextTick(() => chatMessages.value.shift());
@@ -47,6 +47,7 @@ export const useGameEventStore = defineStore('gameEvent', () => {
 
     emitter.on(EVENT_TYPES.GAME.WELCOME, onWelcomeMessage);
     emitter.on(EVENT_TYPES.GAME.LOG_CALLBACK, (data) => addLog(data.message, data.logType));
+    emitter.on(EVENT_TYPES.GAME.CHAT_MESSAGE, (data) => addChatMessage(data.message, data.timestamp, data.senderName));
 
     const isLoggedIn = asyncComputed(() => userInfoStore.isLoggedIn());
     watch(isLoggedIn, (val) => {
@@ -59,6 +60,8 @@ export const useGameEventStore = defineStore('gameEvent', () => {
 
     return {
         logs,
+        chatMessages,
         addLog,
+        addChatMessage,
     };
 });
