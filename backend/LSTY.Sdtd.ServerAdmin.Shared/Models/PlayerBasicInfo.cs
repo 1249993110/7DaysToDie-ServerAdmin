@@ -33,11 +33,11 @@
         /// <summary>
         /// Ip
         /// </summary>
-        public required string? Ip { get; set; }
+        public string? Ip { get; set; }
 
         /// <summary>
         /// Ping
         /// </summary>
-        public required int? Ping { get; set; }
+        public int? Ping { get; set; }
     }
 }

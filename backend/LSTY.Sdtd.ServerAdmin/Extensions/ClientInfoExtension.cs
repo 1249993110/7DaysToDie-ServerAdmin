@@ -12,7 +12,7 @@ namespace LSTY.Sdtd.ServerAdmin.Extensions
                 PlayerId = clientInfo.CrossplatformId.CombinedString,
                 PlatformId = clientInfo.PlatformId.CombinedString,
                 PlayerName = clientInfo.playerName,
-                Position = position ?? clientInfo.latestPlayerData.ecd.pos.ToPosition(),
+                Position = position ?? default,
                 Ip = clientInfo.ip,
                 Ping = clientInfo.ping,
             };

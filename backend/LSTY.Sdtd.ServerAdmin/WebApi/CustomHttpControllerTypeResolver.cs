@@ -18,6 +18,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
                 t.IsClass &&
                 t.IsVisible &&
                 !t.IsAbstract &&
+                t.Assembly == typeof(CustomHttpControllerTypeResolver).Assembly &&
                 typeof(IHttpController).IsAssignableFrom(t);
             }
             catch

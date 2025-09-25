@@ -167,7 +167,10 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
                     return AppConfig.Settings.UserName == username && AppConfig.Settings.Password == password;
                 }
             });
-            app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions());
+            app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions() 
+            {
+                Provider = new CustomOAuthBearerProvider()
+            });
 
             app.Use<ServerSentEventsMiddleware>(_jsonSerializerSettings);
 

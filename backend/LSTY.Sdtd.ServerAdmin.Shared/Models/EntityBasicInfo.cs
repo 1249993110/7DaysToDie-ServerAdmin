@@ -24,5 +24,10 @@
         /// Entity Type
         /// </summary>
         public required EntityType EntityType { get; set; }
+
+        /// <summary>
+        /// Player Id
+        /// </summary>
+        public string? PlayerId { get; set; }
     }
 }

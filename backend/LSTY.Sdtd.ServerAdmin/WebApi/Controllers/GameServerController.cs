@@ -2,11 +2,14 @@
 using LSTY.Sdtd.ServerAdmin.Config;
 using LSTY.Sdtd.ServerAdmin.Extensions;
 using LSTY.Sdtd.ServerAdmin.Shared.Models;
+using MapRendering;
+using ModInfo;
 using Newtonsoft.Json;
 using NSwag.Annotations;
 using SkiaSharp;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Xml;
 using System.Xml.Linq;
@@ -771,6 +774,395 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
             }
 
             return null;
+        }
+        #endregion
+
+        #region Map
+        /// <summary>
+        /// Get map info.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("MapInfo")]
+        public MapInfo GetMapInfo()
+        {
+            var mapInfo = new MapInfo()
+            {
+                BlockSize = MapRendering.Constants.MapBlockSize,
+                MaxZoom = MapRendering.Constants.Zoomlevels - 1
+            };
+            return mapInfo;
+        }
+
+        /// <summary>
+        /// Get map tile.
+        /// </summary>
+        /// <param name="z">zoom</param>
+        /// <param name="x"></param>
+        /// <param name="y">y</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("MapTile/{z:int}/{x:int}/{y:int}")]
+        public IHttpActionResult GetMapTile(int z, int x, int y)
+        {
+            string fileName = MapRendering.Constants.MapDirectory + $"/{z}/{x}/{y}.png";
+
+            if (File.Exists(fileName))
+            {
+                return new FileStreamResult(File.OpenRead(fileName), "image/png");
+            }
+
+            if (ModMain.MapTileCache == null)
+            {
+                return NotFound();
+            }
+
+            byte[] data = ModMain.MapTileCache.GetFileContent(fileName);
+            return new FileContentResult(data, "image/png");
+        }
+
+        /// <summary>
+        /// Render full map.
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("RenderFullMap")]
+        [SwaggerResponse(typeof(IEnumerable<string>))]
+        public async Task<IHttpActionResult> RenderFullMap()
+        {
+            var result = await Utils.ExecuteConsoleCommandAsync("visitmap full");
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Render explored area.
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("RenderExploredArea")]
+        [SwaggerResponse(typeof(IEnumerable<string>))]
+        public async Task<IHttpActionResult> RenderExploredArea()
+        {
+            var result = await Utils.ExecuteConsoleCommandAsync("rendermap");
+            return Ok(result);
+        }
+        #endregion
+
+        #region Locations
+        /// <summary>
+        /// Get locations by entity type.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("Locations")]
+        public IEnumerable<EntityBasicInfo> GetLocations(Shared.Models.EntityType entityType)
+        {
+            var locations = new List<EntityBasicInfo>();
+
+            if (entityType == Shared.Models.EntityType.OfflinePlayer)
+            {
+                var online = GameManager.Instance.World.Players.list.Select(i => ConnectionManager.Instance.Clients.ForEntityId(i.entityId).InternalId).ToHashSet();
+                foreach (var item in GameManager.Instance.GetPersistentPlayerList().Players)
+                {
+                    if (online.Contains(item.Key) == false)
+                    {
+                        var player = item.Value;
+                        locations.Add(new EntityBasicInfo()
+                        {
+                            EntityId = player.EntityId,
+                            EntityName = player.PlayerName.DisplayName,
+                            Position = player.Position.ToPosition(),
+                            EntityType = Shared.Models.EntityType.OfflinePlayer,
+                            PlayerId = player.PrimaryId.CombinedString,
+                        });
+                    }
+                }
+            }
+            else if (entityType == Shared.Models.EntityType.OnlinePlayer)
+            {
+                foreach (var player in GameManager.Instance.World.Players.list)
+                {
+                    locations.Add(new EntityBasicInfo()
+                    {
+                        EntityId = player.entityId,
+                        EntityName = player.EntityName,
+                        Position = player.GetPosition().ToPosition(),
+                        EntityType = Shared.Models.EntityType.OnlinePlayer,
+                        PlayerId = ConnectionManager.Instance.Clients.ForEntityId(player.entityId).InternalId.CombinedString,
+                    });
+                }
+            }
+            else if (entityType == Shared.Models.EntityType.Animal)
+            {
+                foreach (var entity in GameManager.Instance.World.Entities.list)
+                {
+                    if (entity is EntityAnimal entityAnimal && entity.IsAlive())
+                    {
+                        locations.Add(new EntityBasicInfo()
+                        {
+                            EntityId = entityAnimal.entityId,
+                            EntityName = entityAnimal.EntityName ?? ("animal class #" + entityAnimal.entityClass),
+                            Position = entityAnimal.GetPosition().ToPosition(),
+                            EntityType = Shared.Models.EntityType.Animal,
+                        });
+                    }
+                }
+            }
+            else if (entityType == Shared.Models.EntityType.Hostiles)
+            {
+                foreach (var entity in GameManager.Instance.World.Entities.list)
+                {
+                    if (entity is EntityEnemy entityEnemy && entity.IsAlive())
+                    {
+                        locations.Add(new EntityBasicInfo()
+                        {
+                            EntityId = entityEnemy.entityId,
+                            EntityName = entityEnemy.EntityName ?? ("enemy class #" + entityEnemy.entityClass),
+                            Position = entityEnemy.GetPosition().ToPosition(),
+                            EntityType = (Shared.Models.EntityType)entityEnemy.entityType
+                        });
+                    }
+                }
+            }
+            else if (entityType == Shared.Models.EntityType.Zombie)
+            {
+                foreach (var entity in GameManager.Instance.World.Entities.list)
+                {
+                    if (entity is EntityZombie entityZombie && entity.IsAlive())
+                    {
+                        locations.Add(new EntityBasicInfo()
+                        {
+                            EntityId = entityZombie.entityId,
+                            EntityName = entityZombie.EntityName ?? ("zombie class #" + entityZombie.entityClass),
+                            Position = entityZombie.GetPosition().ToPosition(),
+                            EntityType = (Shared.Models.EntityType)entityZombie.entityType
+                        });
+                    }
+                }
+            }
+            else if (entityType == Shared.Models.EntityType.Bandit)
+            {
+                foreach (var entity in GameManager.Instance.World.Entities.list)
+                {
+                    if (entity is EntityBandit entityBandit && entity.IsAlive())
+                    {
+                        locations.Add(new EntityBasicInfo()
+                        {
+                            EntityId = entityBandit.entityId,
+                            EntityName = entityBandit.EntityName ?? ("bandit class #" + entityBandit.entityClass),
+                            Position = entityBandit.GetPosition().ToPosition(),
+                            EntityType = (Shared.Models.EntityType)entityBandit.entityType
+                        });
+                    }
+                }
+            }
+
+            return locations;
+        }
+
+        /// <summary>
+        /// Get locations by entity id.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("Locations/{entityId:int}")]
+        [SwaggerResponse(typeof(EntityBasicInfo))]
+        public IHttpActionResult GetLocation(int entityId)
+        {
+            if (GameManager.Instance.World.Players.dict.TryGetValue(entityId, out var player))
+            {
+                return Ok(new EntityBasicInfo()
+                {
+                    EntityId = player.entityId,
+                    EntityName = player.EntityName,
+                    Position = player.GetPosition().ToPosition(),
+                    EntityType = Shared.Models.EntityType.OnlinePlayer,
+                    PlayerId = ConnectionManager.Instance.Clients.ForEntityId(player.entityId)?.CrossplatformId.CombinedString,
+                });
+            }
+
+            if (GameManager.Instance.World.Entities.dict.TryGetValue(entityId, out var entity))
+            {
+                string entityName = (entity is EntityAlive entityAlive) ? entityAlive.EntityName : "entity class #" + entity.entityClass;
+                return Ok(new EntityBasicInfo()
+                {
+                    EntityId = entity.entityId,
+                    EntityName = entityName,
+                    Position = entity.GetPosition().ToPosition(),
+                    EntityType = (Shared.Models.EntityType)entity.entityType,
+                });
+            }
+
+            return NotFound();
+        }
+        #endregion
+
+        #region Localization
+        /// <summary>
+        /// Get all localization strings for a specified language.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("Localization")]
+        [ResponseCache(Duration = 7200)]
+        [SwaggerResponse(typeof(Dictionary<string, string>))]
+        public IHttpActionResult GetLocalization(Language language)
+        {
+            string _language = language.ToString().ToLower();
+            var dict = Localization.dictionary;
+            int languageIndex = Array.LastIndexOf(dict["KEY"], _language);
+
+            if (languageIndex < 0)
+            {
+                return NotFound();
+            }
+
+            return Ok(dict.ToDictionary(p => p.Key, p => p.Value[languageIndex]));
+        }
+
+        /// <summary>
+        /// Get a specific localization string by key and language.
+        /// </summary>
+        /// <param name="key">key</param>
+        /// <param name="language">language</param>
+        /// <param name="caseInsensitive"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("Localization/{key}")]
+        [ResponseCache(Duration = 7200)]
+        [SwaggerResponse(typeof(string))]
+        public IHttpActionResult GetLocalization(string key, [FromUri] Language language, [FromUri] bool caseInsensitive = false)
+        {
+            return Ok(Utils.GetLocalization(key, language, caseInsensitive));
+        }
+
+        /// <summary>
+        /// Get all known languages.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("KnownLanguages")]
+        [ResponseCache(Duration = 7200)]
+        [SwaggerResponse(typeof(string))]
+        public string[] GetKnownLanguages()
+        {
+            return Localization.dictionary["KEY"];
+        }
+        #endregion
+
+        #region LandClaims
+        /// <summary>
+        /// Get land claims by player id.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("LandClaims/{playerId}")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(ClaimOwner))]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(object))]
+        public IHttpActionResult GetLandClaims(string playerId)
+        {
+            var userId = PlatformUserIdentifierAbs.FromCombinedString(playerId);
+            if (userId == null)
+            {
+                return NotFound();
+            }
+
+            var persistentPlayerData = GameManager.Instance.GetPersistentPlayerList().GetPlayerData(userId);
+            if (persistentPlayerData == null)
+            {
+                return NotFound();
+            }
+
+            var claimOwner = new ClaimOwner()
+            {
+                EntityId = persistentPlayerData.EntityId,
+                PlatformId = persistentPlayerData.NativeId.CombinedString,
+                PlayerId = persistentPlayerData.PrimaryId.CombinedString,
+                PlayerName = persistentPlayerData.PlayerName.DisplayName,
+                ClaimActive = GameManager.Instance.World.IsLandProtectionValidForPlayer(persistentPlayerData),
+                ClaimPositions = persistentPlayerData.LPBlocks.ToPositions(),
+                LastLogin = persistentPlayerData.LastLogin,
+                Position = persistentPlayerData.Position.ToPosition()
+            };
+
+            return Ok(claimOwner);
+        }
+
+        /// <summary>
+        /// Get all land claims.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("LandClaims")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(LandClaims))]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(object))]
+        public LandClaims GetLandClaims()
+        {
+            var claimOwners = new List<ClaimOwner>();
+
+            foreach (var item in GameManager.Instance.GetPersistentPlayerList().Players)
+            {
+                var persistentPlayerData = item.Value;
+                if (persistentPlayerData != null && persistentPlayerData.LPBlocks != null)
+                {
+                    claimOwners.Add(new ClaimOwner()
+                    {
+                        EntityId = persistentPlayerData.EntityId,
+                        PlatformId = persistentPlayerData.NativeId.CombinedString,
+                        PlayerId = persistentPlayerData.PrimaryId.CombinedString,
+                        PlayerName = persistentPlayerData.PlayerName.DisplayName,
+                        ClaimActive = GameManager.Instance.World.IsLandProtectionValidForPlayer(persistentPlayerData),
+                        ClaimPositions = persistentPlayerData.LPBlocks.ToPositions(),
+                        LastLogin = persistentPlayerData.LastLogin,
+                        Position = persistentPlayerData.Position.ToPosition()
+                    });
+                }
+            }
+
+            return new LandClaims()
+            {
+                ClaimOwners = claimOwners,
+                ClaimSize = GamePrefs.GetInt(EnumGamePrefs.LandClaimSize)
+            };
+        }
+
+        /// <summary>
+        /// Remove land claims by player id.
+        /// </summary>
+        /// <param name="playerId"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("LandClaims/{playerId}")]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(IEnumerable<string>))]
+        [SwaggerResponse(HttpStatusCode.NotFound, typeof(object))]
+        public async Task<IHttpActionResult> RemovePlayerLandClaim(string playerId)
+        {
+            var userId = PlatformUserIdentifierAbs.FromCombinedString(playerId);
+            if (userId == null)
+            {
+                return NotFound();
+            }
+            var persistentPlayerData = GameManager.Instance.GetPersistentPlayerList().GetPlayerData(userId);
+            if (persistentPlayerData == null)
+            {
+                return NotFound();
+            }
+
+            var result = await Utils.ExecuteConsoleCommandAsync($"ty-rplc {userId.CombinedString}");
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Remove land claim by block position.
+        /// </summary>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("LandClaims")]
+        [SwaggerResponse(typeof(IEnumerable<string>))]
+        public async Task<IHttpActionResult> RemovePlayerLandClaim([FromBody] Position position)
+        {
+            var result = await Utils.ExecuteConsoleCommandAsync($"ty-rplc {position}");
+            return Ok(result);
         }
         #endregion
     }
