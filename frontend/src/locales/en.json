@@ -260,6 +260,27 @@
             "viewSkills": "View Skills",
             "viewDetails": "View Details"
         },
+        "map": {
+            "region": "Region File",
+            "landClaim": "Land Claim",
+            "zombie": "Zombie",
+            "animal": "Animal",
+            "historyPlayer": "Player (History)",
+            "onlinePlayer": "Player (Online)",
+            "mousePos": "Mouse pos",
+            "lastClick": "Last click",
+            "renderExploredArea": "Render Explored Area",
+            "renderExploredAreaConfirm": "Are you sure you want to render the explored area? This may take a few minutes, you can check the progress in the console",
+            "renderFullMap": "Explore Full Map",
+            "renderFullMapConfirm": "Are you sure you want to explore the full map? This may take a few minutes, you can check the progress in the console, this operation is generally performed only once after the server is started",
+            "refreshMap": "Refresh Map",
+            "autoReload": "Reload every",
+            "seconds": "seconds",
+            "landOwner": "Land Owner",
+            "removeLandClaim": "Remove",
+            "removeLandClaimConfirm": "Are you sure you want to remove the land claim?",
+            "dragendTelePlayerConfirm": "Are you sure you want to teleport player: {0} to the target location {1}?"
+        },
         "console": {
             "invalidCommand": {
                 "title": "Invalid Command",

@@ -17,7 +17,7 @@
                     :href="
                         localeStore.lang === 'zh-cn'
                             ? 'https://qm.qq.com/cgi-bin/qm/qr?k=p3TKGDnBAxxyVsR79pF-WYHI3BjsYiHe&jump_from=webapi&authKey=wTpnGpOGOsAaNTD4TqL4kukLQnxT+TmDFQx803v+Q2zWU0E7LYuSkBQQI+WhrqFB'
-                            : 'https://discord.gg/7daystodie'
+                            : 'https://discord.gg/zdnmngsBK4'
                     "
                 >
                     <icon-mdi:qqchat v-if="localeStore.lang === 'zh-cn'" />

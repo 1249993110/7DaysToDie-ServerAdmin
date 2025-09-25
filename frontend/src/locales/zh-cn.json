@@ -259,6 +259,27 @@
             "viewSkills": "查看技能",
             "viewDetails": "查看详情"
         },
+        "map": {
+            "region": "区域文件",
+            "landClaim": "领地石",
+            "zombie": "僵尸",
+            "animal": "动物",
+            "historyPlayer": "玩家 (历史)",
+            "onlinePlayer": "玩家 (在线)",
+            "mousePos": "鼠标位置",
+            "lastClick": "上次点击",
+            "renderExploredArea": "渲染已探索区域",
+            "renderExploredAreaConfirm": "确认渲染已探索区域吗? 这可能需要几分钟的时间, 您可以前往控制台查看进度",
+            "renderFullMap": "探索完整地图",
+            "renderFullMapConfirm": "确认探索全图吗? 这可能需要几分钟的时间, 您可以前往控制台查看进度, 此操作一般仅在开服后执行一次",
+            "refreshMap": "刷新地图",
+            "autoReload": "自动刷新",
+            "seconds": "秒",
+            "landOwner": "领地所有者",
+            "removeLandClaim": "移除领地石",
+            "removeLandClaimConfirm": "您确定要移除领地石吗?",
+            "dragendTelePlayerConfirm": "确定将玩家: {0} 传送到目标地点 {1} 吗?"
+        },
         "console": {
             "invalidCommand": {
                 "title": "无效命令",

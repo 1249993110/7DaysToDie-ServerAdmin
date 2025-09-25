@@ -38,7 +38,7 @@ const fullRoutes = [
             {
                 name: 'GPSMap',
                 path: '/gps-map',
-                component: () => import('../views/Dashboard/index.vue'),
+                component: () => import('../views/GPSMap/index.vue'),
                 meta: {
                     title: () => t('menus.gpsMap'),
                     icon: markIcon(() => import('~icons/mdi/map')),

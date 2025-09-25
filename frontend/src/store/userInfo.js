@@ -125,5 +125,5 @@ export const useUserInfoStore = defineStore('userInfo', () => {
         return accessToken.value;
     };
 
-    return { username, isRememberMe, signIn, signOut, isLoggedIn, signInByToken, getAccessToken };
+    return { username, isRememberMe, accessToken, signIn, signOut, isLoggedIn, signInByToken, getAccessToken };
 });

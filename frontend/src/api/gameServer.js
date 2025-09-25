@@ -42,11 +42,59 @@ export const getPlayerInventory = (playerId) => {
     return http.get(`/GameServer/PlayerInventory/${playerId}`);
 };
 
-export const getPlayerSkills = (playerId, lang) => {
-    return http.get(`/GameServer/PlayerSkills/${playerId}`, { params: { language: lang } });
+export const getPlayerSkills = (playerId, language) => {
+    return http.get(`/GameServer/PlayerSkills/${playerId}`, { params: { language } });
 };
 
 export const getPlayerDetails = (playerId) => {
     return http.get(`/GameServer/PlayerDetails/${playerId}`);
+};
+//#endregion
+
+//#region Map
+export const getMapInfo = () => {
+    return http.get('/GameServer/MapInfo');
+};
+
+export const renderFullMap = () => {
+    return http.post('/GameServer/RenderFullMap');
+};
+
+export const renderExploredArea = () => {
+    return http.post('/GameServer/RenderExploredArea');
+};
+//#endregion
+
+//#region Locations
+export const getLocations = (entityType) => {
+    return http.get('/GameServer/Locations', { params: { entityType } });
+};
+
+export const getLocation = (entityId) => {
+    return http.get(`/GameServer/Locations/${entityId}`);
 }
 //#endregion
+
+//#region Localization
+export const getLocalizationDict = (language) => {
+    return http.get('/GameServer/Localization', { params: { language } });
+}
+export const getLocalizationByKey = (key, language, isCaseInsensitive = false) => {
+    return http.get(`/GameServer/Localization/${key}`, { params: { language, caseInsensitive: isCaseInsensitive } });
+}
+export const getKnownLanguages = () => {
+    return http.get('/GameServer/KnownLanguages');
+}
+//#endregion
+
+//#region LandClaims
+export const getLandClaims = () => {
+    return http.get('/GameServer/LandClaims');
+};
+export const removePlayerLandClaim = (playerId) => {
+    return http.delete(`/GameServer/LandClaims/${playerId}`);
+};
+export const removePlayerLandClaimByPosition = (x, y, z) => {
+    return http.delete(`/GameServer/LandClaims`, { data: { x, y, z } });
+};
+//endregion
