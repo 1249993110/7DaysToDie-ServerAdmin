@@ -11,7 +11,11 @@
                     <GameIconEx :size="48" :fontSize="20" v-bind="data" />
                 </template>
             </Column>
-            <Column field="localizationName" :header="$t('components.playerInventoryDialog.localizationName')" sortable></Column>
+            <Column field="localizationName" :header="$t('components.playerInventoryDialog.localizationName')" sortable>
+                <template #body="{ data }">
+                    <Tag>{{ data.localizationName }}</Tag>
+                </template>
+            </Column>
             <Column field="itemName" :header="$t('components.playerInventoryDialog.itemName')" sortable></Column>
             <Column :header="$t('components.playerInventoryDialog.mod')">
                 <template #body="{ data }">

@@ -12,7 +12,8 @@
             <template #list>
                 <div class="grid grid-cols-2 overflow-auto">
                     <DataTable :value="leftTableData" showGridlines :pt="{ headerRow: { class: '!hidden' } }">
-                        <Column field="label" class="max-w-[calc(16vw-16px)] overflow-hidden font-semibold"></Column>
+                        <Column field="label" class="max-w-[calc(16vw-16px)] overflow-hidden font-semibold">
+                        </Column>
                         <Column field="value" class="max-w-[calc(16vw-16px)] overflow-hidden t-bg-1"></Column>
                     </DataTable>
                     <DataTable :value="rightTableData" showGridlines :pt="{ headerRow: { class: '!hidden' } }">

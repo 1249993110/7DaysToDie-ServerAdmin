@@ -33,3 +33,18 @@ export const myConfirm = async (options = {}) => {
 
     return result.isConfirmed;
 };
+
+export const myPrompt = async (options = {}) => {
+    const { value: text } = await Swal.fire({
+        title: options.title || t('plugins.myPrompt.title'),
+        input: 'text',
+        inputLabel: options.inputLabel || t('plugins.myPrompt.inputLabel'),
+        inputValue: options.inputValue || '',
+        showCancelButton: true,
+        confirmButtonText: options.confirmButtonText || t('plugins.myPrompt.confirmButtonText'),
+        cancelButtonText: options.cancelButtonText || t('plugins.myPrompt.cancelButtonText'),
+        theme: isDark.value ? 'dark' : 'light',
+    });
+
+    return text;
+};

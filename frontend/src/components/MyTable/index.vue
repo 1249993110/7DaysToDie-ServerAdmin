@@ -71,10 +71,10 @@
             </Column>
             <Column v-if="isShowEditBtn || isShowDeleteBtn || isShowContextMenu" :exportable="false" frozen alignFrozen="right">
                 <template #body="scope">
-                    <Button v-if="isShowEditBtn" outlined rounded class="mr-2" @click="editProduct(scope.data)" size="small">
+                    <Button v-if="isShowEditBtn" outlined rounded class="mr-2" @click="onEdit(scope.data)" size="small">
                         <icon-mdi:pencil />
                     </Button>
-                    <Button v-if="isShowDeleteBtn" outlined rounded class="mr-2" severity="danger" @click="confirmDeleteProduct(scope.data)" size="small">
+                    <Button v-if="isShowDeleteBtn" outlined rounded class="mr-2" severity="danger" @click="onConfirmDelete(scope.data)" size="small">
                         <icon-mdi:delete />
                     </Button>
                     <Button v-if="isShowContextMenu" outlined rounded @click="onToggleContextMenu($event, scope)" size="small">
@@ -187,7 +187,8 @@ const loadLazyData = async () => {
     }
 };
 
-useIntervalFn(loadLazyData, () => props.autoRefreshInterval * 1000, { immediate: true, immediateCallback: true });
+loadLazyData();
+useIntervalFn(loadLazyData, () => props.autoRefreshInterval * 1000, { immediate: true });
 
 const onPage = async (event) => {
     first.value = event.first;

@@ -58,7 +58,7 @@ const fullRoutes = [
             {
                 name: 'ServerConfig',
                 path: '/server-config',
-                component: () => import('../views/Dashboard/index.vue'),
+                component: () => import('../views/ServerConfig/index.vue'),
                 meta: {
                     title: () => t('menus.serverConfig'),
                     icon: markIcon(() => import('~icons/ic/baseline-settings')),

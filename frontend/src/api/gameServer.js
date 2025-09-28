@@ -106,4 +106,14 @@ export const removePlayerLandClaim = (playerId) => {
 export const removePlayerLandClaimByPosition = (x, y, z) => {
     return http.delete(`/GameServer/LandClaims`, { data: { x, y, z } });
 };
-//endregion
+//#endregion
+
+//#region ServerSettings
+export const getServerSettings = () => {
+    return http.get('/GameServer/ServerSettings');
+};
+
+export const updateServerSettings = (settings) => {
+    return http.put('/GameServer/ServerSettings', settings);
+};
+//#endregion

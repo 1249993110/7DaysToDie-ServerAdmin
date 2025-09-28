@@ -11,9 +11,9 @@
                     <GameIcon isUiIcon :iconName="data.iconName" :size="36" :preview="false" />
                 </template>
             </Column>
-            <Column :header="$t('components.playerSkillsDialog.localizationName')">
+            <Column :header="$t('components.playerSkillsDialog.localizationName')" class="min-w-30">
                 <template #body="{ node: data }">
-                    <span :class="{ 'font-semibold': isSkillOrBookGroup(data) }">{{ data.localizationName }}</span>
+                    <Tag :class="{ 'font-semibold': isSkillOrBookGroup(data) }">{{ data.localizationName }}</Tag>
                 </template>
             </Column>
             <Column :header="$t('components.playerSkillsDialog.name')">
