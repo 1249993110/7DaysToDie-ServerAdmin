@@ -5,15 +5,19 @@ using LSTY.Sdtd.ServerAdmin.Shared.Models;
 using MapRendering;
 using ModInfo;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using NSwag.Annotations;
 using SkiaSharp;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Xml;
 using System.Xml.Linq;
 using UnityEngine;
+using UnityEngine.Windows;
 
 namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
 {
@@ -1163,6 +1167,74 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         {
             var result = await Utils.ExecuteConsoleCommandAsync($"ty-rplc {position}");
             return Ok(result);
+        }
+        #endregion
+
+        #region ServerSettings
+        /// <summary>
+        /// Get server settings.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("ServerSettings")]
+        [SwaggerResponse(typeof(Dictionary<string, string>))]
+        public HttpResponseMessage Settings()
+        {
+            var settingsMap = new Dictionary<string, string>();
+
+            string path = Path.Combine(AppContext.BaseDirectory, AppConfig.Settings.ServerConfigFile);
+            var xmlDocument = new XmlDocument();
+            xmlDocument.Load(path);
+            var xmlRoot = xmlDocument.DocumentElement;
+
+            string name;
+            string value;
+            foreach (XmlNode node in xmlRoot.ChildNodes)
+            {
+                if (node.Attributes != null)
+                {
+                    name = node.Attributes["name"].Value;
+                    value = node.Attributes["value"].Value;
+                    settingsMap.Add(name, value);
+                }
+            }
+
+            var serializerSettings = new JsonSerializerSettings()
+            {
+                ContractResolver = new DefaultContractResolver()
+            };
+
+            string json = JsonConvert.SerializeObject(settingsMap, serializerSettings);
+            var response = new HttpResponseMessage(HttpStatusCode.OK);
+            response.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            return response;
+        }
+
+        /// <summary>
+        /// Update server settings.
+        /// </summary>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("ServerSettings")]
+        public IHttpActionResult Settings([FromBody] Dictionary<string, string> model)
+        {
+            string path = Path.Combine(AppContext.BaseDirectory, AppConfig.Settings.ServerConfigFile);
+            var xmlDocument = new XmlDocument();
+            xmlDocument.Load(path);
+            var rootNode = xmlDocument.SelectSingleNode("ServerSettings");
+
+            foreach (var item in model)
+            {
+                var node = rootNode.SelectSingleNode($"property[@name='{item.Key}']");
+                if (node != null && node.Attributes != null)
+                {
+                    node.Attributes["value"].Value = item.Value;
+                }
+            }
+
+            xmlDocument.Save(path);
+            return Ok();
         }
         #endregion
     }

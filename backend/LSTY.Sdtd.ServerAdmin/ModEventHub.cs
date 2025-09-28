@@ -174,7 +174,7 @@ namespace LSTY.Sdtd.ServerAdmin
             var chatMessage = new ChatMessageEventArgs()
             {
                 EntityId = senderEntityId,
-                PlayerId = clientInfo?.CrossplatformId.CombinedString,
+                PlayerId = clientInfo?.CrossplatformId?.CombinedString,
                 ChatType = (ChatType)eChatType,
                 Message = message,
                 SenderName = senderName,
