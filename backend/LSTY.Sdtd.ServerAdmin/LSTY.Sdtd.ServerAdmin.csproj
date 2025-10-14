@@ -105,10 +105,10 @@
 		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.9" />
 		<PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.2.3" />
 		<PackageReference Include="Microsoft.Owin.StaticFiles" Version="4.2.3" />
-		<PackageReference Include="NSwag.Annotations" Version="14.6.0" />
-		<PackageReference Include="NSwag.AspNet.Owin" Version="14.6.0" />
-		<PackageReference Include="SkiaSharp" Version="3.119.0" />
-		<PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.0" />
+		<PackageReference Include="NSwag.Annotations" Version="14.6.1" />
+		<PackageReference Include="NSwag.AspNet.Owin" Version="14.6.1" />
+		<PackageReference Include="SkiaSharp" Version="3.119.1" />
+		<PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.119.1" />
 	</ItemGroup>
 
 	<ItemGroup>
