@@ -29,7 +29,7 @@
 					<div class="grid gap-4 md:grid-cols-2">
 						<FormField v-slot="$field" name="password" class="flex flex-col gap-2">
 							<label class="text-sm font-semibold" for="password">{{ t('views.appSettings.fields.password') }}</label>
-							<InputText id="password" v-model="$field.value" type="password" fluid autocomplete="new-password" />
+							<Password v-model="$field.value" type="text" toggleMask fluid autocomplete="new-password" />
 							<Message v-if="$field?.invalid" severity="error" size="small" variant="simple">{{ $field.error?.message }}</Message>
 						</FormField>
 						<FormField v-slot="$field" name="serverConfigFile" class="flex flex-col gap-2">
