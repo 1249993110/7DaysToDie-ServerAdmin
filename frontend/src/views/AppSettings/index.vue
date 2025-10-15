@@ -75,6 +75,7 @@
 						</template>
 					</Button>
 				</div>
+                <Toast />
 			</template>
 		</template>
 	</Card>
