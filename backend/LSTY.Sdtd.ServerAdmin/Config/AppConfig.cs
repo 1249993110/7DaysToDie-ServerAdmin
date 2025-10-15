@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using System.Runtime;
 using System.Text;
 
 namespace LSTY.Sdtd.ServerAdmin.Config
@@ -61,7 +62,20 @@ namespace LSTY.Sdtd.ServerAdmin.Config
             }
         }
 
-        public static void Write()
+        public static void SaveSettings(AppSettings appSettings)
+        {
+            try
+            {
+                Settings = appSettings;
+                Write();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Save appsettings failed.", ex);
+            }
+        }
+
+        private static void Write()
         {
             string json = JsonConvert.SerializeObject(Settings, Newtonsoft.Json.Formatting.Indented, new JsonSerializerSettings()
             {
