@@ -702,6 +702,17 @@
       "editBan": "编辑黑名单",
       "addWhitelist": "添加白名单",
       "editWhitelist": "编辑白名单"
+    },
+    "permission": {
+      "adminUser": "管理员用户",
+      "addCommandPermission": "新增命令权限",
+      "editCommandPermission": "编辑命令权限",
+      "command": "命令",
+      "commandPermission": "命令权限",
+      "description": "描述",
+      "addAdminUser": "新增管理员",
+      "editAdminUser": "编辑管理员",
+      "permissionLevel": "权限级别"
     }
   }
 }

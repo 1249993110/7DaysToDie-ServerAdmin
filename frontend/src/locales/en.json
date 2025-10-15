@@ -293,6 +293,17 @@
       "removeLandClaimConfirm": "Are you sure you want to remove the land claim?",
       "dragendTelePlayerConfirm": "Are you sure you want to teleport player: {0} to the target location {1}?"
     },
+    "permission": {
+      "adminUser": "Admin User",
+      "addAdminUser": "Add Admin User",
+      "editAdminUser": "Edit Admin User",
+        "addCommandPermission": "Add Command Permission",
+        "editCommandPermission": "Edit Command Permission",
+      "commandPermission": "Command Permission",
+      "command": "Command",
+      "description": "Description",
+      "permissionLevel": "Permission Level"
+    },
     "gameChat": {
       "typeMessage": "Type a message",
       "send": "Send"

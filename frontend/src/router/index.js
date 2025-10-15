@@ -108,7 +108,7 @@ const fullRoutes = [
             {
                 name: 'AppSettings',
                 path: '/app-settings',
-                component: () => import('../views/Dashboard/index.vue'),
+                component: () => import('../views/AppSettings/index.vue'),
                 meta: {
                     title: () => t('menus.appSettings'),
                     icon: markIcon(() => import('~icons/mdi/cog')),

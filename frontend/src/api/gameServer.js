@@ -141,3 +141,29 @@ export const removePlayerFromWhitelist = (playerIds) => {
     return http.delete(`/GameServer/Whitelist`, { params: { playerIds } });
 };
 //#endregion
+
+//#region Permissions
+export const getAdminUsers = (params) => {
+    return http.get('/GameServer/AdminUsers', { params });
+}
+
+export const addAdminUser = (data) => {
+    return http.post('/GameServer/AdminUsers', data);
+}
+
+export const deleteAdminUsers = (playerIds) => {
+    return http.delete('/GameServer/AdminUsers', { params: { playerIds } });
+}
+
+export const getCommandPermissions = (params) => {
+    return http.get('/GameServer/CommandPermissions', { params });
+}
+
+export const addCommandPermission = (data) => {
+    return http.post('/GameServer/CommandPermissions', data);
+}
+
+export const deleteCommandPermissions = (playerIds) => {
+    return http.delete('/GameServer/CommandPermissions', { params: { playerIds } });
+}
+//#endregion
