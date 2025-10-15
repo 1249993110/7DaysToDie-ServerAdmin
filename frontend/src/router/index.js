@@ -76,9 +76,9 @@ const fullRoutes = [
                 },
             },
             {
-                name: 'Permissions',
-                path: '/permissions',
-                component: () => import('../views/Dashboard/index.vue'),
+                name: 'Permission',
+                path: '/permission',
+                component: () => import('../views/Permission/index.vue'),
                 meta: {
                     title: () => t('menus.permissions'),
                     icon: markIcon(() => import('~icons/icon-park-outline/permissions')),

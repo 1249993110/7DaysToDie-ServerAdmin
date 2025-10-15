@@ -20,7 +20,8 @@
 
 <script setup>
 import * as api from '~/api/gameServer';
-import AddOrEditDialog from './AddOrEditDialog/index.vue'
+import AddOrEditDialog from './AddOrEditDialog/index.vue';
+import { myConfirm } from '~/plugins/sweetalert2';
 
 const tableRef = ref();
 const addOrEditDialogRef = ref();
