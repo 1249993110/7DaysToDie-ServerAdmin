@@ -6,6 +6,7 @@ import Lara from '@primeuix/themes/lara';
 import Material from '@primeuix/themes/material';
 import Nora from '@primeuix/themes/nora';
 import { useAppStore } from '~/store/app';
+import ToastService from 'primevue/toastservice';
 
 export const themePresets = {
     aura: Aura,
@@ -35,6 +36,7 @@ export default (app) => {
             }
         }
     });
+    app.use(ToastService);
     app.directive('styleclass', StyleClass);
     app.directive('focustrap', FocusTrap);
 };

@@ -34,18 +34,24 @@
         <template #footer>
             <Button
                 :label="$t('common.cancel')"
-                icon="pi pi-times"
                 class="p-button-text"
                 @click="visible = false"
-            />
+            >
+                <template #icon>
+                    <icon-mdi:close />
+                </template>
+            </Button>
             <Button
                 :label="isEdit ? $t('common.update') : $t('common.save')"
-                icon="pi pi-check"
                 class="p-button-text"
                 type="submit"
                 form="whitelistForm"
                 :loading="loading"
-            />
+            >
+                <template #icon>
+                    <icon-mdi:check />
+                </template>
+            </Button>
         </template>
     </Dialog>
 </template>

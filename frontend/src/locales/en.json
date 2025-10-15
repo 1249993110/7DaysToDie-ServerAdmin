@@ -24,11 +24,11 @@
     "gpsMap": "GPS Map",
     "gameChat": "Game Chat",
     "serverConfig": "Server Config",
+    "appSettings": "App Settings",
     "banWhitelist": "Ban & Whitelist",
     "permissions": "Permissions",
     "modManagement": "Mod Management",
     "console": "Console",
-    "appSettings": "App Settings",
     "apiDocumentation": "API Documentation"
   },
   "components": {
@@ -694,6 +694,27 @@
           "group": "Other",
           "desc": "Daily quest progress limit. Limits the number of quests a player can complete each day to help increase their quest level. Quests above the limit can still be completed to receive rewards"
         }
+      }
+    },
+    "appSettings": {
+      "empty": "No application settings available.",
+      "groups": {
+        "general": "General"
+      },
+      "fields": {
+        "webUrl": "Web URL",
+        "userName": "Username",
+        "password": "Password",
+        "accessTokenExpireTime": "Access Token Expire Time",
+        "refreshTokenExpireTime": "Refresh Token Expire Time",
+        "serverConfigFile": "Server Config File"
+      },
+      "actions": {
+        "save": "Save Settings",
+        "reset": "Reset"
+      },
+      "messages": {
+        "saveSuccess": "Application settings updated."
       }
     },
     "console": {

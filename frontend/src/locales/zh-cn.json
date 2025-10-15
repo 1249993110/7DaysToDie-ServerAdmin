@@ -292,6 +292,27 @@
       "removeLandClaimConfirm": "您确定要移除领地石吗?",
       "dragendTelePlayerConfirm": "确定将玩家: {0} 传送到目标地点 {1} 吗?"
     },
+    "appSettings": {
+      "empty": "暂无应用设置。",
+      "groups": {
+        "general": "通用"
+      },
+      "fields": {
+        "webUrl": "Web 地址",
+        "userName": "用户名",
+        "password": "密码",
+        "accessTokenExpireTime": "访问令牌过期时间",
+        "refreshTokenExpireTime": "刷新令牌过期时间",
+        "serverConfigFile": "服务器配置文件"
+      },
+      "actions": {
+        "save": "保存设置",
+        "reset": "重置"
+      },
+      "messages": {
+        "saveSuccess": "应用设置已更新。"
+      }
+    },
     "gameChat": {
       "typeMessage": "输入消息",
       "send": "发送"

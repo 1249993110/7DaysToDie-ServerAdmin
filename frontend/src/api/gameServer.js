@@ -167,3 +167,12 @@ export const deleteCommandPermissions = (playerIds) => {
     return http.delete('/GameServer/CommandPermissions', { params: { playerIds } });
 }
 //#endregion
+
+//#region AppSettings
+export const getAppSettings = () => {
+    return http.get('/AppSettings');
+};
+export const updateAppSettings = (settings) => {
+    return http.put('/AppSettings', settings);
+}
+//#endregion
