@@ -24,6 +24,7 @@ import * as api from '~/api/gameServer';
 import dayjs from 'dayjs';
 import AddOrEditDialog from './AddOrEditDialog/index.vue';
 import { myConfirm } from '~/plugins/sweetalert2';
+import { searchByKeyword, orderByField } from '~/utils/index';
 
 const tableRef = ref();
 const addOrEditDialogRef = ref();
@@ -33,14 +34,17 @@ const editData = ref(null);
 const columns = computed(() => [
     { field: 'playerId', header: t('views.banWhitelist.playerId'), class: 'min-w-40' },
     { field: 'displayName', header: t('views.banWhitelist.displayName'), sortable: true, class: 'min-w-40' },
-    { field: 'bannedUntil', header: t('views.banWhitelist.bannedUntil'), class: 'min-w-40' },
+    { field: 'bannedUntil', header: t('views.banWhitelist.bannedUntil'), sortable: true, class: 'min-w-40' },
     { field: 'reason', header: t('views.banWhitelist.reason') },
 ]);
 
 const selectedRows = ref([]);
 
 const fetchData = async (params) => {
-    return await api.getBannedPlayers(params);
+    let data = await api.getBannedPlayers(params);
+    data = searchByKeyword(data, params.keyword, ['playerId', 'displayName', 'reason']);
+    data = orderByField(data, params.order, params.desc);
+    return data;
 };
 
 const batchMenuItems = computed(() => [

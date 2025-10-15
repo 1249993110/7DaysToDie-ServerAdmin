@@ -700,7 +700,9 @@
       "bannedUntil": "Banned Until",
       "reason": "Reason",
       "addBan": "Add Ban",
-      "editBan": "Edit Ban"
+      "editBan": "Edit Ban",
+      "addWhitelist": "Add Whitelist",
+      "editWhitelist": "Edit Whitelist"
     }
   }
 }

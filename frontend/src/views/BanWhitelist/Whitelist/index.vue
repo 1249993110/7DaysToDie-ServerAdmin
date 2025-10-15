@@ -1,16 +1,77 @@
 <template>
-    <div class="">
-
+    <div class="h-[calc(100vh-250px)]">
+        <MyTable
+            ref="tableRef"
+            v-model:selection="selectedRows"
+            dataKey="playerId"
+            :columns="columns"
+            :fetchData="fetchData"
+            :batchMenuItems="batchMenuItems"
+            isShowIndex
+            isShowEditBtn
+            @add="onAdd"
+            @edit="onEdit"
+            @delete="onDelete"
+        >
+        </MyTable>
+        <AddOrEditDialog ref="addOrEditDialogRef" :editData="editData" @saved="onSaved" />
     </div>
 </template>
 
-
 <script setup>
+import * as api from '~/api/gameServer';
+import AddOrEditDialog from './AddOrEditDialog/index.vue'
 
+const tableRef = ref();
+const addOrEditDialogRef = ref();
+const { t } = useI18n();
+const editData = ref(null);
 
+const columns = computed(() => [
+    { field: 'playerId', header: t('views.banWhitelist.playerId'), class: 'min-w-40' },
+    { field: 'displayName', header: t('views.banWhitelist.displayName'), sortable: true, class: 'min-w-40' },
+]);
 
+const selectedRows = ref([]);
+
+const fetchData = async (params) => {
+    let data = await api.getWhitelistedPlayers(params);
+    data = searchByKeyword(data, params.keyword, ['playerId', 'displayName']);
+    data = orderByField(data, params.order, params.desc);
+    return data;
+};
+
+const batchMenuItems = computed(() => [
+    {
+        icon: markIcon(() => import('~icons/mdi/delete-sweep')),
+        label: t('common.batchDelete'),
+        disabled: selectedRows.value.length === 0,
+        command: async () => {
+            if (await myConfirm()) {
+                await api.removePlayerFromWhitelist(selectedRows.value.map((row) => row.playerId));
+                tableRef.value.reload();
+            }
+        },
+    },
+]);
+
+const onAdd = () => {
+    editData.value = null;
+    addOrEditDialogRef.value.show();
+};
+
+const onEdit = (rowData) => {
+    editData.value = rowData;
+    addOrEditDialogRef.value.show();
+};
+
+const onDelete = async (rowData) => {
+    await api.removePlayerFromWhitelist([rowData.playerId]);
+    tableRef.value.reload();
+};
+
+const onSaved = () => {
+    tableRef.value.reload();
+    editData.value = null;
+};
 </script>
-
-<style scoped lang="scss">
-
-</style>

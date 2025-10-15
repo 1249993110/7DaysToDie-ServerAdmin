@@ -15,7 +15,8 @@
     "equal": "等于",
     "cancel": "取消",
     "save": "保存",
-    "update": "更新"
+    "update": "更新",
+    "batchDelete": "批量删除"
   },
   "menus": {
     "dashboard": "仪表盘",
@@ -698,7 +699,9 @@
       "bannedUntil": "封禁至",
       "reason": "封禁原因",
       "addBan": "添加黑名单",
-      "editBan": "编辑黑名单"
+      "editBan": "编辑黑名单",
+      "addWhitelist": "添加白名单",
+      "editWhitelist": "编辑白名单"
     }
   }
 }

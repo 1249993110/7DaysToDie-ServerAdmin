@@ -46,3 +46,33 @@ export const formatMinute = (totalMinute) => {
     }
     return result;
 };
+
+export const searchByKeyword = (data, keyword, fields = []) => {
+    if (!keyword || !keyword.trim()) {
+        return data;
+    }
+
+    const regex = new RegExp(keyword, 'i');
+
+    return data.filter((item) => {
+        const keysToSearch = fields.length ? fields : Object.keys(item);
+
+        return keysToSearch.some((field) => {
+            return item[field] != null && regex.test(item[field].toString());
+        });
+    });
+};
+
+export const orderByField = (data, field, desc) => {
+    if (!field) {
+        return data;
+    }
+    return data.sort((a, b) => {
+        if (!desc) {
+            return a[field] > b[field] ? 1 : -1;
+        } else if (desc) {
+            return a[field] < b[field] ? 1 : -1;
+        }
+        return 0;
+    });
+};
