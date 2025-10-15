@@ -99,13 +99,13 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <summary>
         /// Create an admin.
         /// </summary>
-        /// <param name="admin">Admin entry details.</param>
+        /// <param name="model">Admin entry details.</param>
         /// <returns>List of results indicating success or failure for the admin creation.</returns>
         [HttpPost]
         [Route("Admins")]
-        public IEnumerable<string> CreateAdmin([FromBody, Required] AdminEntry admin)
+        public IEnumerable<string> CreateAdmin([FromBody, Required] AdminEntry model)
         {
-            string command = $"admin add {admin.PlayerId} {admin.PermissionLevel} {Utils.FormatCommandArgs(admin.DisplayName)}";
+            string command = $"admin add {model.PlayerId} {model.PermissionLevel} {Utils.FormatCommandArgs(model.DisplayName)}";
             var result = SdtdConsole.Instance.ExecuteSync(command, ModMain.CmdExecuteDelegate);
             return result;
         }
@@ -148,6 +148,136 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                 result.AddRange(SdtdConsole.Instance.ExecuteSync(command, ModMain.CmdExecuteDelegate));
             }
 
+            return result;
+        }
+        #endregion
+
+        #region Bans
+        /// <summary>
+        /// Creates a new ban entry for a player using the specified ban details.
+        /// </summary>
+        /// <remarks>The ban duration is calculated based on the difference between the current time and
+        /// the specified end time. The method executes the ban command synchronously and returns any output generated
+        /// by the command.</remarks>
+        /// <param name="model">An object containing the details of the ban, including the player's ID, the ban duration, reason, and
+        /// display name. Must not be null.</param>
+        /// <returns>An enumerable collection of strings containing the results of the ban command execution.</returns>
+        [HttpPost]
+        [Route("Bans")]
+        public IEnumerable<string> CreateBan([FromBody, Required] BanEntry model)
+        {
+            string command = $"ban add {model.PlayerId} {(int)(model.BannedUntil - DateTime.UtcNow).TotalMinutes} minutes {Utils.FormatCommandArgs(model.Reason)} {Utils.FormatCommandArgs(model.DisplayName)}";
+            return SdtdConsole.Instance.ExecuteSync(command, ModMain.CmdExecuteDelegate);
+        }
+
+        /// <summary>
+        /// Retrieves a collection of ban entries representing players who are currently banned from the game.
+        /// </summary>
+        /// <remarks>Each ban entry includes the player's identifier, ban expiration time, reason for the
+        /// ban, and display name. This method is typically used by administrators to review active bans.</remarks>
+        /// <returns>An enumerable collection of <see cref="BanEntry"/> objects, each containing details about a banned player.
+        /// The collection will be empty if no players are currently banned.</returns>
+        [HttpGet]
+        [Route("Bans")]
+        public IEnumerable<BanEntry> GetBans()
+        {
+            var result = new List<BanEntry>();
+            foreach (var item in GameManager.Instance.adminTools.Blacklist.GetBanned())
+            {
+                result.Add(new BanEntry()
+                {
+                    PlayerId = item.UserIdentifier.CombinedString,
+                    BannedUntil = item.BannedUntil,
+                    Reason = item.BanReason,
+                    DisplayName = item.Name
+                });
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Removes bans for the specified players and returns the results of each ban removal operation.
+        /// </summary>
+        /// <remarks>This method executes a ban removal command for each provided player ID. The returned
+        /// collection contains the output messages from the underlying command execution. The order of results
+        /// corresponds to the order of the input player IDs.</remarks>
+        /// <param name="playerIds">An array of player IDs for which bans should be removed. Cannot be null or empty.</param>
+        /// <returns>An enumerable collection of strings containing the results of each ban removal command. Each string
+        /// represents the output from the ban removal operation for a player.</returns>
+        [HttpDelete]
+        [Route("Bans")]
+        public IEnumerable<string> RemoveBans([FromUri, Required] string[] playerIds)
+        {
+            var result = new List<string>();
+            foreach (var item in playerIds)
+            {
+                string command = $"ban remove {item}";
+                result.AddRange(SdtdConsole.Instance.ExecuteSync(command, ModMain.CmdExecuteDelegate));
+            }
+            return result;
+        }
+        #endregion
+
+        #region Whitelist
+        /// <summary>
+        /// Adds a new entry to the whitelist using the specified player information.
+        /// </summary>
+        /// <remarks>This method executes a server command to add the player to the whitelist. The
+        /// returned collection contains the output messages from the server, which may include success or error
+        /// information.</remarks>
+        /// <param name="model">The whitelist entry containing the player's ID and display name to be added. Cannot be null.</param>
+        /// <returns>An enumerable collection of strings containing the results of the whitelist command execution.</returns>
+        [HttpPost]
+        [Route("Whitelist")]
+        public IEnumerable<string> CreateWhitelistEntry([FromBody, Required] WhitelistEntry model)
+        {
+            string command = $"whitelist add {model.PlayerId} {Utils.FormatCommandArgs(model.DisplayName)}";
+            var result = SdtdConsole.Instance.ExecuteSync(command, ModMain.CmdExecuteDelegate);
+            return result;
+        }
+
+        /// <summary>
+        /// Retrieves the list of all users currently included in the whitelist.
+        /// </summary>
+        /// <remarks>This method is typically used to display or manage the whitelist for administrative
+        /// purposes. The returned entries include both the player's unique identifier and display name.</remarks>
+        /// <returns>An enumerable collection of <see cref="WhitelistEntry"/> objects representing each whitelisted user. The
+        /// collection will be empty if no users are whitelisted.</returns>
+        [HttpGet]
+        [Route("Whitelist")]
+        public IEnumerable<WhitelistEntry> GetWhitelistEntries()
+        {
+            var result = new List<WhitelistEntry>();
+            foreach (var item in GameManager.Instance.adminTools.Whitelist.GetUsers().Values)
+            {
+                result.Add(new WhitelistEntry()
+                {
+                    PlayerId = item.UserIdentifier.CombinedString,
+                    DisplayName = item.Name,
+                });
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Removes the specified players from the server whitelist.
+        /// </summary>
+        /// <remarks>This method executes a removal command for each provided player ID. The returned
+        /// collection may include error messages if a player ID is not found or if removal fails.</remarks>
+        /// <param name="playerIds">An array of player IDs to remove from the whitelist. Cannot be null.</param>
+        /// <returns>A collection of strings containing the results of each whitelist removal command. Each entry represents the
+        /// server's response for the corresponding player ID.</returns>
+        [HttpDelete]
+        [Route("Whitelist")]
+        public IEnumerable<string> RemoveWhitelistEntries([FromUri, Required] string[] playerIds)
+        {
+            var result = new List<string>();
+            foreach (var item in playerIds)
+            {
+                string command = $"whitelist remove {item}";
+                result.AddRange(SdtdConsole.Instance.ExecuteSync(command, ModMain.CmdExecuteDelegate));
+            }
             return result;
         }
         #endregion

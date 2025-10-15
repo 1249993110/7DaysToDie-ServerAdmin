@@ -41,6 +41,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
             ContractResolver = new CamelCasePropertyNamesContractResolver(),
             MissingMemberHandling = MissingMemberHandling.Ignore,
             TypeNameHandling = TypeNameHandling.None,
+            DateParseHandling = DateParseHandling.None,
             Converters = new List<JsonConverter>()
             {
                 new Newtonsoft.Json.Converters.StringEnumConverter(),
