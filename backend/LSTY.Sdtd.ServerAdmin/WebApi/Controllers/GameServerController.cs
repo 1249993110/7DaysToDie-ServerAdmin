@@ -18,6 +18,8 @@ using System.Xml;
 using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.Windows;
+using static AdminCommands;
+using CommandPermission = LSTY.Sdtd.ServerAdmin.Shared.Models.CommandPermission;
 
 namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
 {
@@ -95,15 +97,15 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         }
         #endregion
 
-        #region Admins
+        #region Admin Users
         /// <summary>
         /// Create an admin.
         /// </summary>
         /// <param name="model">Admin entry details.</param>
         /// <returns>List of results indicating success or failure for the admin creation.</returns>
         [HttpPost]
-        [Route("Admins")]
-        public IEnumerable<string> CreateAdmin([FromBody, Required] AdminEntry model)
+        [Route("AdminUsers")]
+        public IEnumerable<string> CreateAdminUser([FromBody, Required] AdminUser model)
         {
             string command = $"admin add {model.PlayerId} {model.PermissionLevel} {Utils.FormatCommandArgs(model.DisplayName)}";
             var result = SdtdConsole.Instance.ExecuteSync(command, ModMain.CmdExecuteDelegate);
@@ -115,13 +117,13 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("Admins")]
-        public IEnumerable<AdminEntry> GetAdmins()
+        [Route("AdminUsers")]
+        public IEnumerable<AdminUser> GetAdminUsers()
         {
-            var result = new List<AdminEntry>();
+            var result = new List<AdminUser>();
             foreach (var item in GameManager.Instance.adminTools.Users.GetUsers().Values)
             {
-                result.Add(new AdminEntry()
+                result.Add(new AdminUser()
                 {
                     PlayerId = item.UserIdentifier.CombinedString,
                     PermissionLevel = item.PermissionLevel,
@@ -138,8 +140,8 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <param name="playerIds">Array of player IDs to remove.</param>
         /// <returns>List of results indicating success or failure for each admin removal.</returns>
         [HttpDelete]
-        [Route("Admins")]
-        public IEnumerable<string> RemoveAdmins([FromUri, Required] string[] playerIds)
+        [Route("AdminUsers")]
+        public IEnumerable<string> RemoveAdminUsers([FromUri, Required] string[] playerIds)
         {
             var result = new List<string>();
             foreach (var item in playerIds)
@@ -148,6 +150,66 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                 result.AddRange(SdtdConsole.Instance.ExecuteSync(command, ModMain.CmdExecuteDelegate));
             }
 
+            return result;
+        }
+        #endregion
+
+        #region Command Permissions
+        /// <summary>
+        /// Creates a new command permission based on the specified model and returns the result messages.
+        /// </summary>
+        /// <param name="model">An object containing the command name and the desired permission level. Must not be null.</param>
+        /// <returns>An enumerable collection of strings containing the result messages from the command execution.</returns>
+        [HttpPost]
+        [Route("CommandPermissions")]
+        public IEnumerable<string> CreateCommandPermission([FromBody, Required] CommandPermissionCreate model)
+        {
+            string command = $"cp add {model.Command} {model.PermissionLevel}";
+            var result = SdtdConsole.Instance.ExecuteSync(command, ModMain.CmdExecuteDelegate);
+            return result;
+        }
+
+        /// <summary>
+        /// Retrieves a collection of available commands and their associated permission levels.
+        /// </summary>
+        /// <remarks>Use this method to enumerate all commands exposed by the system, along with their
+        /// descriptions and required permission levels. This is typically used for administrative interfaces or
+        /// permission management tools.</remarks>
+        /// <returns>An enumerable collection of <see cref="CommandPermission"/> objects, each representing a command and its
+        /// required permission level. The collection will be empty if no commands are available.</returns>
+        [HttpGet]
+        [Route("CommandPermissions")]
+        public IEnumerable<CommandPermission> GetCommandPermissions()
+        {
+            var result = new List<CommandPermission>();
+            foreach (var item in GameManager.Instance.adminTools.Commands.GetCommands().Values)
+            {
+                result.Add(new CommandPermission()
+                {
+                    Command = item.Command,
+                    PermissionLevel = item.PermissionLevel,
+                    Description = SdtdConsole.Instance.GetCommand(item.Command)?.GetDescription(),
+                });
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Removes permissions for the specified commands and returns the results of each removal operation.
+        /// </summary>
+        /// <param name="commands">An array of command names for which permissions should be removed. Cannot be null or empty.</param>
+        /// <returns>An enumerable collection of strings containing the results of each command permission removal. The
+        /// collection will be empty if no commands are provided.</returns>
+        [HttpDelete]
+        [Route("CommandPermissions")]
+        public IEnumerable<string> RemoveCommandPermissions([FromUri, Required] string[] commands)
+        {
+            var result = new List<string>();
+            foreach (var item in commands)
+            {
+                string command = $"cp remove {item}";
+                result.AddRange(SdtdConsole.Instance.ExecuteSync(command, ModMain.CmdExecuteDelegate));
+            }
             return result;
         }
         #endregion

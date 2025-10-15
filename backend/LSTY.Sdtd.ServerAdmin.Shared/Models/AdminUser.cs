@@ -1,9 +1,9 @@
 ﻿namespace LSTY.Sdtd.ServerAdmin.Shared.Models
 {
     /// <summary>
-    /// Admin Entry
+    /// Admin User
     /// </summary>
-    public class AdminEntry
+    public class AdminUser
     {
         [Required]
         public required string PlayerId { get; set; }
