@@ -7,19 +7,19 @@ export const useGameEventStore = defineStore('gameEvent', () => {
     const chatMessages = ref([]);
     const MAX = 2000;
 
-    const addLog = (message, logType) => {
+    const addLog = async (message, logType) => {
         logs.value.push({ id: crypto.randomUUID(), message, logType });
 
         if (logs.value.length > MAX) {
-            nextTick(() => logs.value.shift());
+            await nextTick(() => logs.value.shift());
         }
     };
 
-    const addChatMessage = (message, timestamp, senderName) => {
+    const addChatMessage = async (message, timestamp, senderName) => {
         chatMessages.value.push({ id: crypto.randomUUID(), message, timestamp, senderName });
 
         if (chatMessages.value.length > MAX) {
-            nextTick(() => chatMessages.value.shift());
+            await nextTick(() => chatMessages.value.shift());
         }
     };
 

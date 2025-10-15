@@ -10,6 +10,7 @@
             :isShowEditBtn="false"
             :isShowDeleteBtn="false"
             :contextMenuItems="contextMenuItems"
+            :isShowAddBtn="false"
         >
             <template #playerName-body="{ data }">
                 <span class="flex items-center">

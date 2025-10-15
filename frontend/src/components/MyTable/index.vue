@@ -27,10 +27,13 @@
             <template #header>
                 <div class="flex justify-between">
                     <div class="flex gap-2">
-                        <Button type="button" outlined raised rounded v-tooltip.left="$t('components.myTable.batch')" @click="onToggleBatchMenu">
+                        <Button type="button" v-if="isShowAddBtn" outlined raised rounded v-tooltip.top="$t('components.myTable.add')" @click="$emit('add')">
+                            <icon-mdi:plus />
+                        </Button>
+                        <Button type="button" outlined raised rounded v-tooltip.top="$t('components.myTable.batch')" @click="onToggleBatchMenu">
                             <icon-ic:baseline-more-vert />
                         </Button>
-                        <Button type="button" outlined raised rounded v-tooltip.right="$t('components.myTable.refresh')" @click="loadLazyData">
+                        <Button type="button" outlined raised rounded v-tooltip.top="$t('components.myTable.refresh')" @click="loadLazyData">
                             <icon-mdi:refresh />
                         </Button>
                     </div>
@@ -71,7 +74,7 @@
             </Column>
             <Column v-if="isShowEditBtn || isShowDeleteBtn || isShowContextMenu" :exportable="false" frozen alignFrozen="right">
                 <template #body="scope">
-                    <Button v-if="isShowEditBtn" outlined rounded class="mr-2" @click="onEdit(scope.data)" size="small">
+                    <Button v-if="isShowEditBtn" outlined rounded class="mr-2" @click="$emit('edit', scope.data)" size="small">
                         <icon-mdi:pencil />
                     </Button>
                     <Button v-if="isShowDeleteBtn" outlined rounded class="mr-2" severity="danger" @click="onConfirmDelete(scope.data)" size="small">
@@ -97,6 +100,8 @@
 </template>
 
 <script setup>
+import { myConfirm } from '~/plugins/sweetalert2';
+
 const props = defineProps({
     columns: {
         type: Array,
@@ -113,6 +118,10 @@ const props = defineProps({
     isShowIndex: {
         type: Boolean,
         default: false,
+    },
+    isShowAddBtn: {
+        type: Boolean,
+        default: true,
     },
     isShowEditBtn: {
         type: Boolean,
@@ -180,15 +189,23 @@ const loadLazyData = async () => {
 
         const data = await Promise.resolve(props.fetchData(params));
 
-        tableData.value = data.items;
-        totalRecords.value = data.total;
+        if (data.items && Array.isArray(data.items)) {
+            tableData.value = data.items;
+            totalRecords.value = data.total;
+        } else {
+            tableData.value = data;
+            totalRecords.value = data.length;
+        }
+        
     } finally {
         loading.value = false;
     }
 };
 
 loadLazyData();
-useIntervalFn(loadLazyData, () => props.autoRefreshInterval * 1000, { immediate: true });
+const { pause, resume } = useIntervalFn(loadLazyData, () => props.autoRefreshInterval * 1000, { immediate: true });
+onActivated(resume);
+onDeactivated(pause);
 
 const onPage = async (event) => {
     first.value = event.first;
@@ -244,5 +261,12 @@ const onRowContextMenu = (event) => {
     contextMenuRef.value.show(event.originalEvent);
 };
 
-defineExpose({ currentRow });
+const emits = defineEmits(['add', 'edit', 'delete']);
+const onConfirmDelete = async (rowData) => {
+    if (await myConfirm()) {
+        emits('delete', rowData);
+    }
+};
+
+defineExpose({ currentRow, reload: loadLazyData });
 </script>

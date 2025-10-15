@@ -66,12 +66,12 @@ const onEnter = async () => {
 
 const { pause, resume } = watch(
     () => gameEventStore.chatMessages.length,
-    () => {
+    async () => {
         const element = contentRef.value;
         if (element) {
             const isScrolledToBottom = element.scrollTop + element.clientHeight >= element.scrollHeight - 1;
             if (isScrolledToBottom) {
-                nextTick(() => {
+                await nextTick(() => {
                     element.scrollTop = element.scrollHeight;
                 });
             }

@@ -12,10 +12,10 @@ export const executeConsoleCommand = (command, inMainThread = true) => {
 //#region Send Message
 export const sendGlobalMessage = (message, senderName = null) => {
     return http.post('/GameServer/SendGlobalMessage', { message, senderName });
-}
+};
 export const sendPrivateMessage = (targetPlayerIdOrName, message, senderName = null) => {
     return http.post('/GameServer/SendPrivateMessage', { targetPlayerIdOrName, message, senderName });
-}
+};
 //#endregion
 
 export const getAllowedCommands = () => {
@@ -81,19 +81,19 @@ export const getLocations = (entityType) => {
 
 export const getLocation = (entityId) => {
     return http.get(`/GameServer/Locations/${entityId}`);
-}
+};
 //#endregion
 
 //#region Localization
 export const getLocalizationDict = (language) => {
     return http.get('/GameServer/Localization', { params: { language } });
-}
+};
 export const getLocalizationByKey = (key, language, isCaseInsensitive = false) => {
     return http.get(`/GameServer/Localization/${key}`, { params: { language, caseInsensitive: isCaseInsensitive } });
-}
+};
 export const getKnownLanguages = () => {
     return http.get('/GameServer/KnownLanguages');
-}
+};
 //#endregion
 
 //#region LandClaims
@@ -115,5 +115,29 @@ export const getServerSettings = () => {
 
 export const updateServerSettings = (settings) => {
     return http.put('/GameServer/ServerSettings', settings);
+};
+//#endregion
+
+//#region Bans
+export const getBannedPlayers = (params) => {
+    return http.get('/GameServer/Bans', { params });
+};
+export const banPlayer = (playerId, bannedUntil, displayName, reason = null) => {
+    return http.post('/GameServer/Bans', { playerId, bannedUntil, displayName, reason });
+};
+export const unbanPlayers = (playerIds) => {
+    return http.delete(`/GameServer/Bans`, { params: { playerIds } });
+};
+//#endregion
+
+//#region Whitelist
+export const getWhitelistedPlayers = (params) => {
+    return http.get('/GameServer/Whitelist', { params });
+};
+export const addPlayerToWhitelist = (playerId, displayName) => {
+    return http.post('/GameServer/Whitelist', { playerId, displayName });
+};
+export const removePlayerFromWhitelist = (playerIds) => {
+    return http.delete(`/GameServer/Whitelist`, { params: { playerIds } });
 };
 //#endregion

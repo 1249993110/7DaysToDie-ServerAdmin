@@ -66,11 +66,11 @@ const fullRoutes = [
                 },
             },
             {
-                name: 'BlackWhiteList',
-                path: '/black-white-list',
-                component: () => import('../views/Dashboard/index.vue'),
+                name: 'BanWhitelist',
+                path: '/ban-whitelist',
+                component: () => import('../views/BanWhitelist/index.vue'),
                 meta: {
-                    title: () => t('menus.blackWhiteList'),
+                    title: () => t('menus.banWhitelist'),
                     icon: markIcon(() => import('~icons/mdi/list-status')),
                     isRequireAuth: true,
                 },

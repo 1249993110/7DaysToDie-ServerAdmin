@@ -11,6 +11,7 @@
             :isShowDeleteBtn="false"
             :contextMenuItems="contextMenuItems"
             :autoRefreshInterval="10"
+            :isShowAddBtn="false"
         >
             <template #playerName-body="{ data }">
                 <span class="flex items-center">

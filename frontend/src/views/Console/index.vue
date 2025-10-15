@@ -155,12 +155,12 @@ const getColor = (logType) => logColorMap[logType] || '#00C814';
 
 const { pause, resume } = watch(
     () => gameEventStore.logs.length,
-    () => {
+    async () => {
         const element = contentRef.value;
         if (element) {
             const isScrolledToBottom = element.scrollTop + element.clientHeight >= element.scrollHeight - 1;
             if (isScrolledToBottom) {
-                nextTick(() => {
+                await nextTick(() => {
                     element.scrollTop = element.scrollHeight;
                 });
             }
