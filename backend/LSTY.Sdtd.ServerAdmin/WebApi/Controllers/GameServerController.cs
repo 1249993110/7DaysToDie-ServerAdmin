@@ -9,6 +9,7 @@ using Newtonsoft.Json.Serialization;
 using NSwag.Annotations;
 using SkiaSharp;
 using System.ComponentModel.DataAnnotations;
+using System.IO.Compression;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -1427,6 +1428,244 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
 
             xmlDocument.Save(path);
             return Ok();
+        }
+        #endregion
+
+        #region Mods
+        /// <summary>
+        /// Retrieves information about all available mods by scanning the Mods directory.
+        /// </summary>
+        /// <remarks>Each mod is identified by the presence of a ModInfo.xml or _ModInfo.xml file within
+        /// its folder. Only mods with valid metadata files are included in the result. The returned collection reflects
+        /// the current state of the Mods directory at the time of the request.</remarks>
+        /// <returns>An enumerable collection of <see cref="Shared.Models.ModInfo"/> objects, each representing a mod found in
+        /// the Mods directory. Returns an empty collection if no mods are available.</returns>
+        [HttpGet]
+        [Route("Mods")]
+        public IEnumerable<Shared.Models.ModInfo> GetMods()
+        {
+            var mods = new List<Shared.Models.ModInfo>();
+
+            string modPath = Path.Combine(AppContext.BaseDirectory, "Mods");
+            if (Directory.Exists(modPath) == false)
+            {
+                return Array.Empty<Shared.Models.ModInfo>();
+            }
+
+            foreach (var dir in Directory.GetDirectories(modPath))
+            {
+                bool isUninstalled = false;
+                string path = Path.Combine(dir, "ModInfo.xml");
+                if (File.Exists(path) == false)
+                {
+                    path = Path.Combine(dir, "_ModInfo.xml");
+                    if (File.Exists(path) == false)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        isUninstalled = true;
+                    }
+                }
+
+                var xmlDocument = new XmlDocument();
+                xmlDocument.Load(path);
+                var rootNode = xmlDocument.DocumentElement;
+
+                string GetValue(string nodeName)
+                {
+                    var node = rootNode.SelectSingleNode(nodeName);
+                    return node?.Attributes?["value"]?.Value ?? string.Empty;
+                }
+
+                var mod = new Shared.Models.ModInfo()
+                {
+                    Name = GetValue("Name"),
+                    DisplayName = GetValue("DisplayName"),
+                    Author = GetValue("Author"),
+                    Description = GetValue("Description"),
+                    Version = GetValue("Version"),
+                    Website = GetValue("Website"),
+                    FolderName = new DirectoryInfo(dir).Name,
+                };
+                mod.IsLoaded = ModManager.loadedMods.dict.ContainsKey(mod.Name);
+                mod.IsUninstalled = isUninstalled;
+                mods.Add(mod);
+            }
+
+            return mods;
+        }
+
+        private bool IsSingleRootFolder(string tempZipPath, out string? rootFolderName)
+        {
+            rootFolderName = null;
+            try
+            {
+                using (var archive = ZipFile.OpenRead(tempZipPath))
+                {
+                    var topLevelItems = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                    foreach (var entry in archive.Entries.Where(e => !string.IsNullOrEmpty(e.Name)))
+                    {
+                        var parts = entry.FullName.Split(new char[] { '/', '\\' },
+                                                          2,
+                                                          StringSplitOptions.RemoveEmptyEntries);
+
+                        if (parts.Length > 0)
+                        {
+                            topLevelItems.Add(parts[0].TrimEnd('/', '\\'));
+                        }
+                    }
+
+                    if (topLevelItems.Count == 1)
+                    {
+                        rootFolderName = topLevelItems.First();
+                        return true;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            return false;
+        }
+
+        ///// <summary>
+        ///// Handles a file upload via multipart/form-data and extracts the uploaded ZIP file to the server,
+        ///// conditionally creating a target directory based on the ZIP's structure.
+        ///// </summary>
+        ///// <remarks>If the uploaded ZIP contains a single root folder, its contents are extracted
+        ///// directly into the Mods directory. Otherwise, a new subdirectory is created under Mods using the ZIP file
+        ///// name. Existing directories with the same name will cause the operation to fail with a conflict response. The
+        ///// method deletes the temporary uploaded file after extraction. This endpoint expects requests with
+        ///// 'multipart/form-data' content type.</remarks>
+        ///// <returns>An HTTP response indicating the result of the upload and extraction operation. Returns 200 (OK) if
+        ///// extraction succeeds, 400 (Bad Request) if no file is uploaded, 409 (Conflict) if the target directory
+        ///// already exists, 415 (Unsupported Media Type) if the request content type is invalid, or 500 (Internal Server
+        ///// Error) if an error occurs during upload or extraction.</returns>
+        //[HttpPost]
+        //[Route("Mods")]
+        //public async Task<HttpResponseMessage> UploadAndConditionalUnzip(MultipartFileData multipartFileData)
+        //{
+        //    if (Request.Content.IsMimeMultipartContent() == false)
+        //    {
+        //        return Request.CreateErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported content type.");
+        //    }
+
+        //    string extractionBasePath = Path.Combine(AppContext.BaseDirectory, "Mods");
+        //    string tempFolder = Path.GetTempPath();
+        //    if (Directory.Exists(extractionBasePath) == false)
+        //    {
+        //        Directory.CreateDirectory(extractionBasePath);
+        //    }
+        //    if (Directory.Exists(tempFolder) == false)
+        //    {
+        //        Directory.CreateDirectory(tempFolder);
+        //    }
+
+        //    var provider = new MultipartFormDataStreamProvider(tempFolder);
+        //    string tempFilePath = string.Empty;
+
+        //    try
+        //    {
+        //        await Request.Content.ReadAsMultipartAsync(provider);
+        //        var fileData = provider.FileData.FirstOrDefault();
+
+        //        if (fileData == null) return Request.CreateResponse(HttpStatusCode.BadRequest, "No file uploaded.");
+
+        //        tempFilePath = fileData.LocalFileName;
+        //        string originalFileName = fileData.Headers.ContentDisposition.FileName.Trim('"');
+        //        string zipNameWithoutExtension = Path.GetFileNameWithoutExtension(originalFileName);
+
+        //        bool isSingleRoot = IsSingleRootFolder(tempFilePath, out string? rootFolderName);
+
+        //        string targetDirectory;
+        //        if (isSingleRoot)
+        //        {
+        //            targetDirectory = extractionBasePath;
+        //            string rootPathInBase = Path.Combine(targetDirectory, rootFolderName!);
+        //            if (Directory.Exists(rootPathInBase))
+        //            {
+        //                return Request.CreateResponse(HttpStatusCode.Conflict,
+        //                    $"Extraction aborted. The target directory '{rootFolderName}' already exists.");
+        //            }
+        //        }
+        //        else
+        //        {
+        //            targetDirectory = Path.Combine(extractionBasePath, zipNameWithoutExtension);
+        //            if (Directory.Exists(targetDirectory))
+        //            {
+        //                return Request.CreateResponse(HttpStatusCode.Conflict,
+        //                    $"Extraction aborted. The target directory '{zipNameWithoutExtension}' already exists.");
+        //            }
+        //        }
+
+        //        ZipFile.ExtractToDirectory(tempFilePath, targetDirectory);
+        //        File.Delete(tempFilePath);
+
+        //        return Request.CreateResponse(HttpStatusCode.OK,
+        //            $"ZIP file '{originalFileName}' successfully extracted. Single-Root: {isSingleRoot}. Final Path: {targetDirectory}");
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        if (string.IsNullOrEmpty(tempFilePath) == false && File.Exists(tempFilePath))
+        //        {
+        //            File.Delete(tempFilePath);
+        //        }
+        //        return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, "File upload or decompression failed.", e);
+        //    }
+        //}
+
+        /// <summary>
+        /// Toggles the activation status of a mod by renaming its ModInfo.xml file within the specified folder.
+        /// </summary>
+        /// <remarks>This method enables or disables a mod by renaming its ModInfo.xml file to
+        /// _ModInfo.xml or vice versa. The mod folder must exist within the application's Mods directory. The operation
+        /// is atomic and does not modify the contents of the mod files.</remarks>
+        /// <param name="folderName">The name of the mod folder to update. Cannot be null, empty, or consist only of whitespace.</param>
+        /// <returns>An HTTP response indicating the result of the operation: 200 OK if the status was toggled successfully; 400
+        /// Bad Request if the folder name is invalid; 404 Not Found if the folder or mod info file does not exist; or
+        /// 500 Internal Server Error if an unexpected error occurs.</returns>
+        [HttpPut]
+        [Route("Mods")]
+        public IHttpActionResult ToggleModStatus([FromUri] string folderName)
+        {
+            if (string.IsNullOrWhiteSpace(folderName))
+            {
+                return BadRequest("Folder name cannot be empty.");
+            }
+            string modPath = Path.Combine(AppContext.BaseDirectory, "Mods", folderName);
+            if (Directory.Exists(modPath) == false)
+            {
+                return NotFound();
+            }
+            try
+            {
+                string oldPath = Path.Combine(modPath, "ModInfo.xml");
+                string newPath = Path.Combine(modPath, "_ModInfo.xml");
+
+                if (File.Exists(oldPath))
+                {
+                    File.Move(oldPath, newPath);
+                }
+                else if (File.Exists(newPath))
+                {
+                    File.Move(newPath, oldPath);
+                }
+                else
+                {
+                    return NotFound();
+                }
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(new Exception("Failed to delete mod folder.", ex));
+            }
         }
         #endregion
     }

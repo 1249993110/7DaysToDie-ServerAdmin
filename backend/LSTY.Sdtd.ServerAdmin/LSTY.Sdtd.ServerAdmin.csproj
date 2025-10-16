@@ -75,6 +75,10 @@
 			<Private>false</Private>
 			<HintPath>7dtd-binaries\UnityEngine.AnimationModule.dll</HintPath>
 		</Reference>
+		<Reference Include="System.IO.Compression">
+			<Private>false</Private>
+			<HintPath>7dtd-binaries\System.IO.Compression.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 
 	<ItemGroup>
