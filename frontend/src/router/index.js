@@ -88,7 +88,7 @@ const fullRoutes = [
             {
                 name: 'ModManagement',
                 path: '/mod-management',
-                component: () => import('../views/Dashboard/index.vue'),
+                component: () => import('../views/ModManagement/index.vue'),
                 meta: {
                     title: () => t('menus.modManagement'),
                     icon: markIcon(() => import('~icons/mdi/cogs')),

@@ -176,3 +176,19 @@ export const updateAppSettings = (settings) => {
     return http.put('/AppSettings', settings);
 }
 //#endregion
+
+//#region Mods
+export const getMods = () => {
+    return http.get('/GameServer/Mods');
+};
+
+// export const uploadMod = (formData) => {
+//     return http.post('/GameServer/Mods', formData, {
+//         headers: { 'Content-Type': 'multipart/form-data' },
+//     });
+// }
+
+export const toggleModStatus = (folderName) => {
+    return http.put(`/GameServer/Mods?folderName=${folderName}`);
+};
+//#endregion

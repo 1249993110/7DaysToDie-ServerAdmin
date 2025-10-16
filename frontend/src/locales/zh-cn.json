@@ -313,6 +313,31 @@
         "saveSuccess": "应用设置已更新。"
       }
     },
+    "modManagement": {
+      "columns": {
+        "displayName": "模组",
+        "author": "作者",
+        "version": "版本",
+        "website": "网站",
+        "loaded": "已加载",
+        "uninstalled": "已卸载",
+        "actions": "操作"
+      },
+      "status": {
+        "loaded": "已加载",
+        "unloaded": "未加载",
+        "installed": "已安装",
+        "uninstalled": "已卸载"
+      },
+      "actions": {
+        "install": "安装",
+        "uninstall": "卸载"
+      },
+      "toast": {
+        "title": "模组管理",
+        "toggleSuccess": "模组状态已刷新。"
+      }
+    },
     "gameChat": {
       "typeMessage": "输入消息",
       "send": "发送"

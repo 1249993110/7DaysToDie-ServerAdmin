@@ -717,6 +717,31 @@
         "saveSuccess": "Application settings updated."
       }
     },
+    "modManagement": {
+      "columns": {
+        "displayName": "Mod",
+        "author": "Author",
+        "version": "Version",
+        "website": "Website",
+        "loaded": "Loaded",
+        "uninstalled": "Uninstalled",
+        "actions": "Actions"
+      },
+      "status": {
+        "loaded": "Loaded",
+        "unloaded": "Unloaded",
+        "installed": "Installed",
+        "uninstalled": "Uninstalled"
+      },
+      "actions": {
+        "install": "Install",
+        "uninstall": "Uninstall"
+      },
+      "toast": {
+        "title": "Mod Management",
+        "toggleSuccess": "Mod status refreshed."
+      }
+    },
     "console": {
       "invalidCommand": {
         "title": "Invalid Command",
