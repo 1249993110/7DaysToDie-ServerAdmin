@@ -1,6 +1,7 @@
 import { EventSourcePlus } from 'event-source-plus';
 import emitter, { EVENT_TYPES } from '~/plugins/mitt';
 import { useUserInfoStore } from '~/store/userInfo';
+import { v4 as uuidv4 } from 'uuid';
 
 export const useGameEventStore = defineStore('gameEvent', () => {
     const logs = ref([]);
@@ -8,7 +9,7 @@ export const useGameEventStore = defineStore('gameEvent', () => {
     const MAX = 2000;
 
     const addLog = async (message, logType) => {
-        logs.value.push({ id: crypto.randomUUID(), message, logType });
+        logs.value.push({ id: uuidv4(), message, logType });
 
         if (logs.value.length > MAX) {
             await nextTick(() => logs.value.shift());
@@ -16,7 +17,7 @@ export const useGameEventStore = defineStore('gameEvent', () => {
     };
 
     const addChatMessage = async (message, timestamp, senderName) => {
-        chatMessages.value.push({ id: crypto.randomUUID(), message, timestamp, senderName });
+        chatMessages.value.push({ id: uuidv4(), message, timestamp, senderName });
 
         if (chatMessages.value.length > MAX) {
             await nextTick(() => chatMessages.value.shift());

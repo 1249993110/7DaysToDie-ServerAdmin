@@ -59,7 +59,8 @@ const fetchData = async (params) => {
     }
 
     const list = Array.isArray(response) ? response : [];
-    return transform(list);
+    const data = transform(list);
+    return { items: data.slice((params.pageNumber - 1) * params.pageSize, params.pageNumber * params.pageSize), total: data.length };
 };
 
 const batchMenuItems = computed(() => [

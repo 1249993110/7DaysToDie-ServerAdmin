@@ -44,7 +44,7 @@ const fetchData = async (params) => {
     let data = await api.getBannedPlayers(params);
     data = searchByKeyword(data, params.keyword, ['playerId', 'displayName', 'reason']);
     data = orderByField(data, params.order, params.desc);
-    return data;
+    return { items: data.slice((params.pageNumber - 1) * params.pageSize, params.pageNumber * params.pageSize), total: data.length };
 };
 
 const batchMenuItems = computed(() => [

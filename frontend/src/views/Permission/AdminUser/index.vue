@@ -44,7 +44,7 @@ const fetchData = async (params) => {
     let data = await api.getAdminUsers(params);
     data = searchByKeyword(data, params.keyword, ['playerId', 'displayName']);
     data = orderByField(data, params.order, params.desc);
-    return data;
+    return { items: data.slice((params.pageNumber - 1) * params.pageSize, params.pageNumber * params.pageSize), total: data.length };
 };
 
 const batchMenuItems = computed(() => [

@@ -85,7 +85,7 @@ const fetchData = async (params) => {
     const list = Array.isArray(response) ? response : response?.items ?? [];
     let data = searchByKeyword(list, params.keyword, ['displayName', 'name', 'author', 'folderName', 'description']);
     data = orderByField(data, params.order, params.desc);
-    return data;
+    return { items: data.slice((params.pageNumber - 1) * params.pageSize, params.pageNumber * params.pageSize), total: data.length };
 };
 
 const onToggleStatus = async (mod) => {

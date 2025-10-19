@@ -111,6 +111,7 @@ import { myConfirm } from '~/plugins/sweetalert2';
 import { useAppStore } from '~/store/app';
 import { useLocaleStore } from '~/store/locale';
 import { useUserInfoStore } from '~/store/userInfo';
+import { v4 as uuidv4 } from 'uuid';
 
 const isDark = useDark();
 const userInfoStore = useUserInfoStore();
@@ -123,14 +124,14 @@ const onMenuButtonClick = () => {
     isDrawerMenuVisible.value = !isDrawerMenuVisible.value;
 };
 
-const langMenuId = `menu_${crypto.randomUUID()}`;
+const langMenuId = `menu_${uuidv4()}`;
 const langMenuRef = ref();
 const langNativeMap = localeStore.getLanguageNativeMap();
 const onLangButtonClick = (event) => {
     langMenuRef.value.toggle(event);
 };
 
-const accountMenuId = `menu_${crypto.randomUUID()}`;
+const accountMenuId = `menu_${uuidv4()}`;
 const accountMenuRef = ref();
 const accountMenuItems = [
     {
