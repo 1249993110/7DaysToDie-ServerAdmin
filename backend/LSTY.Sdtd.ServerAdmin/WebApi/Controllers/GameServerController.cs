@@ -1497,41 +1497,41 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
             return mods;
         }
 
-        private bool IsSingleRootFolder(string tempZipPath, out string? rootFolderName)
-        {
-            rootFolderName = null;
-            try
-            {
-                using (var archive = ZipFile.OpenRead(tempZipPath))
-                {
-                    var topLevelItems = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        //private bool IsSingleRootFolder(string tempZipPath, out string? rootFolderName)
+        //{
+        //    rootFolderName = null;
+        //    try
+        //    {
+        //        using (var archive = ZipFile.OpenRead(tempZipPath))
+        //        {
+        //            var topLevelItems = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-                    foreach (var entry in archive.Entries.Where(e => !string.IsNullOrEmpty(e.Name)))
-                    {
-                        var parts = entry.FullName.Split(new char[] { '/', '\\' },
-                                                          2,
-                                                          StringSplitOptions.RemoveEmptyEntries);
+        //            foreach (var entry in archive.Entries.Where(e => !string.IsNullOrEmpty(e.Name)))
+        //            {
+        //                var parts = entry.FullName.Split(new char[] { '/', '\\' },
+        //                                                  2,
+        //                                                  StringSplitOptions.RemoveEmptyEntries);
 
-                        if (parts.Length > 0)
-                        {
-                            topLevelItems.Add(parts[0].TrimEnd('/', '\\'));
-                        }
-                    }
+        //                if (parts.Length > 0)
+        //                {
+        //                    topLevelItems.Add(parts[0].TrimEnd('/', '\\'));
+        //                }
+        //            }
 
-                    if (topLevelItems.Count == 1)
-                    {
-                        rootFolderName = topLevelItems.First();
-                        return true;
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+        //            if (topLevelItems.Count == 1)
+        //            {
+        //                rootFolderName = topLevelItems.First();
+        //                return true;
+        //            }
+        //        }
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return false;
+        //    }
 
-            return false;
-        }
+        //    return false;
+        //}
 
         ///// <summary>
         ///// Handles a file upload via multipart/form-data and extracts the uploaded ZIP file to the server,
