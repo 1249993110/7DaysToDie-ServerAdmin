@@ -29,6 +29,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Middlewares
                 context.Response.ContentType = "text/event-stream";
                 context.Response.Headers.Add("Cache-Control", new[] { "no-cache" });
                 context.Response.Headers.Add("Connection", new[] { "keep-alive" });
+                context.Response.Headers.Add("X-Accel-Buffering", new[] { "no" });
 
                 var queue = Channel.CreateBounded<(string, string)>(new BoundedChannelOptions(1024)
                 {
