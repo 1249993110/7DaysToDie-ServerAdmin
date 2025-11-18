@@ -47,8 +47,8 @@ export const getHistoryPlayer = (playerId) => {
     return http.get(`/GameServer/HistoryPlayers/${playerId}`);
 };
 
-export const getPlayerInventory = (playerId) => {
-    return http.get(`/GameServer/PlayerInventory/${playerId}`);
+export const getPlayerInventory = (playerId, language) => {
+    return http.get(`/GameServer/PlayerInventory/${playerId}`, { params: { language } });
 };
 
 export const getPlayerSkills = (playerId, language) => {

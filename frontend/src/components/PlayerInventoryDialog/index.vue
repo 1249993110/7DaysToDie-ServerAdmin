@@ -29,6 +29,7 @@
 import Grid from './Grid/index.vue';
 import List from './List/index.vue';
 import { getPlayerInventory } from '~/api/gameServer';
+import { useLocaleStore } from '~/store/locale';
 
 const modelValue = ref({});
 const layout = ref('grid');
@@ -37,13 +38,14 @@ const options = ref(['list', 'grid']);
 const visible = ref(false);
 const loading = ref(false);
 const title = ref('');
+const localeStore = useLocaleStore();
 
 const show = async (playerId, playerName) => {
     title.value = `${playerName} (${playerId})`;
     loading.value = true;
     visible.value = true;
     try {
-        modelValue.value = await getPlayerInventory(playerId);
+        modelValue.value = await getPlayerInventory(playerId, localeStore.getLanguageEnglishName());
     } finally {
         loading.value = false;
     }
