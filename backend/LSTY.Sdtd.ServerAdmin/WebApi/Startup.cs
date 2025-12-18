@@ -1,5 +1,4 @@
 ﻿using LSTY.Sdtd.ServerAdmin.Config;
-using LSTY.Sdtd.ServerAdmin.Shared.Constants;
 using LSTY.Sdtd.ServerAdmin.WebApi.Authentication;
 using LSTY.Sdtd.ServerAdmin.WebApi.DataProtection;
 using LSTY.Sdtd.ServerAdmin.WebApi.JsonConverters;
@@ -19,7 +18,6 @@ using NSwag.AspNet.Owin;
 using NSwag.Generation.Processors.Security;
 using Owin;
 using System.Net.Http.Formatting;
-using System.Reflection;
 using System.Web.Http;
 using System.Web.Http.Dispatcher;
 using System.Web.Http.ExceptionHandling;
@@ -98,7 +96,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
                 });
             }
 
-            app.UseSwaggerUi(Assembly.GetExecutingAssembly(), settings =>
+            app.UseSwaggerUi(typeof(Startup).Assembly, settings =>
             {
                 // configure settings here
                 // settings.GeneratorSettings.*: Generator settings and extension points
@@ -168,7 +166,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi
                     return AppConfig.Settings.UserName == username && AppConfig.Settings.Password == password;
                 }
             });
-            app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions() 
+            app.UseOAuthBearerAuthentication(new OAuthBearerAuthenticationOptions()
             {
                 Provider = new CustomOAuthBearerProvider()
             });

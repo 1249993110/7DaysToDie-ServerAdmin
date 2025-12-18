@@ -1,10 +1,8 @@
-﻿using LSTY.Sdtd.ServerAdmin.Shared.Models;
-
-namespace LSTY.Sdtd.ServerAdmin.Shared.EventArgs
+﻿namespace LSTY.Sdtd.ServerAdmin.Shared.EventArgs
 {
     public class PlayerLoginEventArgs : System.EventArgs
     {
-        public required PlayerBasicInfo PlayerInfo { get; set; }
+        public required PlayerBasicInfoDto PlayerInfo { get; set; }
 
         public required string CompatibilityVersion { get; set; }
 

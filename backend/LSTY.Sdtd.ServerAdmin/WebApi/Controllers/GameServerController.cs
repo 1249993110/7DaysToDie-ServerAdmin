@@ -1,26 +1,18 @@
 ﻿using HarmonyLib;
 using LSTY.Sdtd.ServerAdmin.Config;
 using LSTY.Sdtd.ServerAdmin.Extensions;
-using LSTY.Sdtd.ServerAdmin.Shared.Models;
-using MapRendering;
-using ModInfo;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using NSwag.Annotations;
 using SkiaSharp;
 using System.ComponentModel.DataAnnotations;
-using System.IO.Compression;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
 using System.Web.Http;
 using System.Xml;
-using System.Xml.Linq;
 using UnityEngine;
-using UnityEngine.Windows;
-using static AdminCommands;
-using CommandPermission = LSTY.Sdtd.ServerAdmin.Shared.Models.CommandPermission;
+using CommandPermissionDto = LSTY.Sdtd.ServerAdmin.Shared.Dtos.CommandPermissionDto;
 
 namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
 {
@@ -33,14 +25,14 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
     [RoutePrefix("api/GameServer")]
     public class GameServerController : ApiController
     {
-        #region Execute Console Command
+        #region Console Commands
         /// <summary>
         /// Executes a console command and returns the result.
         /// </summary>
         /// <returns>List of results indicating success or failure of the command execution.</returns>
         [HttpPost]
         [Route("ExecuteConsoleCommand")]
-        public Task<IEnumerable<string>> ExecuteConsoleCommand([FromBody, Required] ConsoleCommand consoleCommand)
+        public Task<IEnumerable<string>> ExecuteConsoleCommand([FromBody, Required] ConsoleCommandDto consoleCommand)
         {
             return Utils.ExecuteConsoleCommandAsync(consoleCommand.Command, consoleCommand.InMainThread);
         }
@@ -50,16 +42,16 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// </summary>
         [HttpGet]
         [Route("AllowedCommands")]
-        public IEnumerable<AllowedCommand> GetAllowedCommands()
+        public IEnumerable<AllowedCommandDto> GetAllowedCommands()
         {
             var consoleCommands = SdtdConsole.Instance.GetCommands();
-            var allowedCommands = new List<AllowedCommand>(consoleCommands.Count);
+            var allowedCommands = new List<AllowedCommandDto>(consoleCommands.Count);
             foreach (var consoleCommand in consoleCommands)
             {
                 var commands = consoleCommand.GetCommands();
                 int commandPermissionLevel = GameManager.Instance.adminTools.Commands.GetCommandPermissionLevel(commands);
 
-                allowedCommands.Add(new AllowedCommand()
+                allowedCommands.Add(new AllowedCommandDto()
                 {
                     Commands = commands,
                     PermissionLevel = commandPermissionLevel,
@@ -80,7 +72,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("SendGlobalMessage")]
-        public Task<IEnumerable<string>> SendGlobalMessage([FromBody, Required] GlobalMessage message)
+        public Task<IEnumerable<string>> SendGlobalMessage([FromBody, Required] GlobalMessageDto message)
         {
             return Utils.SendGlobalMessageAsync(message);
         }
@@ -92,7 +84,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("SendPrivateMessage")]
-        public Task<IEnumerable<string>> SendPrivateMessage([FromBody, Required] PrivateMessage message)
+        public Task<IEnumerable<string>> SendPrivateMessage([FromBody, Required] PrivateMessageDto message)
         {
             return Utils.SendPrivateMessageAsync(message);
         }
@@ -106,7 +98,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <returns>List of results indicating success or failure for the admin creation.</returns>
         [HttpPost]
         [Route("AdminUsers")]
-        public IEnumerable<string> CreateAdminUser([FromBody, Required] AdminUser model)
+        public IEnumerable<string> CreateAdminUser([FromBody, Required] AdminUserDto model)
         {
             string command = $"admin add {model.PlayerId} {model.PermissionLevel} {Utils.FormatCommandArgs(model.DisplayName)}";
             var result = SdtdConsole.Instance.ExecuteSync(command, ModMain.CmdExecuteDelegate);
@@ -119,12 +111,12 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("AdminUsers")]
-        public IEnumerable<AdminUser> GetAdminUsers()
+        public IEnumerable<AdminUserDto> GetAdminUsers()
         {
-            var result = new List<AdminUser>();
+            var result = new List<AdminUserDto>();
             foreach (var item in GameManager.Instance.adminTools.Users.GetUsers().Values)
             {
-                result.Add(new AdminUser()
+                result.Add(new AdminUserDto()
                 {
                     PlayerId = item.UserIdentifier.CombinedString,
                     PermissionLevel = item.PermissionLevel,
@@ -163,7 +155,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <returns>An enumerable collection of strings containing the result messages from the command execution.</returns>
         [HttpPost]
         [Route("CommandPermissions")]
-        public IEnumerable<string> CreateCommandPermission([FromBody, Required] CommandPermissionCreate model)
+        public IEnumerable<string> CreateCommandPermission([FromBody, Required] CommandPermissionCreateDto model)
         {
             string command = $"cp add {model.Command} {model.PermissionLevel}";
             var result = SdtdConsole.Instance.ExecuteSync(command, ModMain.CmdExecuteDelegate);
@@ -176,16 +168,16 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <remarks>Use this method to enumerate all commands exposed by the system, along with their
         /// descriptions and required permission levels. This is typically used for administrative interfaces or
         /// permission management tools.</remarks>
-        /// <returns>An enumerable collection of <see cref="CommandPermission"/> objects, each representing a command and its
+        /// <returns>An enumerable collection of <see cref="CommandPermissionDto"/> objects, each representing a command and its
         /// required permission level. The collection will be empty if no commands are available.</returns>
         [HttpGet]
         [Route("CommandPermissions")]
-        public IEnumerable<CommandPermission> GetCommandPermissions()
+        public IEnumerable<CommandPermissionDto> GetCommandPermissions()
         {
-            var result = new List<CommandPermission>();
+            var result = new List<CommandPermissionDto>();
             foreach (var item in GameManager.Instance.adminTools.Commands.GetCommands().Values)
             {
-                result.Add(new CommandPermission()
+                result.Add(new CommandPermissionDto()
                 {
                     Command = item.Command,
                     PermissionLevel = item.PermissionLevel,
@@ -227,7 +219,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <returns>An enumerable collection of strings containing the results of the ban command execution.</returns>
         [HttpPost]
         [Route("Bans")]
-        public IEnumerable<string> CreateBan([FromBody, Required] BanEntry model)
+        public IEnumerable<string> CreateBan([FromBody, Required] BanEntryDto model)
         {
             string command = $"ban add {model.PlayerId} {(int)(model.BannedUntil - DateTime.UtcNow).TotalMinutes} minutes {Utils.FormatCommandArgs(model.Reason)} {Utils.FormatCommandArgs(model.DisplayName)}";
             return SdtdConsole.Instance.ExecuteSync(command, ModMain.CmdExecuteDelegate);
@@ -238,16 +230,16 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// </summary>
         /// <remarks>Each ban entry includes the player's identifier, ban expiration time, reason for the
         /// ban, and display name. This method is typically used by administrators to review active bans.</remarks>
-        /// <returns>An enumerable collection of <see cref="BanEntry"/> objects, each containing details about a banned player.
+        /// <returns>An enumerable collection of <see cref="BanEntryDto"/> objects, each containing details about a banned player.
         /// The collection will be empty if no players are currently banned.</returns>
         [HttpGet]
         [Route("Bans")]
-        public IEnumerable<BanEntry> GetBans()
+        public IEnumerable<BanEntryDto> GetBans()
         {
-            var result = new List<BanEntry>();
+            var result = new List<BanEntryDto>();
             foreach (var item in GameManager.Instance.adminTools.Blacklist.GetBanned())
             {
-                result.Add(new BanEntry()
+                result.Add(new BanEntryDto()
                 {
                     PlayerId = item.UserIdentifier.CombinedString,
                     BannedUntil = item.BannedUntil,
@@ -293,7 +285,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <returns>An enumerable collection of strings containing the results of the whitelist command execution.</returns>
         [HttpPost]
         [Route("Whitelist")]
-        public IEnumerable<string> CreateWhitelistEntry([FromBody, Required] WhitelistEntry model)
+        public IEnumerable<string> CreateWhitelistEntry([FromBody, Required] WhitelistEntryDto model)
         {
             string command = $"whitelist add {model.PlayerId} {Utils.FormatCommandArgs(model.DisplayName)}";
             var result = SdtdConsole.Instance.ExecuteSync(command, ModMain.CmdExecuteDelegate);
@@ -305,16 +297,16 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// </summary>
         /// <remarks>This method is typically used to display or manage the whitelist for administrative
         /// purposes. The returned entries include both the player's unique identifier and display name.</remarks>
-        /// <returns>An enumerable collection of <see cref="WhitelistEntry"/> objects representing each whitelisted user. The
+        /// <returns>An enumerable collection of <see cref="WhitelistEntryDto"/> objects representing each whitelisted user. The
         /// collection will be empty if no users are whitelisted.</returns>
         [HttpGet]
         [Route("Whitelist")]
-        public IEnumerable<WhitelistEntry> GetWhitelistEntries()
+        public IEnumerable<WhitelistEntryDto> GetWhitelistEntries()
         {
-            var result = new List<WhitelistEntry>();
+            var result = new List<WhitelistEntryDto>();
             foreach (var item in GameManager.Instance.adminTools.Whitelist.GetUsers().Values)
             {
-                result.Add(new WhitelistEntry()
+                result.Add(new WhitelistEntryDto()
                 {
                     PlayerId = item.UserIdentifier.CombinedString,
                     DisplayName = item.Name,
@@ -352,7 +344,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("Stats")]
-        public Stats GetStatistics()
+        public StatsDto GetStatistics()
         {
             var gameManager = GameManager.Instance;
             var world = GameManager.Instance.World;
@@ -378,10 +370,10 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
 
             int onlinePlayerCount = world.Players.Count;
             int offlinePlayerCount = gameManager.GetPersistentPlayerList().Players.Count - onlinePlayerCount;
-            return new Stats()
+            return new StatsDto()
             {
                 Uptime = Time.timeSinceLevelLoad,
-                GameTime = new GameTime()
+                GameTime = new GameTimeDto()
                 {
                     Days = GameUtils.WorldTimeToDays(worldTime),
                     Hours = GameUtils.WorldTimeToHours(worldTime),
@@ -484,7 +476,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("OnlinePlayers")]
-        public PagedDto<OnlinePlayer> GetOnlinePlayers([FromUri] PagingQueryDto<OnlinePlayerQueryOrder>? queryDto)
+        public PagedDto<OnlinePlayerDto> GetOnlinePlayers([FromUri] PagingQueryDto<OnlinePlayerQueryOrder>? queryDto)
         {
             queryDto ??= new PagingQueryDto<OnlinePlayerQueryOrder>();
             int pageSize = queryDto.PageSize;
@@ -501,14 +493,14 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                     entityPlayers = entityPlayers.Skip((queryDto.PageNumber - 1) * pageSize).Take(pageSize);
                 }
 
-                var items = new List<OnlinePlayer>();
+                var items = new List<OnlinePlayerDto>();
                 foreach (var entityPlayer in entityPlayers)
                 {
                     var clientInfo = clientInfoMap[entityPlayer.entityId];
                     items.Add(entityPlayer.ToOnlinePlayer(clientInfo));
                 }
 
-                return new PagedDto<OnlinePlayer>()
+                return new PagedDto<OnlinePlayerDto>()
                 {
                     Items = items,
                     Total = total,
@@ -516,7 +508,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
             }
             else
             {
-                IEnumerable<OnlinePlayer> items = new List<OnlinePlayer>();
+                IEnumerable<OnlinePlayerDto> items = new List<OnlinePlayerDto>();
                 bool isHasKeyword = string.IsNullOrEmpty(keyword) == false;
                 foreach (var entityPlayer in entityPlayers)
                 {
@@ -530,10 +522,10 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                         continue;
                     }
 
-                    ((List<OnlinePlayer>)items).Add(entityPlayer.ToOnlinePlayer(clientInfo));
+                    ((List<OnlinePlayerDto>)items).Add(entityPlayer.ToOnlinePlayer(clientInfo));
                 }
 
-                total = ((List<OnlinePlayer>)items).Count;
+                total = ((List<OnlinePlayerDto>)items).Count;
 
                 if (queryDto.Order.HasValue)
                 {
@@ -582,7 +574,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                     items = items.Skip((queryDto.PageNumber - 1) * pageSize).Take(pageSize);
                 }
 
-                return new PagedDto<OnlinePlayer>()
+                return new PagedDto<OnlinePlayerDto>()
                 {
                     Items = items,
                     Total = total,
@@ -597,7 +589,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("OnlinePlayers/{playerId}")]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(Shared.Models.OnlinePlayer))]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(Shared.Dtos.OnlinePlayerDto))]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(object))]
         public IHttpActionResult GetOnlinePlayerById(string playerId)
         {
@@ -625,7 +617,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("HistoryPlayers")]
-        public PagedDto<HistoryPlayer> GetHistoryPlayers([FromUri] PagingQueryDto<HistoryPlayerQueryOrder>? queryDto)
+        public PagedDto<HistoryPlayerDto> GetHistoryPlayers([FromUri] PagingQueryDto<HistoryPlayerQueryOrder>? queryDto)
         {
             queryDto ??= new PagingQueryDto<HistoryPlayerQueryOrder>();
             int pageSize = queryDto.PageSize;
@@ -642,14 +634,14 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                     persistentPlayers = persistentPlayers.Skip((queryDto.PageNumber - 1) * pageSize).Take(pageSize);
                 }
 
-                var items = new List<HistoryPlayer>();
+                var items = new List<HistoryPlayerDto>();
                 foreach (var persistentPlayer in persistentPlayers)
                 {
                     var clientInfo = ConnectionManager.Instance.Clients.ForEntityId(persistentPlayer.EntityId);
                     items.Add(persistentPlayer.ToHistoryPlayer(clientInfo));
                 }
 
-                return new PagedDto<HistoryPlayer>()
+                return new PagedDto<HistoryPlayerDto>()
                 {
                     Items = items,
                     Total = total,
@@ -657,7 +649,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
             }
             else
             {
-                IEnumerable<HistoryPlayer> items = new List<HistoryPlayer>();
+                IEnumerable<HistoryPlayerDto> items = new List<HistoryPlayerDto>();
                 bool isHasKeyword = string.IsNullOrEmpty(keyword) == false;
                 foreach (var persistentPlayer in persistentPlayers)
                 {
@@ -671,10 +663,10 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                     }
 
                     var clientInfo = ConnectionManager.Instance.Clients.ForEntityId(persistentPlayer.EntityId);
-                    ((List<HistoryPlayer>)items).Add(persistentPlayer.ToHistoryPlayer(clientInfo));
+                    ((List<HistoryPlayerDto>)items).Add(persistentPlayer.ToHistoryPlayer(clientInfo));
                 }
 
-                total = ((List<HistoryPlayer>)items).Count;
+                total = ((List<HistoryPlayerDto>)items).Count;
 
                 if (queryDto.Order.HasValue)
                 {
@@ -708,7 +700,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                     items = items.Skip((queryDto.PageNumber - 1) * pageSize).Take(pageSize);
                 }
 
-                return new PagedDto<HistoryPlayer>()
+                return new PagedDto<HistoryPlayerDto>()
                 {
                     Items = items,
                     Total = total,
@@ -723,7 +715,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("HistoryPlayers/{playerId}")]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(Shared.Models.HistoryPlayer))]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(Shared.Dtos.HistoryPlayerDto))]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(object))]
         public IHttpActionResult GetHistoryPlayerById(string playerId)
         {
@@ -748,7 +740,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("PlayerDetails/{playerId}")]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(Shared.Models.PlayerDetails))]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(Shared.Dtos.PlayerDetailsDto))]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(object))]
         public IHttpActionResult GetPlayerDetails(string playerId)
         {
@@ -777,7 +769,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("PlayerInventory/{playerId}")]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(Shared.Models.Inventory))]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(Shared.Dtos.InventoryDto))]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(object))]
         public IHttpActionResult GetPlayerInventory(string playerId, [FromUri] Language language = Language.English)
         {
@@ -811,7 +803,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("PlayerSkills/{playerId}")]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(IEnumerable<PlayerSkill>))]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(IEnumerable<PlayerSkillDto>))]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(object))]
         public IHttpActionResult GetPlayerSkills(string playerId, [FromUri] Language language = Language.English)
         {
@@ -981,9 +973,9 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("MapInfo")]
-        public MapInfo GetMapInfo()
+        public MapInfoDto GetMapInfo()
         {
-            var mapInfo = new MapInfo()
+            var mapInfo = new MapInfoDto()
             {
                 BlockSize = MapRendering.Constants.MapBlockSize,
                 MaxZoom = MapRendering.Constants.Zoomlevels - 1
@@ -1052,11 +1044,11 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("Locations")]
-        public IEnumerable<EntityBasicInfo> GetLocations(Shared.Models.EntityType entityType)
+        public IEnumerable<EntityBasicInfoDto> GetLocations(Shared.Constants.EntityType entityType)
         {
-            var locations = new List<EntityBasicInfo>();
+            var locations = new List<EntityBasicInfoDto>();
 
-            if (entityType == Shared.Models.EntityType.OfflinePlayer)
+            if (entityType == Shared.Constants.EntityType.OfflinePlayer)
             {
                 var online = GameManager.Instance.World.Players.list.Select(i => ConnectionManager.Instance.Clients.ForEntityId(i.entityId).InternalId).ToHashSet();
                 foreach (var item in GameManager.Instance.GetPersistentPlayerList().Players)
@@ -1064,91 +1056,91 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                     if (online.Contains(item.Key) == false)
                     {
                         var player = item.Value;
-                        locations.Add(new EntityBasicInfo()
+                        locations.Add(new EntityBasicInfoDto()
                         {
                             EntityId = player.EntityId,
                             EntityName = player.PlayerName.DisplayName,
                             Position = player.Position.ToPosition(),
-                            EntityType = Shared.Models.EntityType.OfflinePlayer,
+                            EntityType = Shared.Constants.EntityType.OfflinePlayer,
                             PlayerId = player.PrimaryId.CombinedString,
                         });
                     }
                 }
             }
-            else if (entityType == Shared.Models.EntityType.OnlinePlayer)
+            else if (entityType == Shared.Constants.EntityType.OnlinePlayer)
             {
                 foreach (var player in GameManager.Instance.World.Players.list)
                 {
-                    locations.Add(new EntityBasicInfo()
+                    locations.Add(new EntityBasicInfoDto()
                     {
                         EntityId = player.entityId,
                         EntityName = player.EntityName,
                         Position = player.GetPosition().ToPosition(),
-                        EntityType = Shared.Models.EntityType.OnlinePlayer,
+                        EntityType = Shared.Constants.EntityType.OnlinePlayer,
                         PlayerId = ConnectionManager.Instance.Clients.ForEntityId(player.entityId).InternalId.CombinedString,
                     });
                 }
             }
-            else if (entityType == Shared.Models.EntityType.Animal)
+            else if (entityType == Shared.Constants.EntityType.Animal)
             {
                 foreach (var entity in GameManager.Instance.World.Entities.list)
                 {
                     if (entity is EntityAnimal entityAnimal && entity.IsAlive())
                     {
-                        locations.Add(new EntityBasicInfo()
+                        locations.Add(new EntityBasicInfoDto()
                         {
                             EntityId = entityAnimal.entityId,
                             EntityName = entityAnimal.EntityName ?? ("animal class #" + entityAnimal.entityClass),
                             Position = entityAnimal.GetPosition().ToPosition(),
-                            EntityType = Shared.Models.EntityType.Animal,
+                            EntityType = Shared.Constants.EntityType.Animal,
                         });
                     }
                 }
             }
-            else if (entityType == Shared.Models.EntityType.Hostiles)
+            else if (entityType == Shared.Constants.EntityType.Hostiles)
             {
                 foreach (var entity in GameManager.Instance.World.Entities.list)
                 {
                     if (entity is EntityEnemy entityEnemy && entity.IsAlive())
                     {
-                        locations.Add(new EntityBasicInfo()
+                        locations.Add(new EntityBasicInfoDto()
                         {
                             EntityId = entityEnemy.entityId,
                             EntityName = entityEnemy.EntityName ?? ("enemy class #" + entityEnemy.entityClass),
                             Position = entityEnemy.GetPosition().ToPosition(),
-                            EntityType = (Shared.Models.EntityType)entityEnemy.entityType
+                            EntityType = (Shared.Constants.EntityType)entityEnemy.entityType
                         });
                     }
                 }
             }
-            else if (entityType == Shared.Models.EntityType.Zombie)
+            else if (entityType == Shared.Constants.EntityType.Zombie)
             {
                 foreach (var entity in GameManager.Instance.World.Entities.list)
                 {
                     if (entity is EntityZombie entityZombie && entity.IsAlive())
                     {
-                        locations.Add(new EntityBasicInfo()
+                        locations.Add(new EntityBasicInfoDto()
                         {
                             EntityId = entityZombie.entityId,
                             EntityName = entityZombie.EntityName ?? ("zombie class #" + entityZombie.entityClass),
                             Position = entityZombie.GetPosition().ToPosition(),
-                            EntityType = (Shared.Models.EntityType)entityZombie.entityType
+                            EntityType = (Shared.Constants.EntityType)entityZombie.entityType
                         });
                     }
                 }
             }
-            else if (entityType == Shared.Models.EntityType.Bandit)
+            else if (entityType == Shared.Constants.EntityType.Bandit)
             {
                 foreach (var entity in GameManager.Instance.World.Entities.list)
                 {
                     if (entity is EntityBandit entityBandit && entity.IsAlive())
                     {
-                        locations.Add(new EntityBasicInfo()
+                        locations.Add(new EntityBasicInfoDto()
                         {
                             EntityId = entityBandit.entityId,
                             EntityName = entityBandit.EntityName ?? ("bandit class #" + entityBandit.entityClass),
                             Position = entityBandit.GetPosition().ToPosition(),
-                            EntityType = (Shared.Models.EntityType)entityBandit.entityType
+                            EntityType = (Shared.Constants.EntityType)entityBandit.entityType
                         });
                     }
                 }
@@ -1163,17 +1155,17 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("Locations/{entityId:int}")]
-        [SwaggerResponse(typeof(EntityBasicInfo))]
+        [SwaggerResponse(typeof(EntityBasicInfoDto))]
         public IHttpActionResult GetLocation(int entityId)
         {
             if (GameManager.Instance.World.Players.dict.TryGetValue(entityId, out var player))
             {
-                return Ok(new EntityBasicInfo()
+                return Ok(new EntityBasicInfoDto()
                 {
                     EntityId = player.entityId,
                     EntityName = player.EntityName,
                     Position = player.GetPosition().ToPosition(),
-                    EntityType = Shared.Models.EntityType.OnlinePlayer,
+                    EntityType = Shared.Constants.EntityType.OnlinePlayer,
                     PlayerId = ConnectionManager.Instance.Clients.ForEntityId(player.entityId)?.CrossplatformId.CombinedString,
                 });
             }
@@ -1181,12 +1173,12 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
             if (GameManager.Instance.World.Entities.dict.TryGetValue(entityId, out var entity))
             {
                 string entityName = (entity is EntityAlive entityAlive) ? entityAlive.EntityName : "entity class #" + entity.entityClass;
-                return Ok(new EntityBasicInfo()
+                return Ok(new EntityBasicInfoDto()
                 {
                     EntityId = entity.entityId,
                     EntityName = entityName,
                     Position = entity.GetPosition().ToPosition(),
-                    EntityType = (Shared.Models.EntityType)entity.entityType,
+                    EntityType = (Shared.Constants.EntityType)entity.entityType,
                 });
             }
 
@@ -1254,7 +1246,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("LandClaims/{playerId}")]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(ClaimOwner))]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(ClaimOwnerDto))]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(object))]
         public IHttpActionResult GetLandClaims(string playerId)
         {
@@ -1270,7 +1262,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                 return NotFound();
             }
 
-            var claimOwner = new ClaimOwner()
+            var claimOwner = new ClaimOwnerDto()
             {
                 EntityId = persistentPlayerData.EntityId,
                 PlatformId = persistentPlayerData.NativeId.CombinedString,
@@ -1291,18 +1283,18 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("LandClaims")]
-        [SwaggerResponse(HttpStatusCode.OK, typeof(LandClaims))]
+        [SwaggerResponse(HttpStatusCode.OK, typeof(LandClaimsDto))]
         [SwaggerResponse(HttpStatusCode.NotFound, typeof(object))]
-        public LandClaims GetLandClaims()
+        public LandClaimsDto GetLandClaims()
         {
-            var claimOwners = new List<ClaimOwner>();
+            var claimOwners = new List<ClaimOwnerDto>();
 
             foreach (var item in GameManager.Instance.GetPersistentPlayerList().Players)
             {
                 var persistentPlayerData = item.Value;
                 if (persistentPlayerData != null && persistentPlayerData.LPBlocks != null)
                 {
-                    claimOwners.Add(new ClaimOwner()
+                    claimOwners.Add(new ClaimOwnerDto()
                     {
                         EntityId = persistentPlayerData.EntityId,
                         PlatformId = persistentPlayerData.NativeId.CombinedString,
@@ -1316,7 +1308,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                 }
             }
 
-            return new LandClaims()
+            return new LandClaimsDto()
             {
                 ClaimOwners = claimOwners,
                 ClaimSize = GamePrefs.GetInt(EnumGamePrefs.LandClaimSize)
@@ -1356,7 +1348,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         [HttpDelete]
         [Route("LandClaims")]
         [SwaggerResponse(typeof(IEnumerable<string>))]
-        public async Task<IHttpActionResult> RemovePlayerLandClaim([FromBody] Position position)
+        public async Task<IHttpActionResult> RemovePlayerLandClaim([FromBody] PositionDto position)
         {
             var result = await Utils.ExecuteConsoleCommandAsync($"ty-rplc {position}");
             return Ok(result);
@@ -1438,18 +1430,18 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <remarks>Each mod is identified by the presence of a ModInfo.xml or _ModInfo.xml file within
         /// its folder. Only mods with valid metadata files are included in the result. The returned collection reflects
         /// the current state of the Mods directory at the time of the request.</remarks>
-        /// <returns>An enumerable collection of <see cref="Shared.Models.ModInfo"/> objects, each representing a mod found in
+        /// <returns>An enumerable collection of <see cref="Shared.Dtos.ModInfoDto"/> objects, each representing a mod found in
         /// the Mods directory. Returns an empty collection if no mods are available.</returns>
         [HttpGet]
         [Route("Mods")]
-        public IEnumerable<Shared.Models.ModInfo> GetMods()
+        public IEnumerable<Shared.Dtos.ModInfoDto> GetMods()
         {
-            var mods = new List<Shared.Models.ModInfo>();
+            var mods = new List<Shared.Dtos.ModInfoDto>();
 
             string modPath = Path.Combine(AppContext.BaseDirectory, "Mods");
             if (Directory.Exists(modPath) == false)
             {
-                return Array.Empty<Shared.Models.ModInfo>();
+                return Array.Empty<Shared.Dtos.ModInfoDto>();
             }
 
             foreach (var dir in Directory.GetDirectories(modPath))
@@ -1479,7 +1471,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
                     return node?.Attributes?["value"]?.Value ?? string.Empty;
                 }
 
-                var mod = new Shared.Models.ModInfo()
+                var mod = new Shared.Dtos.ModInfoDto()
                 {
                     Name = GetValue("Name"),
                     DisplayName = GetValue("DisplayName"),

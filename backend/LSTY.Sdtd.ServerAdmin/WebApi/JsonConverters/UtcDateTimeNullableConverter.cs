@@ -12,6 +12,11 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.JsonConverters
                 return;
             }
 
+            if (value.Value.Kind != DateTimeKind.Utc)
+            {
+                value = value.Value.ToUniversalTime();
+            }
+
             writer.WriteValue(value.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffZ"));
         }
 

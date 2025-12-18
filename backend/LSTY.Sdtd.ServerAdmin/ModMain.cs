@@ -1,8 +1,7 @@
 ﻿using HarmonyLib;
 using LSTY.Sdtd.ServerAdmin.Config;
-using LSTY.Sdtd.ServerAdmin.HarmonyPatchers;
 using LSTY.Sdtd.ServerAdmin.Hooks;
-using LSTY.Sdtd.ServerAdmin.Triggers;
+using LSTY.Sdtd.ServerAdmin.Patches.Xml;
 using LSTY.Sdtd.ServerAdmin.WebApi;
 using MapRendering;
 using Microsoft.Owin.Hosting;
@@ -81,6 +80,7 @@ namespace LSTY.Sdtd.ServerAdmin
             }
         }
 
+
         /// <summary>
         /// Patch the mod using Harmony.
         /// </summary>
@@ -155,10 +155,10 @@ namespace LSTY.Sdtd.ServerAdmin
                 ModEvents.ChatMessage.RegisterHandler(modEventHub.OnChatMessage);
                 ModEvents.PlayerSpawning.RegisterHandler(modEventHub.OnPlayerSpawning);
 
-                SkyChangeTrigger.Init(modEventHub.OnSkyChanged);
-                WorldPatcher.Init(modEventHub.OnEntitySpawned);
+                SkyStateHook.OnSkyChanged += modEventHub.OnSkyChanged;
+                EntitySpawnHook.OnEntitySpawned += modEventHub.OnEntitySpawned;
                 ModEvents.GameStartDone.RegisterHandler(GetMapTileCache);
-                ModEvents.GameStartDone.RegisterHandler(WorldStaticDataHook.ReplaceXmls);
+                ModEvents.GameStartDone.RegisterHandler(InMemoryXmlPatcher.ReplaceXmls);
                 ModEvents.GameStartDone.RegisterHandler((ref ModEvents.SGameStartDoneData _) => { IsGameStartDone = true; });
 
                 CustomLogger.Info("Registered mod event handlers success.");

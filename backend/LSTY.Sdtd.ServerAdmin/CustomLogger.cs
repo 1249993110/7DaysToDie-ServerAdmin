@@ -1,10 +1,8 @@
-﻿using LSTY.Sdtd.ServerAdmin.Shared.Constants;
-
-namespace LSTY.Sdtd.ServerAdmin
+﻿namespace LSTY.Sdtd.ServerAdmin
 {
     internal static class CustomLogger
     {
-        public const string Prefix = $"[{Common.ProductName}] ";
+        public const string Prefix = $"[{Common.ProductName}] "; // [MODS]
 
         public static void Error(string message)
         {

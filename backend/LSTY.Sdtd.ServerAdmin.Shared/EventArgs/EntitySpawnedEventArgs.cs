@@ -1,13 +1,11 @@
-﻿using LSTY.Sdtd.ServerAdmin.Shared.Models;
-
-namespace LSTY.Sdtd.ServerAdmin.Shared.EventArgs
+﻿namespace LSTY.Sdtd.ServerAdmin.Shared.EventArgs
 {
     public class EntitySpawnedEventArgs : System.EventArgs
     {
         /// <summary>
         /// 
         /// </summary>
-        public required EntityBasicInfo SpawnedEntity { get; set; }
+        public required EntityBasicInfoDto SpawnedEntity { get; set; }
 
         /// <summary>
         ///

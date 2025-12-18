@@ -1,17 +1,17 @@
-﻿using LSTY.Sdtd.ServerAdmin.Shared.Models;
+﻿
 
 namespace LSTY.Sdtd.ServerAdmin.Extensions
 {
     internal static class EntityExtension
     {
-        public static EntityBasicInfo ToEntityBasicInfo(this EntityAlive entityAlive)
+        public static EntityBasicInfoDto ToEntityBasicInfo(this EntityAlive entityAlive)
         {
-            return new EntityBasicInfo()
+            return new EntityBasicInfoDto()
             {
                 EntityId = entityAlive.entityId,
                 EntityName = entityAlive.EntityName,
                 Position = entityAlive.position.ToPosition(),
-                EntityType = entityAlive is EntityPlayer && entityAlive.IsClientControlled() ? Shared.Models.EntityType.OnlinePlayer : (Shared.Models.EntityType)entityAlive.entityType
+                EntityType = entityAlive is EntityPlayer && entityAlive.IsClientControlled() ? Shared.Constants.EntityType.OnlinePlayer : (Shared.Constants.EntityType)entityAlive.entityType
             };
         }
     }

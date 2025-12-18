@@ -1,4 +1,5 @@
-﻿using LSTY.Sdtd.ServerAdmin.Shared.Models;
+﻿
+using LSTY.Sdtd.ServerAdmin.Shared.Constants;
 
 namespace LSTY.Sdtd.ServerAdmin.Shared.EventArgs
 {
@@ -31,5 +32,10 @@ namespace LSTY.Sdtd.ServerAdmin.Shared.EventArgs
         ///
         /// </summary>
         public required DateTime Timestamp { get; set; }
+
+        /// <summary>
+        /// Gets or sets the current game time information for the simulation or game loop.
+        /// </summary>
+        public required GameTimeDto GameTime { get; set; }
     }
 }

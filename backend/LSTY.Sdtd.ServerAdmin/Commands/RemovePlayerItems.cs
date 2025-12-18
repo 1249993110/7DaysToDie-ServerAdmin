@@ -1,4 +1,4 @@
-﻿using LSTY.Sdtd.ServerAdmin.Hooks;
+﻿using LSTY.Sdtd.ServerAdmin.Patches.Xml;
 
 namespace LSTY.Sdtd.ServerAdmin.Commands
 {
@@ -49,7 +49,7 @@ namespace LSTY.Sdtd.ServerAdmin.Commands
                         itemName = itemName.Substring(0, index);
                     }
 
-                    string actionName = WorldStaticDataHook.ActionPrefix + WorldStaticDataHook.TagPrefix + itemName;
+                    string actionName = InMemoryXmlPatcher.ActionPrefix + InMemoryXmlPatcher.TagPrefix + itemName;
 
                     if (GameEventManager.GameEventSequences.ContainsKey(actionName))
                     {

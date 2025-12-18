@@ -1,4 +1,4 @@
-﻿using LSTY.Sdtd.ServerAdmin.Shared.Models;
+﻿
 using UnityEngine;
 
 namespace LSTY.Sdtd.ServerAdmin.Extensions
@@ -10,9 +10,9 @@ namespace LSTY.Sdtd.ServerAdmin.Extensions
         /// </summary>
         /// <param name="v">The Vector3 to convert.</param>
         /// <returns>The converted Position.</returns>
-        public static Position ToPosition(this Vector3 v)
+        public static PositionDto ToPosition(this Vector3 v)
         {
-            return new Position(v.x, v.y, v.z);
+            return new PositionDto(v.x, v.y, v.z);
         }
 
         /// <summary>
@@ -20,9 +20,9 @@ namespace LSTY.Sdtd.ServerAdmin.Extensions
         /// </summary>
         /// <param name="v">The Vector3i to convert.</param>
         /// <returns>The converted Position.</returns>
-        public static Position ToPosition(this Vector3i v)
+        public static PositionDto ToPosition(this Vector3i v)
         {
-            return new Position(v.x, v.y, v.z);
+            return new PositionDto(v.x, v.y, v.z);
         }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace LSTY.Sdtd.ServerAdmin.Extensions
         /// </summary>
         /// <param name="v">The collection of Vector3 to convert.</param>
         /// <returns>The converted collection of Position.</returns>
-        public static IEnumerable<Position> ToPositions(this IEnumerable<Vector3> v)
+        public static IEnumerable<PositionDto> ToPositions(this IEnumerable<Vector3> v)
         {
             return v.Select(i => i.ToPosition());
         }
@@ -40,7 +40,7 @@ namespace LSTY.Sdtd.ServerAdmin.Extensions
         /// </summary>
         /// <param name="v">The collection of Vector3i to convert.</param>
         /// <returns>The converted collection of Position.</returns>
-        public static IEnumerable<Position> ToPositions(this IEnumerable<Vector3i> v)
+        public static IEnumerable<PositionDto> ToPositions(this IEnumerable<Vector3i> v)
         {
             return v.Select(i => i.ToPosition());
         }

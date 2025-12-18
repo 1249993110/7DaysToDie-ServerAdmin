@@ -1,13 +1,13 @@
-﻿using LSTY.Sdtd.ServerAdmin.Shared.Models;
+﻿
 using static PersistentPlayerData;
 
 namespace LSTY.Sdtd.ServerAdmin.Extensions
 {
     internal static class PersistentPlayerDataExtension
     {
-        public static HistoryPlayer ToHistoryPlayer(this PersistentPlayerData persistentPlayerData, ClientInfo? clientInfo)
+        public static HistoryPlayerDto ToHistoryPlayer(this PersistentPlayerData persistentPlayerData, ClientInfo? clientInfo)
         {
-            return new HistoryPlayer()
+            return new HistoryPlayerDto()
             {
                 EntityId = persistentPlayerData.EntityId,
                 PlayerId = persistentPlayerData.PrimaryId.CombinedString,
@@ -28,7 +28,7 @@ namespace LSTY.Sdtd.ServerAdmin.Extensions
             };
         }
 
-        public static Shared.Models.PlayerDetails ToPlayerDetails(this PersistentPlayerData persistentPlayerData, ClientInfo? clientInfo, EntityPlayer? entityPlayer)
+        public static Shared.Dtos.PlayerDetailsDto ToPlayerDetails(this PersistentPlayerData persistentPlayerData, ClientInfo? clientInfo, EntityPlayer? entityPlayer)
         {
             PlayerDataFile playerDataFile;
             if (clientInfo != null)
@@ -41,7 +41,7 @@ namespace LSTY.Sdtd.ServerAdmin.Extensions
                 playerDataFile.Load(GameIO.GetPlayerDataDir(), persistentPlayerData.PrimaryId.CombinedString);
             }
 
-            var result = new Shared.Models.PlayerDetails()
+            var result = new Shared.Dtos.PlayerDetailsDto()
             {
                 EntityId = persistentPlayerData.EntityId,
                 PlayerId = persistentPlayerData.PrimaryId.CombinedString,
@@ -121,7 +121,7 @@ namespace LSTY.Sdtd.ServerAdmin.Extensions
             var stats = playerDataFile.ecd.stats;
             if (stats != null)
             {
-                result.Stats = new PlayerStats()
+                result.Stats = new PlayerStatsDto()
                 {
                     Health = stats.Health.Value,
                     Stamina = stats.Stamina.Value,

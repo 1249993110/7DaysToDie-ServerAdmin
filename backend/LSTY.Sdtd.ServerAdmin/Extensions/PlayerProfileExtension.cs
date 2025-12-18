@@ -2,9 +2,9 @@
 {
     internal static class PlayerProfileExtension
     {
-        public static Shared.Models.PlayerProfile ToModel(this PlayerProfile playerProfile)
+        public static Shared.Dtos.PlayerProfileDto ToModel(this PlayerProfile playerProfile)
         {
-            return new Shared.Models.PlayerProfile()
+            return new Shared.Dtos.PlayerProfileDto()
             {
                 BeardName = playerProfile.BeardName,
                 ChopsName = playerProfile.ChopsName,

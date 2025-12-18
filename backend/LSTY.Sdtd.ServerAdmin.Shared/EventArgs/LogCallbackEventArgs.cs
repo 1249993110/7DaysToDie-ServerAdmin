@@ -1,4 +1,4 @@
-﻿using LSTY.Sdtd.ServerAdmin.Shared.Models;
+﻿using LSTY.Sdtd.ServerAdmin.Shared.Constants;
 
 namespace LSTY.Sdtd.ServerAdmin.Shared.EventArgs
 {

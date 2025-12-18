@@ -1,12 +1,12 @@
-﻿using LSTY.Sdtd.ServerAdmin.Shared.Models;
+﻿
 
 namespace LSTY.Sdtd.ServerAdmin.Extensions
 {
     internal static class ClientInfoExtension
     {
-        public static PlayerBasicInfo ToPlayerBasicInfo(this ClientInfo clientInfo, Position? position = null)
+        public static PlayerBasicInfoDto ToPlayerBasicInfo(this ClientInfo clientInfo, PositionDto? position = null)
         {
-            return new PlayerBasicInfo()
+            return new PlayerBasicInfoDto()
             {
                 EntityId = clientInfo.entityId,
                 PlayerId = clientInfo.CrossplatformId.CombinedString,

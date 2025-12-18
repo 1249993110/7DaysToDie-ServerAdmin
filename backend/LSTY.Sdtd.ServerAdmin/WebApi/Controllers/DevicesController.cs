@@ -1,5 +1,5 @@
 ﻿using LSTY.Sdtd.ServerAdmin.Helpers;
-using LSTY.Sdtd.ServerAdmin.Shared.Models;
+
 using System.Web.Http;
 
 namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
@@ -16,7 +16,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// </summary>
         [HttpGet]
         [Route("CpuTimes")]
-        public CpuTimes? GetCpuTimes()
+        public CpuTimesDto? GetCpuTimes()
         {
             return DeviceHelper.GetCpuTimes();
         }
@@ -27,7 +27,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("MemoryInfo")]
-        public MemoryInfo? GetMemoryInfo()
+        public MemoryInfoDto? GetMemoryInfo()
         {
             return DeviceHelper.GetMemoryInfo();
         }
@@ -37,7 +37,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// </summary>
         [HttpGet]
         [Route("DiskInfos")]
-        public IEnumerable<DiskInfo> GetDiskInfos()
+        public IEnumerable<DiskInfoDto> GetDiskInfos()
         {
             return DeviceHelper.GetDiskInfos();
         }
@@ -47,7 +47,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// </summary>
         [HttpGet]
         [Route("NetworkInfos")]
-        public List<NetworkInfo> GetNetworkInfos()
+        public List<NetworkInfoDto> GetNetworkInfos()
         {
             return DeviceHelper.GetNetworkInfos();
         }
@@ -57,7 +57,7 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// </summary>
         [HttpGet]
         [Route("SystemPlatformInfo")]
-        public SystemPlatformInfo GetSystemPlatformInfo()
+        public SystemPlatformInfoDto GetSystemPlatformInfo()
         {
             return DeviceHelper.GetSystemPlatformInfo();
         }
@@ -67,9 +67,9 @@ namespace LSTY.Sdtd.ServerAdmin.WebApi.Controllers
         /// </summary>
         [HttpGet]
         [Route("SystemMetricsSnapshot")]
-        public SystemMetricsSnapshot GetSystemMetricsSnapshot()
+        public SystemMetricsSnapshotDto GetSystemMetricsSnapshot()
         {
-            return new SystemMetricsSnapshot()
+            return new SystemMetricsSnapshotDto()
             {
                 Timestamp = DateTime.UtcNow,
                 CpuTimes = DeviceHelper.GetCpuTimes(),

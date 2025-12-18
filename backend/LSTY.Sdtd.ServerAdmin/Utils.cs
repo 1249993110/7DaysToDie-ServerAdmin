@@ -1,6 +1,4 @@
-﻿using LSTY.Sdtd.ServerAdmin.Shared.Models;
-
-namespace LSTY.Sdtd.ServerAdmin
+﻿namespace LSTY.Sdtd.ServerAdmin
 {
     internal static class Utils
     {
@@ -48,7 +46,7 @@ namespace LSTY.Sdtd.ServerAdmin
             }
         }
 
-        public static Task<IEnumerable<string>> SendGlobalMessageAsync(GlobalMessage globalMessage)
+        public static Task<IEnumerable<string>> SendGlobalMessageAsync(GlobalMessageDto globalMessage)
         {
             string command = string.Format("ty-say {0} {1}",
                 FormatCommandArgs(globalMessage.Message),
@@ -56,7 +54,7 @@ namespace LSTY.Sdtd.ServerAdmin
             return ExecuteConsoleCommandAsync(command);
         }
 
-        public static Task<IEnumerable<string>> SendPrivateMessageAsync(PrivateMessage privateMessage)
+        public static Task<IEnumerable<string>> SendPrivateMessageAsync(PrivateMessageDto privateMessage)
         {
             string command = string.Format("ty-pm {0} {1} {2}",
                 FormatCommandArgs(privateMessage.TargetPlayerIdOrName),

@@ -1,13 +1,13 @@
-﻿using LSTY.Sdtd.ServerAdmin.Shared.Models;
+﻿
 
 namespace LSTY.Sdtd.ServerAdmin.Extensions
 {
     internal static class EntityPlayerExtension
     {
-        public static OnlinePlayer ToOnlinePlayer(this EntityPlayer entityPlayer, ClientInfo clientInfo)
+        public static OnlinePlayerDto ToOnlinePlayer(this EntityPlayer entityPlayer, ClientInfo clientInfo)
         {
             var progression = entityPlayer.Progression;
-            return new OnlinePlayer()
+            return new OnlinePlayerDto()
             {
                 EntityId = clientInfo.entityId,
                 PlayerId = clientInfo.CrossplatformId.CombinedString,

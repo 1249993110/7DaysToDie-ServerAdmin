@@ -1,6 +1,4 @@
-﻿using LSTY.Sdtd.ServerAdmin.Shared.Models;
-
-namespace LSTY.Sdtd.ServerAdmin.Shared.EventArgs
+﻿namespace LSTY.Sdtd.ServerAdmin.Shared.EventArgs
 {
     public class ChatMessageEventArgs : System.EventArgs
     {

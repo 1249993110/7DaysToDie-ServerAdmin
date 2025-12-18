@@ -1,10 +1,8 @@
-﻿using LSTY.Sdtd.ServerAdmin.Shared.Models;
-
-namespace LSTY.Sdtd.ServerAdmin.Shared.EventArgs
+﻿namespace LSTY.Sdtd.ServerAdmin.Shared.EventArgs
 {
     public class PlayerDisconnectedEventArgs : System.EventArgs
     {
-        public required PlayerBasicInfo PlayerInfo { get; set; }
+        public required PlayerBasicInfoDto PlayerInfo { get; set; }
 
         public required bool GameShuttingDown { get; set; }
 

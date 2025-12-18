@@ -1,6 +1,4 @@
-﻿using LSTY.Sdtd.ServerAdmin.Shared.Models;
-
-namespace LSTY.Sdtd.ServerAdmin.Shared.EventArgs
+﻿namespace LSTY.Sdtd.ServerAdmin.Shared.EventArgs
 {
     /// <summary>
     /// 
@@ -10,12 +8,12 @@ namespace LSTY.Sdtd.ServerAdmin.Shared.EventArgs
         /// <summary>
         /// The dead entity
         /// </summary>
-        public required EntityBasicInfo Victim { get; set; }
+        public required EntityBasicInfoDto Victim { get; set; }
 
         /// <summary>
         /// The killer entity
         /// </summary>
-        public EntityBasicInfo? Killer { get; set; }
+        public EntityBasicInfoDto? Killer { get; set; }
 
         /// <summary>
         ///

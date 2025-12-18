@@ -1,12 +1,10 @@
-﻿using LSTY.Sdtd.ServerAdmin.Shared.Models;
-
-namespace LSTY.Sdtd.ServerAdmin.Extensions
+﻿namespace LSTY.Sdtd.ServerAdmin.Extensions
 {
     internal static class ProgressionExtension
     {
-        public static List<PlayerSkill> ToPlayerSkills(this Progression progression, Language language)
+        public static List<PlayerSkillDto> ToPlayerSkills(this Progression progression, Language language)
         {
-            var result = new List<PlayerSkill>();
+            var result = new List<PlayerSkillDto>();
 
             // var attributesMap = Progression.ProgressionClasses.Where(i => i.Value.Type == ProgressionType.Attribute);
             foreach (var item in Progression.ProgressionClasses.Values)
@@ -17,7 +15,7 @@ namespace LSTY.Sdtd.ServerAdmin.Extensions
                 }
 
                 var progressionValue = progression.GetProgressionValue(item.Name);
-                var playerSkill = new PlayerSkill()
+                var playerSkill = new PlayerSkillDto()
                 {
                     Name = item.Name,
                     LocalizationName = Utils.GetLocalization(item.NameKey, language, true),
@@ -37,15 +35,15 @@ namespace LSTY.Sdtd.ServerAdmin.Extensions
             return result;
         }
 
-        private static List<PlayerSkill> GetChildren(Progression progression, ProgressionClass parent, Language language)
+        private static List<PlayerSkillDto> GetChildren(Progression progression, ProgressionClass parent, Language language)
         {
-            var result = new List<PlayerSkill>();
+            var result = new List<PlayerSkillDto>();
             foreach (var child in Progression.ProgressionClasses.Values)
             {
                 if (child.ParentName != null && child.ParentName == parent.Name)
                 {
                     var childProgressionValue = progression.GetProgressionValue(child.Name);
-                    var childPlayerSkill = new PlayerSkill()
+                    var childPlayerSkill = new PlayerSkillDto()
                     {
                         Name = child.Name,
                         LocalizationName = Utils.GetLocalization(child.NameKey, language, true),

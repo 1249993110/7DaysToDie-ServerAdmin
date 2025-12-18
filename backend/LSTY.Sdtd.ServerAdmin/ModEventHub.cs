@@ -1,8 +1,7 @@
 ﻿using LSTY.Sdtd.ServerAdmin.Extensions;
 using LSTY.Sdtd.ServerAdmin.Shared;
-using LSTY.Sdtd.ServerAdmin.Shared.Constants;
 using LSTY.Sdtd.ServerAdmin.Shared.EventArgs;
-using LSTY.Sdtd.ServerAdmin.Shared.Models;
+
 using static ModEvents;
 
 namespace LSTY.Sdtd.ServerAdmin
@@ -239,7 +238,7 @@ namespace LSTY.Sdtd.ServerAdmin
         /// Runs when an entity is spawned.
         /// </summary>
         /// <param name="entity">The spawned entity.</param>
-        public void OnEntitySpawned(EntityBasicInfo entity)
+        public void OnEntitySpawned(EntityBasicInfoDto entity)
         {
             EntitySpawned?.Invoke(this, new EntitySpawnedEventArgs()
             {
@@ -275,7 +274,7 @@ namespace LSTY.Sdtd.ServerAdmin
             PlayerSpawnedInWorld?.Invoke(this, new PlayerSpawnedInWorldEventArgs()
             {
                 PlayerInfo = sPlayerSpawnedInWorldData.ClientInfo.ToPlayerBasicInfo(sPlayerSpawnedInWorldData.Position.ToPosition()),
-                RespawnType = (Shared.Models.RespawnType)sPlayerSpawnedInWorldData.RespawnType,
+                RespawnType = (Shared.Constants.RespawnType)sPlayerSpawnedInWorldData.RespawnType,
                 Timestamp = DateTime.UtcNow,
             });
         }

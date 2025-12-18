@@ -1,8 +1,9 @@
-﻿using LSTY.Sdtd.ServerAdmin.Shared.Models;
+﻿
 
 namespace LSTY.Sdtd.ServerAdmin.Extensions
 {
-    using Inventory = Shared.Models.Inventory;
+    using LSTY.Sdtd.ServerAdmin.Shared.Constants;
+    using InventoryDto = Shared.Dtos.InventoryDto;
 
     /// <summary>
     /// Extension methods for PlayerDataFile.
@@ -47,11 +48,11 @@ namespace LSTY.Sdtd.ServerAdmin.Extensions
         /// <param name="pdf">The PlayerDataFile instance.</param>
         /// <param name="language"></param>
         /// <returns>The player's inventory.</returns>
-        public static Inventory GetInventory(this PlayerDataFile pdf, Language language)
+        public static InventoryDto GetInventory(this PlayerDataFile pdf, Language language)
         {
             try
             {
-                return new Inventory()
+                return new InventoryDto()
                 {
                     Bag = ProcessInv(pdf.bag, language),
                     Belt = ProcessInv(pdf.inventory, language),
@@ -64,9 +65,9 @@ namespace LSTY.Sdtd.ServerAdmin.Extensions
             }
         }
 
-        private static List<InvItem> ProcessInv(ItemStack[] sourceFields, Language language)
+        private static List<InvItemDto> ProcessInv(ItemStack[] sourceFields, Language language)
         {
-            var target = new List<InvItem>(sourceFields.Length);
+            var target = new List<InvItemDto>(sourceFields.Length);
 
             foreach (var field in sourceFields)
             {
@@ -81,10 +82,10 @@ namespace LSTY.Sdtd.ServerAdmin.Extensions
             return target;
         }
 
-        private static InvItem?[] ProcessEqu(Equipment sourceEquipment, Language language)
+        private static InvItemDto?[] ProcessEqu(Equipment sourceEquipment, Language language)
         {
             int slotCount = sourceEquipment.GetSlotCount();
-            var equipment = new InvItem?[slotCount];
+            var equipment = new InvItemDto?[slotCount];
             for (int i = 0; i < slotCount; i++)
             {
                 var itemValue = sourceEquipment.GetSlotItem(i);
@@ -99,10 +100,10 @@ namespace LSTY.Sdtd.ServerAdmin.Extensions
             return equipment;
         }
 
-        private static void ProcessParts(ItemValue[] parts, InvItem item, Language language)
+        private static void ProcessParts(ItemValue[] parts, InvItemDto item, Language language)
         {
             int length = parts.Length;
-            InvItem?[] itemParts = new InvItem[length];
+            InvItemDto?[] itemParts = new InvItemDto[length];
 
             for (int i = 0; i < length; i++)
             {
@@ -118,7 +119,7 @@ namespace LSTY.Sdtd.ServerAdmin.Extensions
             item.Parts = itemParts;
         }
 
-        private static InvItem? CreateInvItem(ItemValue? itemValue, int count, Language language)
+        private static InvItemDto? CreateInvItem(ItemValue? itemValue, int count, Language language)
         {
             try
             {
@@ -145,7 +146,7 @@ namespace LSTY.Sdtd.ServerAdmin.Extensions
                 }
 
                 UnityEngine.Color iconTint = itemClass.GetIconTint();
-                InvItem item = new InvItem()
+                InvItemDto item = new InvItemDto()
                 {
                     ItemName = name,
                     IconName = itemClass.GetIconName(),

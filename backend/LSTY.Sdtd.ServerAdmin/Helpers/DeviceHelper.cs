@@ -1,4 +1,4 @@
-﻿using LSTY.Sdtd.ServerAdmin.Shared.Models;
+﻿
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -22,7 +22,7 @@ namespace LSTY.Sdtd.ServerAdmin.Helpers
             public ulong ToULong() => ((ulong)dwHighDateTime << 32) | dwLowDateTime;
         }
 
-        public static CpuTimes? GetCpuTimes()
+        public static CpuTimesDto? GetCpuTimes()
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
@@ -31,7 +31,7 @@ namespace LSTY.Sdtd.ServerAdmin.Helpers
                     return null;
                 }
 
-                return new CpuTimes()
+                return new CpuTimesDto()
                 {
                     IdleTime = idleTime1.ToULong(),
                     KernelTime = kernelTime1.ToULong() - idleTime1.ToULong(),
@@ -81,7 +81,7 @@ namespace LSTY.Sdtd.ServerAdmin.Helpers
                     ulong irq = ulong.Parse(parts[6]);
                     ulong softirq = ulong.Parse(parts[7]);
 
-                    var cpuTimes = new CpuTimes()
+                    var cpuTimes = new CpuTimesDto()
                     {
                         UserTime = user + nice,
                         KernelTime = system + irq + softirq,
@@ -125,14 +125,14 @@ namespace LSTY.Sdtd.ServerAdmin.Helpers
             }
         }
 
-        public static MemoryInfo? GetMemoryInfo()
+        public static MemoryInfoDto? GetMemoryInfo()
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 var memStatus = new MEMORYSTATUSEX();
                 if (GlobalMemoryStatusEx(ref memStatus))
                 {
-                    return new MemoryInfo()
+                    return new MemoryInfoDto()
                     {
                         TotalPhysicalMemory = memStatus.ullTotalPhys,
                         AvailablePhysicalMemory = memStatus.ullAvailPhys,
@@ -165,7 +165,7 @@ namespace LSTY.Sdtd.ServerAdmin.Helpers
                     memInfo.TryGetValue("SwapTotal", out ulong totalSwap);
                     memInfo.TryGetValue("SwapFree", out ulong freeSwap);
 
-                    return new MemoryInfo()
+                    return new MemoryInfoDto()
                     {
                         TotalPhysicalMemory = total * 1024,
                         AvailablePhysicalMemory = available * 1024,
@@ -207,14 +207,14 @@ namespace LSTY.Sdtd.ServerAdmin.Helpers
 
         #region Disk
 
-        public static List<DiskInfo> GetDiskInfos()
+        public static List<DiskInfoDto> GetDiskInfos()
         {
-            var result = new List<DiskInfo>();
+            var result = new List<DiskInfoDto>();
             foreach (var item in DriveInfo.GetDrives())
             {
                 if (item.DriveType == DriveType.Fixed && item.TotalSize != 0 && item.DriveFormat != "overlay")
                 {
-                    result.Add(new DiskInfo()
+                    result.Add(new DiskInfoDto()
                     {
                         Name = item.Name,
                         DriveType = item.DriveType,
@@ -231,13 +231,13 @@ namespace LSTY.Sdtd.ServerAdmin.Helpers
         #endregion
 
         #region Network
-        public static List<NetworkInfo> GetNetworkInfos()
+        public static List<NetworkInfoDto> GetNetworkInfos()
         {
             var hostName = Dns.GetHostName();
             var hostAddrs = Dns.GetHostAddresses(hostName).Where(i => i.AddressFamily == AddressFamily.InterNetwork).ToHashSet();
 
             var allNetworkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
-            var result = new List<NetworkInfo>();
+            var result = new List<NetworkInfoDto>();
             foreach (var item in allNetworkInterfaces)
             {
                 if (item.OperationalStatus != OperationalStatus.Up || item.NetworkInterfaceType == NetworkInterfaceType.Loopback)
@@ -249,7 +249,7 @@ namespace LSTY.Sdtd.ServerAdmin.Helpers
                 if (hostAddrs.Overlaps(ipAddresses))
                 {
                     var ipStatistics = item.GetIPv4Statistics();
-                    var networkInfo = new NetworkInfo()
+                    var networkInfo = new NetworkInfoDto()
                     {
                         Id = item.Id,
                         Mac = BitConverter.ToString(item.GetPhysicalAddress().GetAddressBytes()),
@@ -270,9 +270,9 @@ namespace LSTY.Sdtd.ServerAdmin.Helpers
         #endregion
 
         #region SystemPlatform
-        public static SystemPlatformInfo GetSystemPlatformInfo()
+        public static SystemPlatformInfoDto GetSystemPlatformInfo()
         {
-            return new SystemPlatformInfo()
+            return new SystemPlatformInfoDto()
             {
                 DeviceModel = UnityEngine.Device.SystemInfo.deviceModel,
                 DeviceName = UnityEngine.Device.SystemInfo.deviceName,
