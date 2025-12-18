@@ -75,15 +75,15 @@ export const useUserInfoStore = defineStore('userInfo', () => {
         expiresAt.value = '';
         refreshToken.value = '';
 
-        localStorage.removeItem('username');
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('expires_at');
-        localStorage.removeItem('refresh_token');
+        localStorage.removeItem(keyPrefix + 'username');
+        localStorage.removeItem(keyPrefix + 'access_token');
+        localStorage.removeItem(keyPrefix + 'expires_at');
+        localStorage.removeItem(keyPrefix + 'refresh_token');
 
-        sessionStorage.removeItem('username');
-        sessionStorage.removeItem('access_token');
-        sessionStorage.removeItem('expires_at');
-        sessionStorage.removeItem('refresh_token');
+        sessionStorage.removeItem(keyPrefix + 'username');
+        sessionStorage.removeItem(keyPrefix + 'access_token');
+        sessionStorage.removeItem(keyPrefix + 'expires_at');
+        sessionStorage.removeItem(keyPrefix + 'refresh_token');
 
         router.push('/login');
         await Promise.resolve();
@@ -119,7 +119,7 @@ export const useUserInfoStore = defineStore('userInfo', () => {
     };
 
     const getAccessToken = async () => {
-        if (dayjs() > dayjs(expiresAt.value)) {
+        if (dayjs().isAfter(dayjs(expiresAt.value))) {
             await refresh();
         }
         return accessToken.value;

@@ -5,6 +5,7 @@
     --scrollbar-width: calc(100vw - 100%);
     // --p-paginator-jump-to-page-input-max-width: 3rem !important;
 
+    /* Keep SweetAlert2 modals on top of other layers */
     .swal2-container {
         z-index: 9999;
     }
@@ -12,10 +13,12 @@
 
 html {
     background-color: var(--p-surface-50);
+    /* Dark-mode background aligned with main theme colors */
     &.dark {
         background-color: var(--p-surface-950);
     }
 
+    /* Enhance PrimeVue table mask blur and transparency for both themes */
     .p-table-mask {
         backdrop-filter: blur(4px) !important;
         background-color: color-mix(in srgb, var(--p-surface-0), transparent 80%) !important;
@@ -24,11 +27,13 @@ html {
         background-color: color-mix(in srgb, var(--p-surface-900), transparent 80%) !important;
     }
 
+    /* Align table loading text color with the primary theme color */
     .p-table-loading {
         color: var(--p-primary-500) !important;
     }
 }
 
+/* Fade-out animation used for modal dismissal */
 .animate-fadeout {
     animation: fadeout 0.15s linear;
 
@@ -42,6 +47,7 @@ html {
     }
 }
 
+/* Scale-in animation typically used for popups or menus */
 .animate-scalein {
     animation: scalein 0.15s linear;
 
